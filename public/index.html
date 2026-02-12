@@ -23,16 +23,19 @@
     <div class="fullscreen-slider">
         <div class="slide">
             <div class="slide-content">
+                <img src="https://via.placeholder.com/1920x1080/FF5733/FFFFFF?text=Golf+Cart" alt="골프 카트" class="slider-image">
                 <h2>친환경 이동의 새로운 기준, 드림전동차</h2>
             </div>
         </div>
         <div class="slide">
             <div class="slide-content">
+                <img src="https://via.placeholder.com/1920x1080/33FF57/000000?text=Industrial+Battery" alt="산업용 배터리" class="slider-image">
                 <h2>압도적인 등판 능력과 배터리 수명</h2>
             </div>
         </div>
         <div class="slide">
             <div class="slide-content">
+                <img src="https://via.placeholder.com/1920x1080/3357FF/FFFFFF?text=Company+Building" alt="회사 빌딩" class="slider-image">
                 <h2>지금 바로 시승을 예약하세요</h2>
             </div>
         </div>
@@ -106,5 +109,22 @@
         </p>
         <p>&copy; 2026 Dream EV. All rights reserved.</p>
     </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const slider = document.querySelector('.fullscreen-slider');
+            const slides = document.querySelectorAll('.fullscreen-slider .slide');
+            const totalSlides = slides.length;
+            let currentSlide = 0;
+
+            function slideNext() {
+                currentSlide = (currentSlide + 1) % totalSlides;
+                slider.style.transform = `translateX(-${currentSlide * 100}vw)`;
+            }
+
+            // Automatic slide every 5 seconds (5000 milliseconds)
+            setInterval(slideNext, 5000);
+        });
+    </script>
 </body>
 </html>
