@@ -5,6 +5,68 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>드림 아카이브 - Dream EV</title>
     <link rel="stylesheet" href="css/style.css">
+    <style>
+        .archive-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .filter-buttons button {
+            background-color: #f4f7f6;
+            border: 1px solid #ccc;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .filter-buttons button.active,
+        .filter-buttons button:hover {
+            background-color: #004080;
+            color: white;
+            border-color: #004080;
+        }
+        .search-bar input {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            min-width: 250px;
+        }
+        .archive-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+        .archive-card {
+            background-color: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        .archive-card:hover {
+            transform: translateY(-5px);
+        }
+        .archive-card img {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+        }
+        .archive-card-content {
+            padding: 1rem 1.5rem;
+        }
+        .archive-card-content h3 {
+            margin-top: 0;
+            color: #004080;
+        }
+        .archive-card-content p {
+            font-size: 0.9rem;
+            color: #666;
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -20,8 +82,68 @@
     </header>
 
     <main class="container">
-        <h2 class="section-title">드림 아카이브</h2>
-        <!-- Archive content will go here -->
+        <section id="archive">
+            <h2 class="section-title">드림 아카이브</h2>
+            <p style="text-align: center; margin-bottom: 2rem;">드림EV는 고객의 모든 요구에 맞춰 다양한 커스텀 전동차를 제작합니다. 우리의 기술력과 창의력이 담긴 제작 사례들을 만나보세요.</p>
+
+            <div class="archive-controls">
+                <div class="filter-buttons">
+                    <button class="active">전체</button>
+                    <button>캠핑용</button>
+                    <button>농업용</button>
+                    <button>레저용</button>
+                    <button>특수제작</button>
+                </div>
+                <div class="search-bar">
+                    <input type="text" placeholder="용도, 모델명 등으로 검색">
+                </div>
+            </div>
+
+            <div class="archive-grid">
+                <div class="archive-card">
+                    <img src="https://images.unsplash.com/photo-1529337424849-7c800e4734e5?q=80&w=2070&auto=format&fit=crop" alt="캠핑용 전기차">
+                    <div class="archive-card-content">
+                        <h3>감성 캠핑 카트</h3>
+                        <p>납품처: 강원도 글램핑 파크</p>
+                    </div>
+                </div>
+                <div class="archive-card">
+                    <img src="https://images.unsplash.com/photo-1579992822406-2ea41693e814?q=80&w=2070&auto=format&fit=crop" alt="농업용 운반차">
+                    <div class="archive-card-content">
+                        <h3>스마트팜 자동 운반차</h3>
+                        <p>납품처: 충남 스마트팜 단지</p>
+                    </div>
+                </div>
+                <div class="archive-card">
+                    <img src="https://images.unsplash.com/photo-1629532283917-91b53936a623?q=80&w=1974&auto=format&fit=crop" alt="해변용 레저 카트">
+                    <div class="archive-card-content">
+                        <h3>비치 레저 카트</h3>
+                        <p>납품처: 제주도 고급 리조트</p>
+                    </div>
+                </div>
+                <div class="archive-card">
+                    <img src="https://images.unsplash.com/photo-1618223249152-b13459e7a840?q=80&w=2070&auto=format&fit=crop" alt="공항용 특수 카트">
+                    <div class="archive-card-content">
+                        <h3>공항 수하물 운송 카트</h3>
+                        <p>납품처: 인천국제공항</p>
+                    </div>
+                </div>
+                <div class="archive-card">
+                    <img src="https://images.unsplash.com/photo-1593511883988-99b65905f324?q=80&w=2070&auto=format&fit=crop" alt="푸드트럭">
+                    <div class="archive-card-content">
+                        <h3>이동식 푸드트럭</h3>
+                        <p>납품처: 서울 밤도깨비 야시장</p>
+                    </div>
+                </div>
+                <div class="archive-card">
+                    <img src="https://images.unsplash.com/photo-1620589254202-b0ee3b57353f?q=80&w=1974&auto=format&fit=crop" alt="골프 카트">
+                    <div class="archive-card-content">
+                        <h3>프리미엄 골프 카트</h3>
+                        <p>납품처: 가평 베네스트 GC</p>
+                    </div>
+                </div>
+            </div>
+        </section>
     </main>
 
     <footer>

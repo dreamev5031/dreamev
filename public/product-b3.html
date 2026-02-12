@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>다목적 전동 카트 B-3 - Dream EV</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/product-detail.css"> 
+    <style>
+        .product-detail-container {
+            display: flex;
+            gap: 3rem;
+            margin-top: 2rem;
+        }
+        .product-image-gallery {
+            flex: 1;
+        }
+        .product-image-gallery img {
+            width: 100%;
+            border-radius: 8px;
+        }
+        .product-info {
+            flex: 1;
+        }
+        .product-info h2 {
+            font-size: 2.5rem;
+            color: #004080;
+            margin-top: 0;
+            margin-bottom: 1rem;
+        }
+        .specs-list {
+            list-style: none;
+            padding: 0;
+            margin: 2rem 0;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        .specs-list li {
+            background-color: #f4f7f6;
+            padding: 1rem;
+            border-radius: 5px;
+        }
+        .specs-list strong {
+            display: block;
+            color: #004080;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+        .custom-options h3 {
+            font-size: 1.5rem;
+            color: #004080;
+            margin-bottom: 1rem;
+        }
+        .color-swatches {
+            display: flex;
+            gap: 10px;
+        }
+        .swatch {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid #ccc;
+        }
+        .swatch.active {
+            border-color: #004080;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1><a href="index.html" style="color: #fff; text-decoration: none;">Dream EV</a></h1>
+        <nav>
+            <ul>
+                <li><a href="about.html">브랜드 스토리</a></li>
+                <li><a href="products.html">대표 모델</a></li>
+                <li><a href="archive.html">드림 아카이브</a></li>
+                <li><a href="support.html">고객지원</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="container">
+        <div style="margin: 2rem 0;">
+            <a href="products.html">&larr; 대표 모델 목록으로 돌아가기</a>
+        </div>
+
+        <div class="product-detail-container">
+            <div class="product-image-gallery">
+                <img src="https://img.freepik.com/premium-photo/blue-golf-cart-with-white-seat-is-shown-in-a-white-background_902639-9993.jpg?w=1060" alt="다목적 전동 카트 B-3">
+            </div>
+            <div class="product-info">
+                <h2>다목적 전동 카트 B-3</h2>
+                <p>공장, 리조트, 캠핑장 등 다양한 환경에서 활용 가능한 B-3 모델입니다. 넓은 좌석과 적재 공간을 갖추고 있으며, 부드러운 주행감과 손쉬운 조작법으로 누구나 편안하게 이용할 수 있습니다.</p>
+
+                <ul class="specs-list">
+                    <li><strong>배터리 성능</strong> 48V / 300Ah</li>
+                    <li><strong>최대 주행 거리</strong> 100km</li>
+                    <li><strong>탑승 인원</strong> 4인</li>
+                    <li><strong>최고 속도</strong> 25 km/h</li>
+                </ul>
+
+                <div class="custom-options">
+                    <h3>커스터마이징 옵션</h3>
+                    <p>개성에 맞는 색상을 선택하세요.</p>
+                    <div class="color-swatches">
+                        <div class="swatch active" style="background-color: #004080;"></div>
+                        <div class="swatch" style="background-color: #ffffff; border: 1px solid #ddd;"></div>
+                        <div class="swatch" style="background-color: #339933;"></div>
+                        <div class="swatch" style="background-color: #ff9900;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Dream EV. 모든 권리 보유.</p>
+    </footer>
+</body>
+</html>

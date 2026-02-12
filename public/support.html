@@ -5,6 +5,88 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>고객지원 - Dream EV</title>
     <link rel="stylesheet" href="css/style.css">
+    <style>
+        .support-container {
+            display: flex;
+            gap: 4rem;
+        }
+        .faq-section {
+            flex: 2;
+        }
+        .inquiry-section {
+            flex: 1;
+            background-color: #f4f7f6;
+            padding: 2rem;
+            border-radius: 8px;
+        }
+
+        .faq-item {
+            border-bottom: 1px solid #ddd;
+            padding: 1rem 0;
+        }
+        .faq-question {
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .faq-answer {
+            margin-top: 1rem;
+            display: none; /* Initially hidden */
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background-color: #004080;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .submit-btn:hover {
+            background-color: #0059b3;
+        }
+        .news-list {
+            list-style: none;
+            padding: 0;
+        }
+        .news-item {
+            border-bottom: 1px solid #eee;
+            padding: 1rem 0;
+        }
+        .news-item a {
+            text-decoration: none;
+            color: #333;
+            font-weight: bold;
+        }
+        .news-item span {
+            display: block;
+            font-size: 0.9rem;
+            color: #888;
+            margin-top: 0.5rem;
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -20,12 +102,86 @@
     </header>
 
     <main class="container">
-        <h2 class="section-title">고객지원</h2>
-        <!-- Support content will go here -->
+        <section id="faq-and-inquiry">
+            <h2 class="section-title">무엇을 도와드릴까요?</h2>
+            <div class="support-container">
+                <div class="faq-section">
+                    <h3>자주 묻는 질문 (FAQ)</h3>
+                    <div class="faq-item">
+                        <div class="faq-question">Q. 제품 보증 기간은 어떻게 되나요?<span>▼</span></div>
+                        <div class="faq-answer">A. 저희 드림EV의 모든 제품은 구매일로부터 2년 동안 무상 보증을 제공합니다. (배터리 등 소모품은 1년)</div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question">Q. 충전은 어떻게 하나요?<span>▼</span></div>
+                        <div class="faq-answer">A. 모든 제품은 220V 가정용 콘센트로 간편하게 충전할 수 있습니다. 완속 충전기 설치도 가능하며, 관련 문의는 고객센터로 연락주시기 바랍니다.</div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question">Q. 배송 절차와 기간이 궁금합니다.<span>▼</span></div>
+                        <div class="faq-answer">A. 주문 제작 모델의 경우 제작 기간 포함 약 3-4주가 소요되며, 재고가 있는 모델은 1주일 내로 배송됩니다. 전문 기사님이 직접 방문하여 제품 인계 및 사용법 안내를 도와드립니다.</div>
+                    </div>
+                </div>
+                <div class="inquiry-section">
+                    <h3>시승 및 견적 문의</h3>
+                    <form id="contact-form">
+                        <div class="form-group">
+                            <label for="name">성함</label>
+                            <input type="text" id="name" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">연락처</label>
+                            <input type="tel" id="phone" name="phone" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="region">지역</label>
+                            <input type="text" id="region" name="region">
+                        </div>
+                        <div class="form-group">
+                            <label for="model">관심 모델</label>
+                            <select id="model" name="model">
+                                <option>전동 지게차 A-1</option>
+                                <option>다목적 전동 카트 B-3</option>
+                                <option>대형 전동 운반차 C-MAX</option>
+                                <option>기타 맞춤 제작</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="submit-btn">문의하기</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+        
+        <section id="news">
+            <h2 class="section-title">공지사항 & 뉴스</h2>
+            <ul class="news-list">
+                <li class="news-item">
+                    <a href="#">드림EV, 2026 국제 스마트 모빌리티 엑스포 참가</a>
+                    <span>2026. 02. 10</span>
+                </li>
+                <li class="news-item">
+                    <a href="#">신제품 '전동 지게차 A-1' 출시 안내</a>
+                    <span>2026. 02. 01</span>
+                </li>
+                 <li class="news-item">
+                    <a href="#">(주)드림EV, 충남 스마트팜 단지와 MOU 체결</a>
+                    <span>2026. 01. 25</span>
+                </li>
+            </ul>
+        </section>
     </main>
 
     <footer>
         <p>&copy; 2026 Dream EV. 모든 권리 보유.</p>
     </footer>
+    
+    <script>
+        document.querySelectorAll('.faq-question').forEach(item => {
+            item.addEventListener('click', event => {
+                const answer = item.nextElementSibling;
+                const isVisible = answer.style.display === 'block';
+                answer.style.display = isVisible ? 'none' : 'block';
+                item.querySelector('span').textContent = isVisible ? '▼' : '▲';
+            });
+        });
+    </script>
 </body>
 </html>

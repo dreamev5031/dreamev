@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>전동 지게차 A-1 - Dream EV</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .product-detail-container {
+            display: flex;
+            gap: 3rem;
+            margin-top: 2rem;
+        }
+        .product-image-gallery {
+            flex: 1;
+        }
+        .product-image-gallery img {
+            width: 100%;
+            border-radius: 8px;
+        }
+        .product-info {
+            flex: 1;
+        }
+        .product-info h2 {
+            font-size: 2.5rem;
+            color: #004080;
+            margin-top: 0;
+            margin-bottom: 1rem;
+        }
+        .specs-list {
+            list-style: none;
+            padding: 0;
+            margin: 2rem 0;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        .specs-list li {
+            background-color: #f4f7f6;
+            padding: 1rem;
+            border-radius: 5px;
+        }
+        .specs-list strong {
+            display: block;
+            color: #004080;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+        .custom-options h3 {
+            font-size: 1.5rem;
+            color: #004080;
+            margin-bottom: 1rem;
+        }
+        .color-swatches {
+            display: flex;
+            gap: 10px;
+        }
+        .swatch {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid #ccc;
+        }
+        .swatch.active {
+            border-color: #004080;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1><a href="index.html" style="color: #fff; text-decoration: none;">Dream EV</a></h1>
+        <nav>
+            <ul>
+                <li><a href="about.html">브랜드 스토리</a></li>
+                <li><a href="products.html">대표 모델</a></li>
+                <li><a href="archive.html">드림 아카이브</a></li>
+                <li><a href="support.html">고객지원</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="container">
+        <div style="margin: 2rem 0;">
+            <a href="products.html">&larr; 대표 모델 목록으로 돌아가기</a>
+        </div>
+
+        <div class="product-detail-container">
+            <div class="product-image-gallery">
+                <img src="https://img.freepik.com/free-photo/forklift-white-background_23-2150912204.jpg?w=1060" alt="전동 지게차 A-1">
+            </div>
+            <div class="product-info">
+                <h2>전동 지게차 A-1</h2>
+                <p>물류 현장의 효율성을 극대화하기 위해 설계된 A-1 모델은 강력한 리프팅 성능과 안정적인 주행 능력을 자랑합니다. 최신 배터리 기술을 적용하여 한 번의 충전으로 하루 종일 사용 가능하며, 좁은 공간에서도 뛰어난 기동성을 보여줍니다.</p>
+
+                <ul class="specs-list">
+                    <li><strong>배터리 성능</strong> 48V / 500Ah</li>
+                    <li><strong>최대 주행 거리</strong> 150km</li>
+                    <li><strong>최대 적재 용량</strong> 2.5 Ton</li>
+                    <li><strong>최고 속도</strong> 20 km/h</li>
+                </ul>
+
+                <div class="custom-options">
+                    <h3>커스터마이징 옵션</h3>
+                    <p>원하는 색상으로 지게차를 커스터마이징 하세요.</p>
+                    <div class="color-swatches">
+                        <div class="swatch active" style="background-color: #004080;"></div>
+                        <div class="swatch" style="background-color: #ffcc00;"></div>
+                        <div class="swatch" style="background-color: #cc0000;"></div>
+                        <div class="swatch" style="background-color: #555555;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Dream EV. 모든 권리 보유.</p>
+    </footer>
+</body>
+</html>
