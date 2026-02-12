@@ -3,43 +3,183 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>기업용 웹사이트</title>
+    <title>Dream EV - 산업용 전동차</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
             margin: 0;
             padding: 0;
+            background-color: #f4f7f6;
+            color: #333;
         }
         header {
-            background-color: #333;
+            background-color: #004080; /* 신뢰성 있는 파란색 */
             color: #fff;
-            padding: 1rem;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 1.8rem;
+        }
+        nav ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+        }
+        nav ul li {
+            margin-left: 20px;
+        }
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: bold;
+            padding: 5px 10px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        nav a:hover {
+            background-color: #0059b3;
+        }
+        .hero {
+            background-image: url('https://img.freepik.com/free-photo/electric-car-in-an-electric-car-service_23-2150912188.jpg');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            padding: 4rem 2rem;
             text-align: center;
+        }
+        .hero h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+        }
+        .hero p {
+            font-size: 1.2rem;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
         }
         main {
             padding: 2rem;
         }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        section {
+            margin-bottom: 3rem;
+        }
+        h2.section-title {
+            color: #004080;
+            border-bottom: 3px solid #004080;
+            padding-bottom: 10px;
+            margin-bottom: 2rem;
+            font-size: 2rem;
+        }
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        .product-card {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+        }
+        .product-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+        .product-card-content {
+            padding: 1.5rem;
+        }
+        .product-card-content h3 {
+            color: #004080;
+            margin-top: 0;
+        }
         footer {
             background-color: #333;
             color: #fff;
-            padding: 1rem;
+            padding: 1.5rem;
             text-align: center;
-            position: fixed;
-            bottom: 0;
-            width: 100%;
         }
     </style>
 </head>
 <body>
     <header>
-        <h1>기업용 웹사이트</h1>
+        <h1>Dream EV</h1>
+        <nav>
+            <ul>
+                <li><a href="#products">제품</a></li>
+                <li><a href="#about">회사소개</a></li>
+                <li><a href="#technology">기술</a></li>
+                <li><a href="#contact">문의</a></li>
+            </ul>
+        </nav>
     </header>
-    <main>
-        <h2>환영합니다!</h2>
-        <p>이곳은 기업용 웹사이트의 메인 페이지입니다. 필요한 콘텐츠를 추가하여 웹사이트를 완성하세요.</p>
+
+    <div class="hero">
+        <h2>미래를 선도하는 산업용 전동차</h2>
+        <p>혁신적인 기술과 신뢰성으로 고객의 비즈니스를 가속화합니다.</p>
+    </div>
+
+    <main class="container">
+        <section id="products">
+            <h2 class="section-title">제품</h2>
+            <div class="product-grid">
+                <div class="product-card">
+                    <img src="https://img.freepik.com/free-photo/forklift-white-background_23-2150912204.jpg?w=1060" alt="전동 지게차">
+                    <div class="product-card-content">
+                        <h3>전동 지게차 A-1</h3>
+                        <p>강력한 성능과 긴 배터리 수명을 자랑하는 최신형 전동 지게차입니다. 물류 창고에 최적화되어 있습니다.</p>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <img src="https://img.freepik.com/premium-photo/blue-golf-cart-with-white-seat-is-shown-in-a-white-background_902639-9993.jpg?w=1060" alt="전동 카트">
+                    <div class="product-card-content">
+                        <h3>다목적 전동 카트 B-3</h3>
+                        <p>넓은 적재 공간과 안정적인 주행 성능으로 공장 내 자재 운반에 이상적입니다.</p>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <img src="https://img.freepik.com/premium-photo/a-blue-and-white-golf-cart-is-parked-in-a-white-room_902639-9831.jpg?w=1060" alt="전동 운반차">
+                    <div class="product-card-content">
+                        <h3>대형 전동 운반차 C-MAX</h3>
+                        <p>중량물 운반을 위한 견고한 설계와 파워풀한 모터를 탑재했습니다.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="about">
+            <h2 class="section-title">회사소개</h2>
+            <p>Dream EV는 2026년에 설립된 이래, 산업용 전동차 분야의 혁신을 이끌어왔습니다. 우리는 지속 가능한 미래를 위해 친환경적이고 효율적인 운송 솔루션을 제공하는 것을 목표로 합니다. 최고의 기술력과 끊임없는 연구 개발을 통해 고객에게 신뢰와 만족을 드리는 파트너가 되겠습니다.</p>
+        </section>
+
+        <section id="technology">
+            <h2 class="section-title">우리의 기술</h2>
+            <p>자체 개발한 고효율 배터리 관리 시스템(BMS)과 인공지능 기반의 자율 주행 기술을 통해 작업 현장의 생산성을 극대화합니다. 모든 제품은 엄격한 안전 기준을 통과했으며, IoT 기술을 접목하여 실시간 차량 모니터링 및 원격 진단 서비스를 제공합니다.</p>
+        </section>
+
+        <section id="contact">
+            <h2 class="section-title">문의</h2>
+            <p>제품에 대한 문의나 협력 제안이 있으시면 언제든지 연락 주십시오.</p>
+            <p><strong>이메일:</strong> contact@dreamev.com</p>
+            <p><strong>전화:</strong> 02-1234-5678</p>
+        </section>
     </main>
+
     <footer>
-        <p>&copy; 2026 회사명. 모든 권리 보유.</p>
+        <p>&copy; 2026 Dream EV. 모든 권리 보유.</p>
     </footer>
 </body>
 </html>
