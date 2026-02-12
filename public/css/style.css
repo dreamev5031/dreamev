@@ -178,10 +178,15 @@ h2.section-title {
 footer {
     background-color: #333333; /* Dark footer for contrast */
     color: #FFFFFF;
-    padding: 1.5rem;
-    text-align: center;
+    padding: 2rem 4rem; /* Increased padding */
+    text-align: left; /* Left-align text */
     position: relative;
     z-index: 2;
+}
+
+footer p {
+    line-height: 1.6; /* Add line-height for better readability */
+    margin: 0.5rem 0;
 }
 
 /* Trust Points Section */
