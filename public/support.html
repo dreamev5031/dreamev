@@ -72,18 +72,7 @@
         <section id="news">
             <h2 class="section-title">공지사항 & 뉴스</h2>
             <ul class="news-list">
-                <li class="news-item">
-                    <a href="#">드림EV, 2026 국제 스마트 모빌리티 엑스포 참가</a>
-                    <span>2026. 02. 10</span>
-                </li>
-                <li class="news-item">
-                    <a href="#">신제품 '전동 지게차 A-1' 출시 안내</a>
-                    <span>2026. 02. 01</span>
-                </li>
-                 <li class="news-item">
-                    <a href="#">(주)드림EV, 충남 스마트팜 단지와 MOU 체결</a>
-                    <span>2026. 01. 25</span>
-                </li>
+                <!-- 뉴스가 여기에 동적으로 추가됩니다. -->
             </ul>
         </section>
     </main>
@@ -93,6 +82,7 @@
     </footer>
     
     <script>
+        // FAQ Accordion
         document.querySelectorAll('.faq-question').forEach(item => {
             item.addEventListener('click', event => {
                 const answer = item.nextElementSibling;
@@ -100,6 +90,36 @@
                 answer.style.display = isVisible ? 'none' : 'block';
                 item.querySelector('span').textContent = isVisible ? '▼' : '▲';
             });
+        });
+
+        // Load News
+        document.addEventListener('DOMContentLoaded', () => {
+            fetch('data/news.json')
+                .then(response => response.json())
+                .then(data => {
+                    const newsList = document.querySelector('.news-list');
+                    newsList.innerHTML = ''; // Clear existing items
+                    data.forEach(newsItem => {
+                        const li = document.createElement('li');
+                        li.className = 'news-item';
+                        
+                        const a = document.createElement('a');
+                        a.href = newsItem.link;
+                        a.textContent = newsItem.title;
+                        
+                        const span = document.createElement('span');
+                        span.textContent = newsItem.date;
+                        
+                        li.appendChild(a);
+                        li.appendChild(span);
+                        newsList.appendChild(li);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching news:', error);
+                    const newsList = document.querySelector('.news-list');
+                    newsList.innerHTML = '<li>뉴스를 불러오는 데 실패했습니다.</li>';
+                });
         });
     </script>
 </body>
