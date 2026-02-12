@@ -56,7 +56,7 @@ nav a:hover {
 .fullscreen-slider {
     position: relative;
     width: 100vw;
-    height: 100vh;
+    height: 90vh; /* Adjusted height */
     overflow: hidden;
     background-color: #333; /* Fallback color */
 }
@@ -72,9 +72,13 @@ nav a:hover {
     opacity: 0;
     animation: fadeEffect 18s infinite;
     z-index: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
 }
 
-/* Add an overlay to the slides for better text readability if needed */
+/* Add an overlay to the slides for better text readability */
 .slide::after {
     content: '';
     position: absolute;
@@ -82,22 +86,34 @@ nav a:hover {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.3); /* Dark overlay */
+    background-color: rgba(0, 0, 0, 0.4); /* Slightly darker overlay */
+}
+
+.slide-content {
+    color: #FFFFFF;
+    z-index: 2;
+    padding: 20px;
+}
+
+.slide-content h2 {
+    font-size: 3rem;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
+    margin: 0;
 }
 
 
 .slide:nth-child(1) {
-    background-image: url('https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=2070&auto=format&fit=crop');
+    background-image: url('https://images.unsplash.com/photo-1593591933552-32d9f33f5a0f?q=80&w=2072&auto=format&fit=crop'); /* Golf Cart */
     animation-delay: 0s;
 }
 
 .slide:nth-child(2) {
-    background-image: url('https://images.unsplash.com/photo-1493238792000-8113da705763?q=80&w=2070&auto=format&fit=crop');
+    background-image: url('https://images.unsplash.com/photo-1551522435-645715a3c183?q=80&w=1974&auto=format&fit=crop'); /* Electric Bus */
     animation-delay: 6s;
 }
 
 .slide:nth-child(3) {
-    background-image: url('https://images.unsplash.com/photo-1552519507-da3b142c6e3d?q=80&w=2070&auto=format&fit=crop');
+    background-image: url('https://images.unsplash.com/photo-1586902578505-6d605a229541?q=80&w=2070&auto=format&fit=crop'); /* Building */
     animation-delay: 12s;
 }
 
@@ -116,7 +132,7 @@ main {
     background-color: #FFFFFF;
     position: relative; /* Ensure it appears on top of the slider */
     z-index: 2; /* Higher z-index than the slider */
-    margin-top: 100vh; /* Push content below the slider */
+    margin-top: 90vh; /* Push content below the slider */
 }
 
 
