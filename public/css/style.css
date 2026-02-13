@@ -1785,38 +1785,36 @@ a {
         grid-template-columns: 1fr;
     }
 
-    .support-urgent-title {
-        font-size: 1.5rem;
-    }
-
-    .support-urgent-btn {
-        padding: 1.25rem 2rem;
-        font-size: 1.25rem;
-    }
-
-    .support-urgent-icon {
-        font-size: 1.5rem;
-    }
-
-    .support-urgent-text strong {
-        font-size: 1.25rem;
-    }
-
-    .process-steps {
-        flex-direction: column;
-        gap: 2rem;
-    }
-
-    .process-arrow {
-        transform: rotate(90deg);
-    }
-
     .location-address-large {
         font-size: 1.1rem;
     }
 
     .location-hours-large {
         font-size: 1rem;
+    }
+
+    .location-map-large {
+        width: 100%;
+    }
+
+    .location-map-large iframe {
+        height: 400px;
+    }
+
+    /* Hide inquiry form on mobile for support.html */
+    .support-page .global-inquiry-section {
+        display: none;
+    }
+
+    /* Reduce padding for mobile */
+    .support-faq-section-top {
+        padding-top: 3rem;
+        padding-bottom: 2rem;
+    }
+
+    .support-location-section-large {
+        padding-top: 2rem;
+        padding-bottom: 2rem;
     }
 
     .global-footer-row,

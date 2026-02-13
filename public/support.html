@@ -6,7 +6,7 @@
     <title>고객지원 - 드림전동차</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
-<body>
+<body class="support-page">
     <!-- GNB -->
     <header class="gnb" id="gnb">
         <a href="index.html" class="gnb-logo">드림<span>전동차</span></a>
@@ -22,103 +22,8 @@
         <a href="support.html" class="gnb-cta">견적문의</a>
     </header>
 
-    <!-- 긴급 상담 섹션 -->
-    <section class="support-hero">
-        <div class="support-hero-content">
-            <h1 class="support-hero-title">무엇을 도와드릴까요?</h1>
-            <p class="support-hero-subtitle">전문 상담사가 빠르고 정확하게 답변해드립니다</p>
-            <div class="support-hero-buttons">
-                <a href="tel:010-3789-7653" class="support-btn support-btn-phone">
-                    <span class="support-btn-icon">📞</span>
-                    <span class="support-btn-text">
-                        <strong>전화 연결</strong>
-                        <small>010-3789-7653</small>
-                    </span>
-                </a>
-                <a href="https://pf.kakao.com/_yourkakaoid" target="_blank" class="support-btn support-btn-kakao">
-                    <span class="support-btn-icon">💬</span>
-                    <span class="support-btn-text">
-                        <strong>카카오톡 상담</strong>
-                        <small>평일 09:00 - 18:00</small>
-                    </span>
-                </a>
-            </div>
-        </div>
-    </section>
-
-    <!-- 긴급 상담 전화 버튼 -->
-    <section class="section support-urgent-section">
-        <div class="support-urgent-content">
-            <h2 class="support-urgent-title">긴급 상담은 전화로 연락주세요</h2>
-            <a href="tel:010-3789-7653" class="support-urgent-btn">
-                <span class="support-urgent-icon">📞</span>
-                <span class="support-urgent-text">
-                    <strong>010-3789-7653</strong>
-                    <small>24시간 상담 가능</small>
-                </span>
-            </a>
-        </div>
-    </section>
-
-    <!-- A/S 프로세스 -->
-    <section class="section support-process-section">
-        <h2 class="section-title">A/S <span>프로세스</span></h2>
-        <div class="process-steps">
-            <div class="process-step">
-                <div class="process-number">01</div>
-                <h3 class="process-title">접수</h3>
-                <p class="process-desc">전화 또는 카카오톡으로 A/S 접수</p>
-            </div>
-            <div class="process-arrow">→</div>
-            <div class="process-step">
-                <div class="process-number">02</div>
-                <h3 class="process-title">현장방문/수거</h3>
-                <p class="process-desc">기술자가 직접 현장 방문하여 점검</p>
-            </div>
-            <div class="process-arrow">→</div>
-            <div class="process-step">
-                <div class="process-number">03</div>
-                <h3 class="process-title">수리</h3>
-                <p class="process-desc">전문 기술자가 신속하게 수리 진행</p>
-            </div>
-            <div class="process-arrow">→</div>
-            <div class="process-step">
-                <div class="process-number">04</div>
-                <h3 class="process-title">사후점검</h3>
-                <p class="process-desc">수리 후 안정성 확인 및 사용법 안내</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- 오시는 길 (확대) -->
-    <section class="section support-location-section-large">
-        <h2 class="section-title">오시는 <span>길</span></h2>
-        <div class="support-location-large">
-            <div class="location-info-large">
-                <p class="location-address-large">경기도 양주시 광적면 부흥로 956번길 174</p>
-                <p class="location-hours-large">운영시간: 평일 09:00 - 18:00</p>
-                <div class="location-buttons-large">
-                    <a href="https://map.naver.com/v5/search/경기도 양주시 광적면 부흥로956번길 174" target="_blank" class="btn-directions-large">네이버 지도에서 길찾기</a>
-                    <a href="https://map.kakao.com/link/search/경기도 양주시 광적면 부흥로956번길 174" target="_blank" class="btn-directions-large btn-kakao-map">카카오맵에서 길찾기</a>
-                </div>
-            </div>
-            <div class="location-map-large">
-                <iframe
-                    src="https://www.google.com/maps?q=%EA%B2%BD%EA%B8%B0%EB%8F%84+%EC%96%91%EC%A3%BC%EC%8B%9C+%EA%B4%91%EC%A0%81%EB%A9%B4+%EB%B6%80%ED%9D%A5%EB%A1%9C956%EB%B2%88%EA%B8%B8+174&output=embed"
-                    width="100%"
-                    height="500"
-                    style="border:0; border-radius: 16px;"
-                    allowfullscreen=""
-                    loading="lazy"
-                    referrerpolicy="no-referrer-when-downgrade"
-                    title="드림전동차 오시는 길">
-                </iframe>
-            </div>
-        </div>
-    </section>
-
-    <!-- Global Footer: FAQ Section -->
-    <section class="section global-faq-section">
+    <!-- FAQ Section (상단 배치) -->
+    <section class="section support-faq-section-top">
         <h2 class="section-title">자주 묻는 <span>질문</span></h2>
         <div class="faq-container">
             <div class="faq-item">
@@ -150,6 +55,33 @@
                 <div class="faq-answer">
                     <p>안정적인 <strong>국산 컨트롤러</strong>를 탑재하여 부드러운 가감속이 가능합니다. 초보자나 어르신도 금방 적응하실 수 있을 만큼 조작이 직관적이고 안전합니다.</p>
                 </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 오시는 길 (FAQ 바로 아래 배치) -->
+    <section class="section support-location-section-large">
+        <h2 class="section-title">오시는 <span>길</span></h2>
+        <div class="support-location-large">
+            <div class="location-info-large">
+                <p class="location-address-large">경기도 양주시 광적면 부흥로 956번길 174</p>
+                <p class="location-hours-large">운영시간: 평일 09:00 - 18:00</p>
+                <div class="location-buttons-large">
+                    <a href="https://map.naver.com/v5/search/경기도 양주시 광적면 부흥로956번길 174" target="_blank" class="btn-directions-large">네이버 지도에서 길찾기</a>
+                    <a href="https://map.kakao.com/link/search/경기도 양주시 광적면 부흥로956번길 174" target="_blank" class="btn-directions-large btn-kakao-map">카카오맵에서 길찾기</a>
+                </div>
+            </div>
+            <div class="location-map-large">
+                <iframe
+                    src="https://www.google.com/maps?q=%EA%B2%BD%EA%B8%B0%EB%8F%84+%EC%96%91%EC%A3%BC%EC%8B%9C+%EA%B4%91%EC%A0%81%EB%A9%B4+%EB%B6%80%ED%9D%A5%EB%A1%9C956%EB%B2%88%EA%B8%B8+174&output=embed"
+                    width="100%"
+                    height="500"
+                    style="border:0; border-radius: 16px;"
+                    allowfullscreen=""
+                    loading="lazy"
+                    referrerpolicy="no-referrer-when-downgrade"
+                    title="드림전동차 오시는 길">
+                </iframe>
             </div>
         </div>
     </section>
@@ -205,6 +137,38 @@
             function onScroll() { gnb.classList.toggle('scrolled', window.scrollY > 50); }
             window.addEventListener('scroll', onScroll);
             onScroll();
+        })();
+
+        // FAQ Accordion (for support page top FAQ)
+        (function() {
+            var faqItems = document.querySelectorAll('.support-faq-section-top .faq-item');
+            faqItems.forEach(function(item) {
+                var question = item.querySelector('.faq-question');
+                var answer = item.querySelector('.faq-answer');
+                var toggle = item.querySelector('.faq-toggle');
+                
+                if (!question || !answer || !toggle) return;
+                
+                question.addEventListener('click', function() {
+                    var isOpen = item.classList.contains('active');
+                    
+                    faqItems.forEach(function(otherItem) {
+                        if (otherItem !== item) {
+                            otherItem.classList.remove('active');
+                            var otherToggle = otherItem.querySelector('.faq-toggle');
+                            if (otherToggle) otherToggle.textContent = '+';
+                        }
+                    });
+                    
+                    if (isOpen) {
+                        item.classList.remove('active');
+                        toggle.textContent = '+';
+                    } else {
+                        item.classList.add('active');
+                        toggle.textContent = '−';
+                    }
+                });
+            });
         })();
 
         // Global Footer initialization
