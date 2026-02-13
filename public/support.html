@@ -350,9 +350,10 @@ document.addEventListener('DOMContentLoaded', function() {
     if (btn && nav) {
         btn.onclick = function(e) {
             e.preventDefault();
-            this.classList.toggle('active');
-            nav.classList.toggle('active');
-            document.body.style.overflow = nav.classList.contains('active') ? 'hidden' : 'auto';
+            const isActive = nav.classList.toggle('active');
+            btn.classList.toggle('active');
+            document.body.style.overflow = isActive ? 'hidden' : 'auto';
+            console.log("메뉴가 열렸나요?:", isActive);
         };
     }
 });

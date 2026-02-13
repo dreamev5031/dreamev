@@ -323,11 +323,15 @@ document.addEventListener('DOMContentLoaded', function() {
     const nav = document.querySelector('.gnb-nav');
 
     if (btn && nav) {
+        // 기존 이벤트를 완전히 초기화하고 새로 등록
         btn.onclick = function(e) {
             e.preventDefault();
-            this.classList.toggle('active');
-            nav.classList.toggle('active');
-            document.body.style.overflow = nav.classList.contains('active') ? 'hidden' : 'auto';
+            const isActive = nav.classList.toggle('active');
+            btn.classList.toggle('active');
+            
+            // 메뉴가 열리면 뒷배경 스크롤 방지
+            document.body.style.overflow = isActive ? 'hidden' : 'auto';
+            console.log("메뉴가 열렸나요?:", isActive);
         };
     }
 });
