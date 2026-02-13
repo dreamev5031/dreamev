@@ -2,7 +2,6 @@ backend:
   name: github
   repo: dreamev5031/dreamev
   branch: main
-  base_url: https://dreamev.netlify.app
 
 media_folder: public/images
 public_folder: images
