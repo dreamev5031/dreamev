@@ -3,7 +3,7 @@ backend:
   repo: dreamev5031/dreamev
   branch: main
   base_url: https://dreamev-site.pages.dev
-  auth_endpoint: /auth
+  auth_endpoint: auth
 
 site_url: https://dreamev.kr
 display_url: https://dreamev.kr

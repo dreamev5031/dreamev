@@ -27,6 +27,7 @@ export async function onRequestGet(context) {
   
   // Exchange code for access token
   const tokenUrl = 'https://github.com/login/oauth/access_token';
+  const redirectUri = 'https://dreamev-site.pages.dev/callback';
   const tokenResponse = await fetch(tokenUrl, {
     method: 'POST',
     headers: {
@@ -37,6 +38,7 @@ export async function onRequestGet(context) {
       client_id: clientId,
       client_secret: clientSecret,
       code: code,
+      redirect_uri: redirectUri,
     }),
   });
   
