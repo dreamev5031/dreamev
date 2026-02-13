@@ -464,29 +464,20 @@
             }
         })();
 
-        // Mobile Menu Toggle - 새로운 코드
-        document.addEventListener('DOMContentLoaded', function() {
-            var menuToggle = document.querySelector('.mobile-menu-toggle');
-            var gnbNav = document.querySelector('.gnb-nav');
-
-            if (menuToggle && gnbNav) {
-                // 기존 이벤트 덮어쓰기
-                menuToggle.onclick = function(e) {
-                    e.preventDefault();
-                    this.classList.toggle('active'); // 햄버거 버튼을 X로 바꿈
-                    gnbNav.classList.toggle('active'); // 메뉴판을 화면에 띄움
-                };
-
-                // 메뉴 항목 클릭 시 자동으로 닫히게 만들기
-                var navLinks = gnbNav.querySelectorAll('a');
-                navLinks.forEach(function(link) {
-                    link.onclick = function() {
-                        menuToggle.classList.remove('active');
-                        gnbNav.classList.remove('active');
-                    };
-                });
-            }
-        });
     </script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const btn = document.querySelector('.mobile-menu-toggle');
+    const menu = document.querySelector('.gnb-nav');
+    
+    if (btn && menu) {
+        btn.onclick = function() {
+            menu.classList.toggle('show');
+            btn.classList.toggle('active');
+            console.log('메뉴 클릭됨!', menu.classList.contains('show'));
+        };
+    }
+});
+</script>
 </body>
 </html>
