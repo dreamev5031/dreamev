@@ -1452,53 +1452,6 @@ nav {
         margin: 0;
     }
 
-    .gnb-nav {
-        display: none !important; /* Force hide desktop menu on mobile */
-        visibility: hidden !important;
-        opacity: 0 !important;
-        height: 0 !important;
-        overflow: hidden !important;
-    }
-    
-    /* Show menu when .show-menu class is added */
-    .gnb-nav.show-menu {
-        display: flex !important;
-        flex-direction: column !important;
-        position: fixed !important;
-        top: 60px !important;
-        left: 0 !important;
-        right: 0 !important;
-        background: #FFFFFF !important;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
-        padding: 1rem !important;
-        visibility: visible !important;
-        opacity: 1 !important;
-        height: auto !important;
-        z-index: 1000 !important;
-        gap: 0 !important;
-        overflow: visible !important;
-    }
-    
-    .gnb-nav.show-menu li {
-        width: 100% !important;
-        border-bottom: 1px solid #f0f0f0 !important;
-    }
-    
-    .gnb-nav.show-menu li:last-child {
-        border-bottom: none !important;
-    }
-    
-    .gnb-nav.show-menu a {
-        display: block !important;
-        padding: 1rem !important;
-        width: 100% !important;
-    }
-
-    /* Show hamburger menu toggle on mobile */
-    .mobile-menu-toggle {
-        display: block !important;
-        visibility: visible !important;
-    }
 
     .gnb-right-group {
         display: flex !important;
@@ -2558,124 +2511,50 @@ nav {
     }
 }
 
-/* ========================================= */
-/* 모바일 강제 최적화 (이 아래로 괄호 주의!) */
-/* ========================================= */
+/* 모바일 메뉴 클린 코드 */
 @media (max-width: 768px) {
-    /* 1. 모바일 스크롤 완벽 보장 */
-    html, body {
-        overflow-x: hidden !important;
-        overflow-y: auto !important;
-        height: auto !important;
-        min-height: 100vh;
-        -webkit-overflow-scrolling: touch !important;
-    }
-
-    /* 2. 모바일 헤더(GNB) 깨짐 및 점(bullet) 완벽 제거 */
+    /* 1. 모바일 헤더 높이 고정 및 여백 제거 */
     .gnb {
-        display: flex !important;
-        justify-content: space-between !important;
-        align-items: center !important;
-        padding: 0.5rem 1rem !important;
         height: 60px !important;
-        overflow: hidden !important;
+        padding: 0 1.5rem !important;
+        margin: 0 !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
     }
-    
-    /* 기본 상태: 메뉴 숨김 */
+
+    /* 2. 기존 메뉴 숨기기 */
     .gnb-nav {
         display: none !important;
     }
 
-    /* 버튼 클릭 시(.active가 붙었을 때): 메뉴 강제 노출 */
-    .gnb-nav.active {
+    /* 3. 새로운 모바일 전용 오버레이 메뉴 */
+    .gnb-nav.mobile-active {
         display: flex !important;
-        flex-direction: column !important;
         position: fixed !important;
         top: 0 !important;
         left: 0 !important;
         width: 100vw !important;
         height: 100vh !important;
-        background: #1a202c !important; /* 배경색 확실히 지정 */
-        z-index: 10000 !important; /* 헤더보다 높게 */
-        padding-top: 80px !important;
-        align-items: center !important;
-    }
-
-    .gnb-nav.active li {
-        margin: 1.5rem 0 !important;
-        list-style: none !important;
-    }
-
-    .gnb-nav.active a {
-        font-size: 1.5rem !important;
-        color: #ffffff !important;
-        font-weight: 700 !important;
-    }
-    
-    .mobile-menu-toggle {
-        display: block !important;
-    }
-}
-
-/* 모바일 메뉴 강제 출력 설정 */
-@media (max-width: 768px) {
-    .gnb-nav { display: none !important; } /* 평소엔 숨김 */
-
-    .gnb-nav.show {
-        display: flex !important;
-        visibility: visible !important;
-        opacity: 1 !important;
-        position: fixed !important;
-        top: 0 !important;
-        left: 0 !important;
-        width: 100% !important;
-        height: 100% !important;
-        background: #111827 !important;
+        background-color: #1a202c !important; /* 드림전동차 다크 테마 */
         z-index: 999999 !important;
-        flex-direction: column !important;
-        align-items: center !important;
-        padding-top: 100px !important;
-    }
-}
-
-@media (max-width: 768px) {
-    /* 1. 평소 모바일 메뉴 숨김 */
-    .gnb-nav {
-        display: none !important;
-    }
-
-    /* 2. 메뉴 활성화 시 (.active) 강제 출력 */
-    .gnb-nav.active {
-        display: flex !important;
-        position: fixed !important;
-        top: 0 !important;
-        left: 0 !important;
-        width: 100vw !important;
-        height: 100vh !important;
-        background-color: #1a202c !important; /* 배경색: 어두운 네이비 */
-        z-index: 99999 !important; /* 모든 요소 위에 배치 */
         flex-direction: column !important;
         justify-content: center !important;
         align-items: center !important;
-        gap: 2rem !important;
-        padding: 0 !important;
+        gap: 2.5rem !important;
     }
 
-    /* 3. 메뉴 글자 스타일 */
-    .gnb-nav.active li {
-        list-style: none !important;
-    }
-
-    .gnb-nav.active a {
-        font-size: 1.8rem !important;
+    .gnb-nav.mobile-active a {
+        font-size: 2rem !important;
         color: #ffffff !important;
-        font-weight: 700 !important;
+        font-weight: 800 !important;
         text-decoration: none !important;
     }
 
-    /* 4. 닫기 버튼(X)이 메뉴 위로 올라오게 설정 */
-    .mobile-menu-toggle.active {
-        z-index: 100000 !important;
+    /* 4. 햄버거 버튼을 메뉴 위로 올리기 */
+    .mobile-menu-toggle {
+        display: block !important;
+        z-index: 1000000 !important;
         position: relative !important;
     }
 }
