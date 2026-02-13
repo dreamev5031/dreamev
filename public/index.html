@@ -318,15 +318,22 @@
 
     </script>
 <script>
-const toggleBtn = document.querySelector('.mobile-menu-toggle');
-const navMenu = document.querySelector('.gnb-nav');
+document.addEventListener('DOMContentLoaded', function() {
+    const btn = document.querySelector('.mobile-menu-toggle');
+    const nav = document.querySelector('.gnb-nav');
 
-if (toggleBtn && navMenu) {
-    toggleBtn.onclick = function() {
-        this.classList.toggle('active');
-        navMenu.classList.toggle('mobile-active');
-    };
-}
+    if (btn && nav) {
+        btn.onclick = function(e) {
+            e.preventDefault();
+            // 딱 두 줄로 끝낸다
+            const isOpen = nav.classList.toggle('mobile-active');
+            btn.classList.toggle('active');
+            
+            // 메뉴 열릴 때 배경 스크롤 방지
+            document.body.style.overflow = isOpen ? 'hidden' : 'auto';
+        };
+    }
+});
 </script>
 </body>
 </html>

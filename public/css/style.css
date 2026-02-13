@@ -1473,10 +1473,6 @@ nav {
         text-decoration: none;
     }
 
-    .gnb-nav a {
-        font-size: 0.9rem;
-    }
-    
     /* Remove any padding-top from hero on mobile */
     .hero {
         margin-top: 0 !important;
@@ -2511,6 +2507,7 @@ nav {
     }
 }
 
+/* 모바일 메뉴 클린 코드 */
 /* 모바일 메뉴 클린 코드 */
 @media (max-width: 768px) {
     /* 1. 모바일 헤더 높이 고정 및 여백 제거 */
