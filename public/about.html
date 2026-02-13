@@ -94,13 +94,34 @@
         </div>
     </section>
 
-    <footer id="contact">
-        <p>© 드림전동차. All rights reserved.</p>
+    <!-- Global Footer: Official Footer -->
+    <footer class="global-footer" id="contact">
+        <div class="global-footer-content">
+            <div class="global-footer-grid">
+                <div class="global-footer-col">
+                    <div class="global-footer-logo">드림<span>전동차</span></div>
+                    <p class="global-footer-tagline">기술자가 만드는<br>올 스테인리스 전동차</p>
+                </div>
+                <div class="global-footer-col">
+                    <h4 class="global-footer-col-title">고객지원</h4>
+                    <p class="global-footer-address">경기도 양주시 광적면<br>부흥로 956번길 174</p>
+                </div>
+                <div class="global-footer-col">
+                    <h4 class="global-footer-col-title">사업자정보</h4>
+                    <p class="global-footer-contact">
+                        <strong>대표번호:</strong> 010-3789-7653<br>
+                        <strong>사업자등록번호:</strong> 560-86-02294
+                    </p>
+                </div>
+            </div>
+            <p class="global-footer-copyright">© 드림전동차. All rights reserved.</p>
+        </div>
     </footer>
 
     <script src="js/script.js"></script>
     <script>
-        // Mobile Menu Toggle
+        // Mobile Menu Toggle - 기존 코드 주석 처리
+        /*
         (function() {
             var menuToggle = document.getElementById('mobileMenuToggle');
             var menuDrawer = document.getElementById('mobileMenuDrawer');
@@ -153,6 +174,7 @@
                 }
             });
         })();
+        */
 
         (function() {
 
@@ -171,6 +193,85 @@
                 fadeEls.forEach(function(el) { observer.observe(el); });
             }
         })();
+
+        // Global Footer initialization (only for support.html)
+        (function() {
+            // FAQ Accordion (only if FAQ section exists)
+            var faqItems = document.querySelectorAll('.global-faq-section .faq-item');
+            if (faqItems.length > 0) {
+                faqItems.forEach(function(item) {
+                    var question = item.querySelector('.faq-question');
+                    var answer = item.querySelector('.faq-answer');
+                    var toggle = item.querySelector('.faq-toggle');
+                    
+                    if (!question || !answer || !toggle) return;
+                    
+                    question.addEventListener('click', function() {
+                        var isOpen = item.classList.contains('active');
+                        
+                        // Close all other items
+                        faqItems.forEach(function(otherItem) {
+                            if (otherItem !== item) {
+                                otherItem.classList.remove('active');
+                                var otherToggle = otherItem.querySelector('.faq-toggle');
+                                if (otherToggle) otherToggle.textContent = '+';
+                            }
+                        });
+                        
+                        // Toggle current item
+                        if (isOpen) {
+                            item.classList.remove('active');
+                            toggle.textContent = '+';
+                        } else {
+                            item.classList.add('active');
+                            toggle.textContent = '−';
+                        }
+                    });
+                });
+            }
+
+            // Global Inquiry Form submission (only if form exists)
+            var form = document.getElementById('globalInquiryForm');
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    var formData = new FormData(form);
+                    var data = {};
+                    formData.forEach(function(value, key) {
+                        data[key] = value;
+                    });
+                    
+                    console.log('Global inquiry submitted:', data);
+                    alert('상담 신청이 접수되었습니다.\n빠른 시일 내에 연락드리겠습니다.');
+                    form.reset();
+                });
+            }
+        })();
+
+        // Mobile Menu Toggle - 새로운 코드
+        document.addEventListener('DOMContentLoaded', function() {
+            var menuToggle = document.querySelector('.mobile-menu-toggle');
+            var gnbNav = document.querySelector('.gnb-nav');
+
+            if (menuToggle && gnbNav) {
+                // 기존 이벤트 덮어쓰기
+                menuToggle.onclick = function(e) {
+                    e.preventDefault();
+                    this.classList.toggle('active'); // 햄버거 버튼을 X로 바꿈
+                    gnbNav.classList.toggle('show-menu'); // 메뉴판을 화면에 띄움
+                };
+
+                // 메뉴 항목 클릭 시 자동으로 닫히게 만들기
+                var navLinks = gnbNav.querySelectorAll('a');
+                navLinks.forEach(function(link) {
+                    link.onclick = function() {
+                        menuToggle.classList.remove('active');
+                        gnbNav.classList.remove('show-menu');
+                    };
+                });
+            }
+        });
     </script>
 </body>
 </html>

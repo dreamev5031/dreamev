@@ -136,67 +136,6 @@
         </div>
     </section>
 
-    <!-- Global Footer: FAQ Section -->
-    <section class="section global-faq-section">
-        <h2 class="section-title">자주 묻는 <span>질문</span></h2>
-        <div class="faq-container">
-            <div class="faq-item">
-                <div class="faq-question">
-                    <span>Q.</span>
-                    <span>정말 녹이 안 슬까요?</span>
-                    <span class="faq-toggle">+</span>
-                </div>
-                <div class="faq-answer">
-                    <p>네, 드림전동차는 전 기종 <strong>올 스테인리스(Stainless Steel)</strong> 바디를 채택하여 축사나 농장 등 습기가 많은 환경에서도 부식 걱정 없이 반영구적으로 사용 가능합니다.</p>
-                </div>
-            </div>
-            <div class="faq-item">
-                <div class="faq-question">
-                    <span>Q.</span>
-                    <span>한 번 충전하면 얼마나 쓰나요?</span>
-                    <span class="faq-toggle">+</span>
-                </div>
-                <div class="faq-answer">
-                    <p>검증된 고성능 <strong>딥사이클 배터리</strong>를 표준 장착하여, 작업 환경에 따라 다르지만 넉넉한 주행 거리와 강력한 파워를 보장합니다.</p>
-                </div>
-            </div>
-            <div class="faq-item">
-                <div class="faq-question">
-                    <span>Q.</span>
-                    <span>운전이 어렵지는 않나요?</span>
-                    <span class="faq-toggle">+</span>
-                </div>
-                <div class="faq-answer">
-                    <p>안정적인 <strong>국산 컨트롤러</strong>를 탑재하여 부드러운 가감속이 가능합니다. 초보자나 어르신도 금방 적응하실 수 있을 만큼 조작이 직관적이고 안전합니다.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Global Footer: Inquiry Section -->
-    <section class="section global-inquiry-section">
-        <h2 class="section-title">더 궁금하신 점이 있나요? <span>상담 신청하기</span></h2>
-        <div class="global-inquiry-container">
-            <form id="globalInquiryForm" class="global-inquiry-form">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="globalInquiryName">성함 <span class="required">*</span></label>
-                        <input type="text" id="globalInquiryName" name="name" required placeholder="홍길동">
-                    </div>
-                    <div class="form-group">
-                        <label for="globalInquiryPhone">연락처 <span class="required">*</span></label>
-                        <input type="tel" id="globalInquiryPhone" name="phone" required placeholder="010-1234-5678">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="globalInquiryMessage">문의 내용 <span class="required">*</span></label>
-                    <textarea id="globalInquiryMessage" name="message" rows="6" required placeholder="문의하실 내용을 자세히 적어주시면 더 정확한 답변을 드릴 수 있습니다."></textarea>
-                </div>
-                <button type="submit" class="btn-submit">상담 신청하기</button>
-            </form>
-        </div>
-    </section>
-
     <!-- Global Footer: Official Footer -->
     <footer class="global-footer" id="contact">
         <div class="global-footer-content">
@@ -223,7 +162,8 @@
 
     <script src="js/script.js"></script>
     <script>
-        // Mobile Menu Toggle
+        // Mobile Menu Toggle - 기존 코드 주석 처리
+        /*
         (function() {
             var menuToggle = document.getElementById('mobileMenuToggle');
             var menuDrawer = document.getElementById('mobileMenuDrawer');
@@ -276,6 +216,7 @@
                 }
             });
         })();
+        */
 
         // Hero auto slider with cross-fade effect
         (function() {
@@ -320,41 +261,43 @@
             revealEls.forEach(function(el) { observer.observe(el); });
         })();
 
-        // Global Footer initialization
+        // Global Footer initialization (only for support.html)
         (function() {
-            // FAQ Accordion
+            // FAQ Accordion (only if FAQ section exists)
             var faqItems = document.querySelectorAll('.global-faq-section .faq-item');
-            faqItems.forEach(function(item) {
-                var question = item.querySelector('.faq-question');
-                var answer = item.querySelector('.faq-answer');
-                var toggle = item.querySelector('.faq-toggle');
-                
-                if (!question || !answer || !toggle) return;
-                
-                question.addEventListener('click', function() {
-                    var isOpen = item.classList.contains('active');
+            if (faqItems.length > 0) {
+                faqItems.forEach(function(item) {
+                    var question = item.querySelector('.faq-question');
+                    var answer = item.querySelector('.faq-answer');
+                    var toggle = item.querySelector('.faq-toggle');
                     
-                    // Close all other items
-                    faqItems.forEach(function(otherItem) {
-                        if (otherItem !== item) {
-                            otherItem.classList.remove('active');
-                            var otherToggle = otherItem.querySelector('.faq-toggle');
-                            if (otherToggle) otherToggle.textContent = '+';
+                    if (!question || !answer || !toggle) return;
+                    
+                    question.addEventListener('click', function() {
+                        var isOpen = item.classList.contains('active');
+                        
+                        // Close all other items
+                        faqItems.forEach(function(otherItem) {
+                            if (otherItem !== item) {
+                                otherItem.classList.remove('active');
+                                var otherToggle = otherItem.querySelector('.faq-toggle');
+                                if (otherToggle) otherToggle.textContent = '+';
+                            }
+                        });
+                        
+                        // Toggle current item
+                        if (isOpen) {
+                            item.classList.remove('active');
+                            toggle.textContent = '+';
+                        } else {
+                            item.classList.add('active');
+                            toggle.textContent = '−';
                         }
                     });
-                    
-                    // Toggle current item
-                    if (isOpen) {
-                        item.classList.remove('active');
-                        toggle.textContent = '+';
-                    } else {
-                        item.classList.add('active');
-                        toggle.textContent = '−';
-                    }
                 });
-            });
+            }
 
-            // Global Inquiry Form submission
+            // Global Inquiry Form submission (only if form exists)
             var form = document.getElementById('globalInquiryForm');
             if (form) {
                 form.addEventListener('submit', function(e) {
@@ -372,6 +315,30 @@
                 });
             }
         })();
+
+        // Mobile Menu Toggle - 새로운 코드
+        document.addEventListener('DOMContentLoaded', function() {
+            var menuToggle = document.querySelector('.mobile-menu-toggle');
+            var gnbNav = document.querySelector('.gnb-nav');
+
+            if (menuToggle && gnbNav) {
+                // 기존 이벤트 덮어쓰기
+                menuToggle.onclick = function(e) {
+                    e.preventDefault();
+                    this.classList.toggle('active'); // 햄버거 버튼을 X로 바꿈
+                    gnbNav.classList.toggle('show-menu'); // 메뉴판을 화면에 띄움
+                };
+
+                // 메뉴 항목 클릭 시 자동으로 닫히게 만들기
+                var navLinks = gnbNav.querySelectorAll('a');
+                navLinks.forEach(function(link) {
+                    link.onclick = function() {
+                        menuToggle.classList.remove('active');
+                        gnbNav.classList.remove('show-menu');
+                    };
+                });
+            }
+        });
     </script>
 </body>
 </html>
