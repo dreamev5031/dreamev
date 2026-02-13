@@ -144,6 +144,7 @@ a {
     inset: 0;
     display: flex;
     transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform;
 }
 
 .hero-slide {
@@ -156,9 +157,11 @@ a {
     align-items: center;
     padding-top: 150px;
     box-sizing: border-box;
+    background-color: #1F2937;
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
+    will-change: transform;
 }
 
 .hero-slide::before {
@@ -248,6 +251,7 @@ a {
     border-radius: 16px;
     overflow: hidden;
     box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+    background-color: #1F2937;
 }
 
 .model-image {
@@ -332,9 +336,11 @@ a {
 .category-box-bg {
     position: absolute;
     inset: 0;
+    background-color: #1F2937;
     background-size: cover;
     background-position: center;
     transition: filter 0.3s, transform 0.3s;
+    will-change: transform;
 }
 
 .category-box:hover .category-box-bg {
@@ -403,10 +409,12 @@ a {
     align-items: center;
     justify-content: center;
     padding: 140px 2rem 4rem;
+    background-color: #1F2937;
     background-image: url('../images/about-bg.jpg');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
+    will-change: transform;
 }
 
 .about-intro-overlay {
@@ -563,6 +571,10 @@ footer {
         max-width: 100%;
     }
 
+    .model-image {
+        height: 250px;
+    }
+
     .model-content {
         max-width: 100%;
     }
@@ -579,6 +591,11 @@ footer {
         grid-template-columns: 1fr;
     }
 
+    .gallery-item img {
+        max-width: 100%;
+        height: auto;
+    }
+
     .core-values-grid {
         grid-template-columns: 1fr;
     }
@@ -586,5 +603,17 @@ footer {
     .about-intro {
         min-height: 50vh;
         padding: 120px 1rem 3rem;
+        background-size: cover;
+        background-position: center;
+    }
+
+    .hero-slide {
+        background-size: cover;
+        background-position: center;
+    }
+
+    .category-box-bg {
+        background-size: cover;
+        background-position: center;
     }
 }
