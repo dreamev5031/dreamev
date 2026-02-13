@@ -343,18 +343,15 @@
 
     </script>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const btn = document.querySelector('.mobile-menu-toggle');
-    const menu = document.querySelector('.gnb-nav');
-    
-    if (btn && menu) {
-        btn.onclick = function() {
-            menu.classList.toggle('show');
-            btn.classList.toggle('active');
-            console.log('메뉴 클릭됨!', menu.classList.contains('show'));
-        };
-    }
-});
+const toggleBtn = document.querySelector('.mobile-menu-toggle');
+const navMenu = document.querySelector('.gnb-nav');
+
+if (toggleBtn && navMenu) {
+    toggleBtn.onclick = function() {
+        this.classList.toggle('active');
+        navMenu.classList.toggle('active');
+    };
+}
 </script>
 </body>
 </html>
