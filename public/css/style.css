@@ -48,11 +48,10 @@ input[type="number"] {
 
 html {
     overflow-x: hidden !important;
-    overflow-y: auto !important;
+    overflow-y: visible !important;
     scroll-behavior: smooth;
-    width: 100vw !important;
-    max-width: 100vw !important;
-    position: relative !important;
+    width: 100%;
+    position: relative;
     height: auto;
     min-height: 100%;
 }
@@ -75,10 +74,9 @@ body {
     height: auto;
     line-height: 1.6;
     overflow-x: hidden !important;
-    overflow-y: auto !important;
-    width: 100vw !important;
-    max-width: 100vw !important;
-    position: relative !important;
+    overflow-y: visible !important;
+    width: 100%;
+    position: relative;
 }
 
 a {
@@ -199,7 +197,7 @@ nav {
     position: relative;
     width: 100%;
     min-height: 100vh;
-    height: auto;
+    height: 100vh;
     padding-top: 150px;
     box-sizing: border-box;
     overflow-x: hidden;
@@ -207,20 +205,27 @@ nav {
     display: flex;
     align-items: center;
     justify-content: center;
-    /* Prevent scroll blocking */
+    /* Prevent scroll blocking - ensure hero doesn't block document scroll */
     pointer-events: auto;
     touch-action: pan-y;
     -webkit-overflow-scrolling: touch;
+    /* Ensure hero section doesn't create scroll barrier */
+    z-index: 0;
+    isolation: isolate;
 }
 
 .hero-slider {
-    position: relative;
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
-    min-height: 100vh;
-    height: 100vh;
+    height: 100%;
     /* Prevent scroll blocking */
     pointer-events: none;
     touch-action: pan-y;
+    /* Ensure slider doesn't interfere with scroll */
+    z-index: 0;
+    overflow: visible;
 }
 
 .hero-slide {
@@ -244,7 +249,7 @@ nav {
     transition: opacity 1.5s ease-in-out;
     will-change: opacity, transform;
     transform: translateZ(0);
-    /* Prevent scroll blocking */
+    /* Prevent scroll blocking - critical for scroll functionality */
     pointer-events: none;
     touch-action: pan-y;
     backface-visibility: hidden;
@@ -254,6 +259,8 @@ nav {
     isolation: isolate;
     /* Ensure slide doesn't block document flow */
     z-index: 0;
+    /* Prevent overflow from blocking scroll */
+    overflow: visible;
 }
 
 .hero-slide.active {
@@ -263,12 +270,17 @@ nav {
 .hero-slide::before {
     content: '';
     position: absolute;
-    inset: 0;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     background: linear-gradient(to right, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0.4) 50%, rgba(0, 0, 0, 0.2) 100%);
     z-index: 1;
     /* Ensure overlay doesn't block scroll */
     pointer-events: none;
     touch-action: none;
+    /* Prevent overlay from interfering with scroll */
+    overflow: visible;
 }
 
 /* Ken Burns 효과: 천천히 확대 */
