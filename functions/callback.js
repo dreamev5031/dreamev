@@ -186,6 +186,8 @@ export async function onRequestGet(context) {
     }
     
     // Success: Send token to parent window
+    const target = 'https://dreamev-site.pages.dev';
+    const tokenJson = JSON.stringify({ token: accessToken, provider: 'github' });
     const successHtml = `
 <!DOCTYPE html>
 <html>
@@ -196,12 +198,11 @@ export async function onRequestGet(context) {
 <body>
   <script>
     console.log('Authorization successful, sending token to parent window');
+    const target = '${target}';
+    const tokenJson = ${JSON.stringify(tokenJson)};
     if (window.opener) {
-      window.opener.postMessage({
-        type: 'authorization',
-        token: '${accessToken}',
-        provider: 'github'
-      }, '*');
+      window.opener.postMessage('authorizing:github', target);
+      window.opener.postMessage('authorization:github:success:' + tokenJson, target);
       window.close();
     } else {
       // Fallback: redirect to admin with token in hash
