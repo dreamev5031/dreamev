@@ -182,27 +182,6 @@
 
     <script src="js/script.js"></script>
     <script>
-        // GNB scroll (optimized with requestAnimationFrame)
-        (function() {
-            var gnb = document.getElementById('gnb');
-            if (!gnb) return;
-            var ticking = false;
-            
-            function updateScroll() {
-                gnb.classList.toggle('scrolled', window.scrollY > 50);
-                ticking = false;
-            }
-            
-            function onScroll() {
-                if (!ticking) {
-                    window.requestAnimationFrame(updateScroll);
-                    ticking = true;
-                }
-            }
-            
-            window.addEventListener('scroll', onScroll, { passive: true });
-            updateScroll();
-        })();
 
         // Load CMS cases data
         (function() {
