@@ -1500,8 +1500,7 @@ nav {
         margin-top: 0 !important;
         padding-top: 0 !important;
     }
-}
-
+    
     .category-grid {
         grid-template-columns: 1fr !important; /* 모바일은 1열이 기본, 2열 원하면 repeat(2, 1fr)로 수정 */
     }
@@ -2522,5 +2521,43 @@ nav {
         font-size: 1.1rem;
         min-height: 52px; /* Touch-friendly button height */
         margin-top: 0.5rem;
+    }
+}
+
+/* ========================================= */
+/* 모바일 강제 최적화 (이 아래로 괄호 주의!) */
+/* ========================================= */
+@media (max-width: 768px) {
+    /* 1. 모바일 스크롤 완벽 보장 */
+    html, body {
+        overflow-x: hidden !important;
+        overflow-y: auto !important;
+        height: auto !important;
+        min-height: 100vh;
+        -webkit-overflow-scrolling: touch !important;
+    }
+
+    /* 2. 모바일 헤더(GNB) 깨짐 및 점(bullet) 완벽 제거 */
+    .gnb {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        padding: 0.5rem 1rem !important;
+        height: 60px !important;
+        overflow: hidden !important;
+    }
+    
+    .gnb-nav {
+        display: none !important;
+        list-style: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        height: 0 !important;
+    }
+    
+    .mobile-menu-toggle {
+        display: block !important;
     }
 }
