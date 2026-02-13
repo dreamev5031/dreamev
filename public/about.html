@@ -19,7 +19,29 @@
                 <li><a href="support.html">고객지원</a></li>
             </ul>
         </nav>
-        <a href="support.html" class="gnb-cta">견적문의</a>
+        <div class="gnb-right-group">
+            <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="메뉴 열기">
+                <span class="hamburger-icon">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </span>
+            </button>
+            <a href="support.html" class="gnb-cta">견적문의</a>
+        </div>
+        <!-- Mobile Menu Drawer -->
+        <div class="mobile-menu-drawer" id="mobileMenuDrawer">
+            <div class="mobile-menu-overlay"></div>
+            <div class="mobile-menu-content">
+                <ul class="mobile-menu-list">
+                    <li><a href="index.html">홈</a></li>
+                    <li><a href="about.html">브랜드 스토리</a></li>
+                    <li><a href="index.html#best-sellers">대표모델</a></li>
+                    <li><a href="cases.html">제작사례</a></li>
+                    <li><a href="support.html">고객지원</a></li>
+                </ul>
+            </div>
+        </div>
     </header>
 
     <!-- 1. 인트로 (Brand Story) -->
@@ -78,6 +100,60 @@
 
     <script src="js/script.js"></script>
     <script>
+        // Mobile Menu Toggle
+        (function() {
+            var menuToggle = document.getElementById('mobileMenuToggle');
+            var menuDrawer = document.getElementById('mobileMenuDrawer');
+            
+            if (!menuToggle || !menuDrawer) return;
+            
+            function toggleMenu() {
+                var isActive = menuDrawer.classList.contains('active');
+                
+                if (isActive) {
+                    menuDrawer.classList.remove('active');
+                    menuToggle.classList.remove('active');
+                    document.body.style.overflow = '';
+                } else {
+                    menuDrawer.classList.add('active');
+                    menuToggle.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                }
+            }
+            
+            function closeMenu() {
+                menuDrawer.classList.remove('active');
+                menuToggle.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+            
+            menuToggle.addEventListener('click', function(e) {
+                e.stopPropagation();
+                toggleMenu();
+            });
+            
+            // Close menu when clicking overlay
+            var overlay = menuDrawer.querySelector('.mobile-menu-overlay');
+            if (overlay) {
+                overlay.addEventListener('click', closeMenu);
+            }
+            
+            // Close menu when clicking menu links
+            var menuLinks = menuDrawer.querySelectorAll('.mobile-menu-list a');
+            menuLinks.forEach(function(link) {
+                link.addEventListener('click', function() {
+                    setTimeout(closeMenu, 100);
+                });
+            });
+            
+            // Close menu on ESC key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && menuDrawer.classList.contains('active')) {
+                    closeMenu();
+                }
+            });
+        })();
+
         (function() {
 
             var fadeEls = document.querySelectorAll('.scroll-fade');

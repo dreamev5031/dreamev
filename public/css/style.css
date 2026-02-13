@@ -192,6 +192,135 @@ nav {
     box-shadow: 0 8px 24px rgba(16, 185, 129, 0.25);
 }
 
+/* ===== Mobile Menu Toggle (Hamburger) ===== */
+.gnb-right-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.mobile-menu-toggle {
+    display: none; /* Hidden on desktop */
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 10px;
+    z-index: 10002;
+    position: relative;
+}
+
+.hamburger-icon {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 24px;
+    height: 18px;
+    position: relative;
+}
+
+.hamburger-icon span {
+    display: block;
+    width: 100%;
+    height: 3px;
+    background: #FFFFFF;
+    border-radius: 2px;
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    transform-origin: center;
+}
+
+/* Hamburger to X animation */
+.mobile-menu-toggle.active .hamburger-icon span:nth-child(1) {
+    transform: translateY(7.5px) rotate(45deg);
+}
+
+.mobile-menu-toggle.active .hamburger-icon span:nth-child(2) {
+    opacity: 0;
+    transform: scaleX(0);
+}
+
+.mobile-menu-toggle.active .hamburger-icon span:nth-child(3) {
+    transform: translateY(-7.5px) rotate(-45deg);
+}
+
+/* ===== Mobile Menu Drawer ===== */
+.mobile-menu-drawer {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    z-index: 10001;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.mobile-menu-drawer.active {
+    display: block;
+    opacity: 1;
+    visibility: visible;
+}
+
+.mobile-menu-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+
+.mobile-menu-content {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: rgba(26, 32, 44, 0.95);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    padding: 100px 2rem 2rem;
+    transform: translateY(-100%);
+    transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.mobile-menu-drawer.active .mobile-menu-content {
+    transform: translateY(0);
+}
+
+.mobile-menu-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.mobile-menu-list li {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.mobile-menu-list li:last-child {
+    border-bottom: none;
+}
+
+.mobile-menu-list a {
+    display: block;
+    color: #FFFFFF;
+    font-size: 18px;
+    font-weight: 500;
+    padding: 1.25rem 0;
+    text-decoration: none;
+    transition: color 0.3s, padding-left 0.3s;
+}
+
+.mobile-menu-list a:hover,
+.mobile-menu-list a:active {
+    color: var(--primary);
+    padding-left: 1rem;
+}
+
 /* ===== Hero Slider (100vh) ===== */
 .hero {
     position: relative;
@@ -1313,39 +1442,46 @@ nav {
 /* ===== Responsive ===== */
 @media (max-width: 768px) {
     .gnb {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 1rem;
         flex-wrap: nowrap;
-        padding: 1rem 0.5rem 1rem 1rem;
-        justify-content: flex-start;
         position: relative;
     }
 
     .gnb-logo {
         font-size: 1.2rem;
         flex-shrink: 0;
-        z-index: 1000;
-        margin-right: auto;
+        z-index: 10003;
     }
 
     .gnb-nav {
-        order: 2;
-        display: none; /* 햄버거 메뉴로 숨김 (향후 구현 시 활성화) */
+        display: none; /* Desktop menu hidden on mobile */
+    }
+
+    /* Show hamburger menu toggle on mobile */
+    .mobile-menu-toggle {
+        display: block;
+    }
+
+    .gnb-right-group {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        z-index: 10003;
     }
 
     .gnb-cta {
-        order: 3;
-        position: absolute !important;
-        right: 15px !important;
-        top: 50% !important;
-        transform: translateY(-50%) !important;
         padding: 0.6rem 1rem;
         font-size: 0.85rem;
         flex-shrink: 0;
         white-space: nowrap;
-        z-index: 9999 !important;
-        background: var(--primary) !important;
-        color: #FFFFFF !important;
+        background: var(--primary);
+        color: #FFFFFF;
         border-radius: 8px;
         box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+        text-decoration: none;
     }
 
     .gnb-nav a {
