@@ -111,35 +111,97 @@
         </div>
     </section>
 
-    <!-- Contact Bar: 빠른 상담 -->
-    <section class="contact-bar">
-        <div class="contact-bar-content">
-            <p class="contact-bar-text">현장을 가장 잘 아는 기술자가 직접 만듭니다. 지금 바로 상담하세요!</p>
-            <div class="contact-bar-buttons">
-                <a href="tel:010-3789-7653" class="contact-btn contact-btn-phone">
-                    <span>📞</span>
-                    <span>전화 상담: 010-3789-7653</span>
-                </a>
-                <a href="https://pf.kakao.com/_yourkakaoid" target="_blank" class="contact-btn contact-btn-kakao">
-                    <span>💬</span>
-                    <span>카카오톡 견적 문의</span>
-                </a>
+    <!-- FAQ Section: 자주 묻는 질문 -->
+    <section class="section index-faq-section">
+        <h2 class="section-title">자주 묻는 <span>질문</span></h2>
+        <div class="faq-container">
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span>Q.</span>
+                    <span>정말 녹이 안 슬까요?</span>
+                    <span class="faq-toggle">+</span>
+                </div>
+                <div class="faq-answer">
+                    <p>네, 드림전동차는 전 기종 <strong>올 스테인리스(Stainless Steel)</strong> 바디를 채택하여 축사나 농장 등 습기가 많은 환경에서도 부식 걱정 없이 반영구적으로 사용 가능합니다.</p>
+                </div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span>Q.</span>
+                    <span>한 번 충전하면 얼마나 쓰나요?</span>
+                    <span class="faq-toggle">+</span>
+                </div>
+                <div class="faq-answer">
+                    <p>검증된 고성능 <strong>딥사이클 배터리</strong>를 표준 장착하여, 작업 환경에 따라 다르지만 넉넉한 주행 거리와 강력한 파워를 보장합니다.</p>
+                </div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span>Q.</span>
+                    <span>운전이 어렵지는 않나요?</span>
+                    <span class="faq-toggle">+</span>
+                </div>
+                <div class="faq-answer">
+                    <p>안정적인 <strong>국산 컨트롤러</strong>를 탑재하여 부드러운 가감속이 가능합니다. 초보자나 어르신도 금방 적응하실 수 있을 만큼 조작이 직관적이고 안전합니다.</p>
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- Wide Footer: 공식 사업자 정보 -->
-    <footer class="wide-footer" id="contact">
-        <div class="footer-content">
-            <div class="footer-info">
-                <p class="footer-company">드림전동차</p>
-                <p class="footer-address">경기도 양주시 광적면 부흥로 956번길 174</p>
-                <p class="footer-details">
-                    <span>사업자등록번호: 560-86-02294</span>
-                    <span>대표번호: 010-3789-7653</span>
-                </p>
+    <!-- Inquiry Section: 견적 및 A/S 접수 -->
+    <section class="section index-inquiry-section">
+        <h2 class="section-title">더 궁금하신 점이 있나요? <span>상담 신청하기</span></h2>
+        <div class="index-inquiry-container">
+            <form id="indexInquiryForm" class="index-inquiry-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="inquiryName">성함 <span class="required">*</span></label>
+                        <input type="text" id="inquiryName" name="name" required placeholder="홍길동">
+                    </div>
+                    <div class="form-group">
+                        <label for="inquiryPhone">연락처 <span class="required">*</span></label>
+                        <input type="tel" id="inquiryPhone" name="phone" required placeholder="010-1234-5678">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="inquiryModel">차종/모델</label>
+                        <input type="text" id="inquiryModel" name="model" placeholder="예: 산업용 전동차">
+                    </div>
+                    <div class="form-group">
+                        <label for="inquiryType">문의 유형 <span class="required">*</span></label>
+                        <select id="inquiryType" name="inquiryType" required>
+                            <option value="">선택해주세요</option>
+                            <option value="신규견적">신규 견적</option>
+                            <option value="AS요청">A/S 요청</option>
+                            <option value="기타">기타 문의</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="inquiryMessage">상세 내용 <span class="required">*</span></label>
+                    <textarea id="inquiryMessage" name="message" rows="6" required placeholder="문의하실 내용을 자세히 적어주시면 더 정확한 답변을 드릴 수 있습니다."></textarea>
+                </div>
+                <button type="submit" class="btn-submit">상담 신청하기</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Final Footer: 공식 사업자 정보 -->
+    <footer class="final-footer" id="contact">
+        <div class="final-footer-content">
+            <div class="final-footer-row">
+                <span class="final-footer-item"><strong>상호명:</strong> 드림전동차</span>
+                <span class="final-footer-separator">|</span>
+                <span class="final-footer-item"><strong>대표번호:</strong> 010-3789-7653</span>
             </div>
-            <p class="footer-copyright">© 드림전동차. All rights reserved.</p>
+            <div class="final-footer-row">
+                <span class="final-footer-item">경기도 양주시 광적면 부흥로 956번길 174</span>
+            </div>
+            <div class="final-footer-row">
+                <span class="final-footer-item">사업자등록번호: 560-86-02294</span>
+            </div>
+            <p class="final-footer-copyright">© 드림전동차. All rights reserved.</p>
         </div>
     </footer>
 
@@ -192,6 +254,63 @@
                 });
             }, { rootMargin: '0px 0px -100px 0px', threshold: 0.1 });
             revealEls.forEach(function(el) { observer.observe(el); });
+        })();
+
+        // FAQ Accordion
+        (function() {
+            var faqItems = document.querySelectorAll('.index-faq-section .faq-item');
+            faqItems.forEach(function(item) {
+                var question = item.querySelector('.faq-question');
+                var answer = item.querySelector('.faq-answer');
+                var toggle = item.querySelector('.faq-toggle');
+                
+                if (!question || !answer) return;
+                
+                question.addEventListener('click', function() {
+                    var isOpen = item.classList.contains('active');
+                    
+                    // Close all other items
+                    faqItems.forEach(function(otherItem) {
+                        if (otherItem !== item) {
+                            otherItem.classList.remove('active');
+                            var otherToggle = otherItem.querySelector('.faq-toggle');
+                            if (otherToggle) otherToggle.textContent = '+';
+                        }
+                    });
+                    
+                    // Toggle current item
+                    if (isOpen) {
+                        item.classList.remove('active');
+                        toggle.textContent = '+';
+                    } else {
+                        item.classList.add('active');
+                        toggle.textContent = '−';
+                    }
+                });
+            });
+        })();
+
+        // Inquiry Form submission
+        (function() {
+            var form = document.getElementById('indexInquiryForm');
+            if (!form) return;
+            
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                var formData = new FormData(form);
+                var data = {};
+                formData.forEach(function(value, key) {
+                    data[key] = value;
+                });
+                
+                // 여기에 실제 전송 로직을 추가하세요
+                console.log('Inquiry submitted:', data);
+                
+                // 임시 알림
+                alert('상담 신청이 접수되었습니다.\n빠른 시일 내에 연락드리겠습니다.');
+                form.reset();
+            });
         })();
     </script>
 </body>
