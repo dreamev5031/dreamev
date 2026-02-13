@@ -27,12 +27,17 @@
 
 * {
     box-sizing: border-box;
-    scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none; /* IE and Edge */
+    margin: 0;
+    padding: 0;
 }
 
 *::-webkit-scrollbar {
-    display: none; /* Chrome, Safari, Opera */
+    display: none;
+}
+
+* {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
 }
 
 /* Hide number input spinners */
@@ -46,14 +51,15 @@ input[type="number"] {
     -moz-appearance: textfield;
 }
 
-html {
-    overflow-x: hidden !important;
-    overflow-y: visible !important;
-    scroll-behavior: smooth;
+html, body {
     width: 100%;
-    position: relative;
-    height: auto;
-    min-height: 100%;
+    min-height: 100vh;
+    overflow-x: hidden;
+    overflow-y: auto !important; /* 스크롤 강제 활성화 */
+    scroll-behavior: smooth;
+    background: #2D3748;
+    color: var(--text-main);
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
 }
 
 /* Performance optimization: contain layout and paint */
@@ -62,22 +68,6 @@ img {
     height: auto;
     content-visibility: auto;
     contain-intrinsic-size: 400px;
-}
-
-body {
-    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
-    margin: 0;
-    padding: 0;
-    padding-top: 0 !important;
-    background: #2D3748;
-    color: var(--text-main);
-    min-height: 100vh;
-    height: auto;
-    line-height: 1.6;
-    overflow-x: hidden !important;
-    overflow-y: visible !important;
-    width: 100%;
-    position: relative;
 }
 
 a {
@@ -109,9 +99,7 @@ nav {
 .gnb {
     position: sticky;
     top: 0;
-    left: 0;
     width: 100%;
-    max-width: 100%;
     z-index: 9999;
     display: flex;
     align-items: center;
@@ -124,6 +112,7 @@ nav {
     box-sizing: border-box;
     border-bottom: 2px solid rgba(16, 185, 129, 0.3);
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25), 0 2px 8px rgba(0, 0, 0, 0.15);
+    margin: 0 !important; /* 빈 공간 제거의 핵심 */
 }
 
 /* GNB scroll effect removed - header stays static */
@@ -142,7 +131,7 @@ nav {
     display: flex;
     align-items: center;
     gap: 2rem;
-    list-style: none;
+    list-style: none !important; /* 리스트 점(bullet) 완벽 제거 */
     margin: 0;
     padding: 0;
     overflow: visible;
@@ -326,16 +315,15 @@ nav {
 .hero {
     position: relative;
     width: 100%;
-    min-height: 100vh;
-    height: 100vh;
-    margin-top: 0 !important;
-    padding-top: 0 !important;
-    box-sizing: border-box;
-    overflow-x: hidden;
-    overflow-y: visible;
+    height: calc(100vh - 70px); /* 헤더 높이만큼 빼서 빈 공간 밀림 방지 */
+    min-height: 500px;
+    margin: 0 !important;
+    padding: 0 !important;
     display: flex;
     align-items: center;
     justify-content: center;
+    overflow: hidden; /* 사진 확대 시 밖으로 삐져나감 방지 */
+    box-sizing: border-box;
     /* Prevent scroll blocking - ensure hero doesn't block document scroll */
     pointer-events: auto;
     touch-action: pan-y;
@@ -370,8 +358,8 @@ nav {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-top: 0 !important;
-    padding-top: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
     box-sizing: border-box;
     background-color: #1F2937;
     background-size: cover;
