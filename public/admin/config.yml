@@ -1,0 +1,30 @@
+backend:
+  name: github
+  repo: dreamev5031/dreamev
+  branch: main
+  base_url: https://dreamev.netlify.app
+
+media_folder: public/images
+public_folder: images
+
+collections:
+  - name: "cases"
+    label: "제작사례"
+    label_singular: "제작사례"
+    file: "public/data/cases.json"
+    format: "json"
+    create: true
+    fields:
+      - { label: "제작사례 목록", name: "cases", widget: "list", fields:
+          - { label: "제목", name: "title", widget: "string", required: true }
+          - { 
+              label: "카테고리", 
+              name: "category", 
+              widget: "select", 
+              options: ["industrial", "agricultural", "multipurpose", "custom"],
+              required: true 
+            }
+          - { label: "이미지", name: "image", widget: "image", required: true }
+          - { label: "날짜", name: "date", widget: "date", required: true }
+          - { label: "설명", name: "description", widget: "text", required: false }
+        }
