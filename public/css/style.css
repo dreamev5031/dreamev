@@ -2507,10 +2507,9 @@ nav {
     }
 }
 
-/* 모바일 메뉴 클린 코드 */
-/* 모바일 메뉴 클린 코드 */
+/* ----- 모바일 전용 (768px 이하) ----- */
 @media (max-width: 768px) {
-    /* 1. 모바일 헤더 높이 고정 및 여백 제거 */
+    /* 1. 헤더 초기화 */
     .gnb {
         height: 60px !important;
         padding: 0 1.5rem !important;
@@ -2518,6 +2517,7 @@ nav {
         display: flex !important;
         align-items: center !important;
         justify-content: space-between !important;
+        position: sticky !important; top: 0 !important; z-index: 10000 !important;
     }
 
     /* 2. 기존 메뉴 숨기기 */
@@ -2525,39 +2525,32 @@ nav {
         display: none !important;
     }
 
-    /* 3. 새로운 모바일 전용 오버레이 메뉴 */
-    .gnb-nav.mobile-active {
-        display: flex !important;
-        position: fixed !important;
-        top: 0 !important;
-        left: 0 !important;
-        width: 100vw !important;
-        height: 100vh !important;
-        background-color: #1a202c !important; /* 드림전동차 다크 테마 */
-        z-index: 999999 !important;
-        flex-direction: column !important;
-        justify-content: center !important;
-        align-items: center !important;
-        gap: 2.5rem !important;
-    }
-
-    .gnb-nav.mobile-active a {
-        font-size: 2rem !important;
-        color: #ffffff !important;
-        font-weight: 800 !important;
-        text-decoration: none !important;
-    }
-
-    /* 4. 햄버거 버튼을 메뉴 위로 올리기 */
+    /* 3. 햄버거 버튼 노출 및 최상위 배치 */
     .mobile-menu-toggle {
         display: block !important;
-        z-index: 1000000 !important;
+        z-index: 100002 !important;
         position: relative !important;
     }
-}
 
-@media (max-width: 768px) {
-    .gnb-logo, .gnb-logo a, .gnb-logo span {
-        color: skyblue !important; /* 업데이트 확인용 하늘색 */
+    /* 4. 새로운 모바일 전용 오버레이 메뉴 (활성화 시) */
+    /* .active 클래스가 붙으면 나타나게 설정 */
+    .gnb-nav.active {
+        display: flex !important;
+        position: fixed !important; /* 화면에 고정 */
+        top: 0 !important; left: 0 !important;
+        width: 100vw !important; height: 100vh !important;
+        background-color: #1a202c !important; /* 드림전동차 다크 배경 */
+        z-index: 100001 !important; /* 헤더보다 위, 버튼보다 아래 */
+        flex-direction: column !important;
+        justify-content: center !important; align-items: center !important;
+        gap: 2.5rem !important; padding-top: 60px !important;
+    }
+
+    /* 5. 모바일 메뉴 글자 스타일 */
+    .gnb-nav.active li { list-style: none !important; }
+    .gnb-nav.active a {
+        font-size: 2rem !important; color: #ffffff !important;
+        font-weight: 800 !important; text-decoration: none !important;
+        display: block !important;
     }
 }
