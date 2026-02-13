@@ -49,7 +49,7 @@ export async function onRequestGet(context) {
   const accessToken = tokenData.access_token;
   
   // Redirect back to admin with token
-  const adminUrl = new URL('/admin/', url.origin);
+  const adminUrl = new URL('/admin/', 'https://dreamev-site.pages.dev');
   adminUrl.hash = `#access_token=${accessToken}&token_type=bearer&state=${state || ''}`;
   
   return Response.redirect(adminUrl.toString(), 302);
