@@ -258,9 +258,9 @@ document.addEventListener('DOMContentLoaded', function() {
     if (btn && nav) {
         btn.onclick = function(e) {
             e.preventDefault();
-            nav.classList.toggle('show-me');
-            btn.classList.toggle('active');
-            console.log("글자색은 하늘색인가요? 메뉴 상태:", nav.classList.contains('show-me'));
+            this.classList.toggle('active');
+            nav.classList.toggle('active');
+            document.body.style.overflow = nav.classList.contains('active') ? 'hidden' : 'auto';
         };
     }
 });

@@ -2508,45 +2508,47 @@ nav {
 }
 
 @media (max-width: 768px) {
-    /* 1. 기본 메뉴 숨김 */
+    /* 1. 드림전동차 글자색은 확인용으로 하늘색 유지 */
+    .gnb-logo, .gnb-logo a, .gnb-logo span {
+        color: skyblue !important;
+    }
+
+    /* 2. 햄버거 버튼 강제 노출 (흰색 세 줄) */
+    .mobile-menu-toggle {
+        display: flex !important;
+        flex-direction: column;
+        justify-content: space-around;
+        width: 30px; height: 24px;
+        background: transparent; border: none; cursor: pointer;
+        z-index: 1000001 !important;
+        position: relative;
+    }
+    .mobile-menu-toggle span {
+        width: 100%; height: 3px; background-color: #ffffff;
+        transition: 0.3s;
+    }
+
+    /* 3. 메뉴판 초기 상태 (숨김) */
     .gnb-nav {
         display: none !important;
     }
 
-    /* 2. 메뉴 활성화 시 (.show-me 클래스 추가 시) */
-    .gnb-nav.show-me {
+    /* 4. 메뉴 활성화 상태 (.active) */
+    .gnb-nav.active {
         display: flex !important;
         position: fixed !important;
-        top: 0 !important;
-        left: 0 !important;
-        width: 100vw !important;
-        height: 100vh !important;
-        background-color: #1a202c !important; /* 다크 배경 */
-        z-index: 99999 !important;
+        top: 0; left: 0; width: 100vw; height: 100vh;
+        background: #1a202c !important;
+        z-index: 1000000 !important;
         flex-direction: column !important;
         justify-content: center !important;
         align-items: center !important;
-        gap: 30px !important;
+        gap: 2rem !important;
     }
 
-    .gnb-nav.show-me a {
+    .gnb-nav.active a {
         font-size: 2rem !important;
         color: white !important;
-        font-weight: bold !important;
-    }
-
-    /* 3. 햄버거 버튼 위치 사수 */
-    .mobile-menu-toggle {
-        display: block !important;
-        z-index: 100000 !important;
-        position: relative !important;
+        font-weight: 800 !important;
     }
 }
-
-@media (max-width: 768px) {
-    /* 왼쪽 상단 텍스트 색상 강제 변경 */
-    .gnb-logo, .gnb-logo span {
-        color: skyblue !important; 
-    }
-}
-/* test */
