@@ -2508,46 +2508,49 @@ nav {
 }
 
 @media (max-width: 768px) {
-    /* [테스트용] 드림전동차 글자색 하늘색 유지 */
+    /* [검증] 하늘색 글자 유지 */
     .gnb-logo, .gnb-logo a, .gnb-logo span { 
         color: skyblue !important; 
-        position: relative !important; 
         z-index: 1000005 !important; 
+        position: relative !important;
     }
 
-    /* 1. 햄버거 버튼 복구 (세 줄 그리기) */
+    /* 1. 사라진 버튼 강제 소환 (빨간 테두리로 위치 확인) */
     .mobile-menu-toggle {
-        display: flex !important;
+        display: flex !important; /* 강제 노출 */
+        visibility: visible !important;
         flex-direction: column !important;
         justify-content: space-between !important;
-        width: 28px !important; height: 20px !important;
-        background: transparent !important; border: none !important;
-        z-index: 1000005 !important; position: relative !important;
-    }
-    .mobile-menu-toggle span {
-        display: block !important; width: 100% !important; height: 3px !important;
-        background-color: #ffffff !important; border-radius: 2px !important;
-        transition: 0.3s !important;
+        width: 30px !important; height: 22px !important;
+        padding: 0 !important; background: transparent !important;
+        border: 2px solid red !important; /* 찾기 쉽게 빨간 테두리 추가 */
+        cursor: pointer !important;
+        z-index: 1000005 !important;
+        position: relative !important;
     }
 
-    /* 2. 버튼 클릭 시 X로 변신 */
-    .mobile-menu-toggle.active span:nth-child(1) { transform: translateY(8.5px) rotate(45deg) !important; }
-    .mobile-menu-toggle.active span:nth-child(2) { opacity: 0 !important; }
-    .mobile-menu-toggle.active span:nth-child(3) { transform: translateY(-8.5px) rotate(-45deg) !important; }
+    /* 2. 버튼 세 줄 다시 그리기 (흰색) */
+    .mobile-menu-toggle span {
+        display: block !important;
+        width: 100% !important; height: 3px !important;
+        background-color: #ffffff !important;
+        border-radius: 2px !important;
+    }
 
     /* 3. 메뉴판 (기본 숨김) */
     .gnb-nav { display: none !important; }
 
-    /* 4. 메뉴판 활성화 (전체 화면 & 불투명 배경) */
+    /* 4. 메뉴판 활성화 (전체 화면) */
     .gnb-nav.active {
         display: flex !important;
-        position: fixed !important; top: 0 !important; left: 0 !important;
+        position: fixed !important;
+        top: 0 !important; left: 0 !important;
         width: 100vw !important; height: 100vh !important;
-        background-color: #1a202c !important; /* 투명도 없는 진한 배경 */
-        z-index: 1000000 !important; /* 로고(1000005)보다는 아래 */
+        background-color: #1a202c !important; /* 진한 배경 */
+        z-index: 1000000 !important;
         flex-direction: column !important;
         justify-content: center !important; align-items: center !important;
-        gap: 3rem !important; margin: 0 !important;
+        gap: 2.5rem !important;
     }
     .gnb-nav.active a { font-size: 2rem !important; color: #fff !important; font-weight: 800 !important; }
 }

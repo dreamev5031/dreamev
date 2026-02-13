@@ -254,15 +254,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const nav = document.querySelector('.gnb-nav');
 
     if (btn && nav) {
-        // 기존 이벤트 제거를 위한 클론 처리
-        const newBtn = btn.cloneNode(true);
-        btn.parentNode.replaceChild(newBtn, btn);
-
-        newBtn.onclick = function(e) {
+        btn.onclick = function(e) {
             e.preventDefault();
-            const isOpen = nav.classList.toggle('active');
+            nav.classList.toggle('active');
             this.classList.toggle('active');
-            document.body.style.overflow = isOpen ? 'hidden' : 'auto';
+            document.body.style.overflow = nav.classList.contains('active') ? 'hidden' : 'auto';
         };
     }
 });
