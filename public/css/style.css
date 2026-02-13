@@ -49,7 +49,7 @@ body {
     font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
     margin: 0;
     padding: 0;
-    background: var(--bg-main);
+    background: #F8F9FA;
     color: var(--text-main);
     min-height: 100vh;
     line-height: 1.6;
@@ -95,15 +95,18 @@ nav {
     align-items: center;
     justify-content: space-between;
     padding: 1rem 2rem;
-    background: var(--glass-bg);
+    background: #0F172A;
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    transition: border-color 0.3s;
+    transition: border-color 0.3s, box-shadow 0.3s;
     box-sizing: border-box;
+    border-bottom: 2px solid rgba(16, 185, 129, 0.3);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .gnb.scrolled {
-    border-bottom: 1px solid var(--glass-border);
+    border-bottom: 2px solid rgba(16, 185, 129, 0.5);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
 }
 
 .gnb-logo {
@@ -156,10 +159,12 @@ nav {
     display: inline-block;
     padding: 0.6rem 1.5rem;
     background: var(--primary);
-    color: var(--text-main);
+    color: #FFFFFF;
     font-weight: 600;
     border-radius: 8px;
     transition: background 0.3s, transform 0.3s, box-shadow 0.3s;
+    white-space: nowrap;
+    z-index: 1001;
 }
 
 .gnb-cta:hover {
@@ -272,6 +277,10 @@ nav {
     padding-top: 5rem;
     box-sizing: border-box;
     overflow-x: hidden;
+    background: #FFFFFF;
+    border-radius: 16px;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .section-title {
@@ -845,7 +854,7 @@ nav {
 .global-faq-section,
 .index-faq-section {
     padding-top: 5rem;
-    background: var(--bg-main);
+    background: #FFFFFF;
 }
 
 .global-faq-section .faq-container,
@@ -858,7 +867,7 @@ nav {
 .global-inquiry-section,
 .index-inquiry-section {
     padding-top: 5rem;
-    background: #252F3F;
+    background: #FFFFFF;
 }
 
 .global-inquiry-container,
@@ -1166,11 +1175,13 @@ nav {
         flex-wrap: nowrap;
         padding: 1rem;
         justify-content: space-between;
+        position: relative;
     }
 
     .gnb-logo {
         font-size: 1.2rem;
         flex-shrink: 0;
+        z-index: 1000;
     }
 
     .gnb-nav {
@@ -1180,11 +1191,16 @@ nav {
 
     .gnb-cta {
         order: 3;
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
         padding: 0.5rem 1rem;
-        font-size: 0.9rem;
+        font-size: 0.85rem;
         flex-shrink: 0;
         margin-left: auto;
         white-space: nowrap;
+        z-index: 1002;
     }
 
     .gnb-nav a {
@@ -1432,6 +1448,46 @@ nav {
 .support-faq-section-top {
     padding-top: 5rem;
     padding-bottom: 3rem;
+    background: #FFFFFF;
+    border-radius: 0;
+}
+
+/* Support FAQ Hero Section */
+.support-faq-hero {
+    text-align: center;
+    margin-bottom: 3rem;
+    padding: 2rem 0;
+}
+
+.support-faq-icon {
+    font-size: 4rem;
+    margin-bottom: 1.5rem;
+    display: inline-block;
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+.support-faq-title {
+    font-size: clamp(1.8rem, 4vw, 2.5rem);
+    font-weight: 800;
+    color: #1F2937;
+    margin: 0 0 1rem 0;
+    line-height: 1.4;
+}
+
+.support-faq-subtitle {
+    font-size: clamp(1rem, 2vw, 1.2rem);
+    color: #6B7280;
+    margin: 0;
+    line-height: 1.6;
 }
 
 .faq-container {
@@ -1442,6 +1498,81 @@ nav {
     gap: 1rem;
 }
 
+.faq-item {
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    overflow: visible;
+    transition: none;
+    margin-bottom: 1rem;
+}
+
+.faq-item.active {
+    border: none;
+}
+
+/* Support page FAQ button style */
+.support-faq-section-top .faq-item {
+    margin-bottom: 1rem;
+}
+
+.support-faq-section-top .faq-question {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.25rem 1.5rem;
+    background: var(--primary);
+    color: #FFFFFF;
+    border-radius: 12px;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.3s, transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+}
+
+.support-faq-section-top .faq-question:hover {
+    background: var(--primary-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(16, 185, 129, 0.3);
+}
+
+.support-faq-section-top .faq-question:active {
+    transform: translateY(0);
+}
+
+.support-faq-section-top .faq-question span:first-child {
+    font-weight: 700;
+    color: #FFFFFF;
+    font-size: 1.1rem;
+    min-width: 30px;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 0.3rem 0.6rem;
+    border-radius: 6px;
+}
+
+.support-faq-section-top .faq-question span:nth-child(2) {
+    flex: 1;
+    font-weight: 600;
+    color: #FFFFFF;
+    font-size: 1.05rem;
+    text-align: left;
+}
+
+.support-faq-section-top .faq-toggle {
+    color: #FFFFFF;
+    font-size: 1.5rem;
+    font-weight: 300;
+    min-width: 24px;
+    text-align: center;
+    transition: transform 0.3s;
+}
+
+.support-faq-section-top .faq-item.active .faq-toggle {
+    transform: rotate(180deg);
+}
+
+/* Default FAQ style (for other pages) */
 .faq-item {
     background: var(--bg-card);
     border: 1px solid var(--glass-border);
@@ -1512,6 +1643,23 @@ nav {
     color: var(--text-muted);
     line-height: 1.7;
     padding-top: 0.5rem;
+}
+
+/* Support page FAQ answer style */
+.support-faq-section-top .faq-answer {
+    background: #F8F9FA;
+    border-radius: 0 0 12px 12px;
+    margin-top: 0.5rem;
+    padding: 0 1.5rem;
+}
+
+.support-faq-section-top .faq-item.active .faq-answer {
+    padding: 1.25rem 1.5rem;
+}
+
+.support-faq-section-top .faq-answer p {
+    color: #374151;
+    font-size: 1rem;
 }
 
 .support-location-section {
@@ -1700,7 +1848,7 @@ nav {
 .support-location-section-large {
     padding-top: 5rem;
     padding-bottom: 5rem;
-    background: var(--bg-card);
+    background: #FFFFFF;
 }
 
 .support-location-large {
@@ -1857,6 +2005,24 @@ nav {
     .support-faq-section-top {
         padding-top: 3rem;
         padding-bottom: 2rem;
+    }
+
+    .support-faq-hero {
+        padding: 1.5rem 0;
+        margin-bottom: 2rem;
+    }
+
+    .support-faq-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+    }
+
+    .support-faq-title {
+        font-size: 1.8rem;
+    }
+
+    .support-faq-subtitle {
+        font-size: 1rem;
     }
 
     .support-location-section-large {
