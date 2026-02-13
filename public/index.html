@@ -3,125 +3,105 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dream EV - 미래를 선도하는 산업용 전동차</title>
+    <title>Dream EV - 산업용 전동차</title>
     <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/responsive.css">
 </head>
 <body>
-    <header>
-        <h1><a href="index.html" style="color: #fff; text-decoration: none;">Dream EV</a></h1>
+    <!-- GNB -->
+    <header class="gnb" id="gnb">
+        <a href="index.html" class="gnb-logo">DREAM <span>EV</span></a>
         <nav>
-            <ul>
-                <li><a href="about.html">브랜드 스토리</a></li>
-                <li><a href="products.html">대표 모델</a></li>
-                <li><a href="archive.html">제작사례</a></li>
-                <li><a href="support.html">고객지원</a></li>
+            <ul class="gnb-nav">
+                <li><a href="index.html">홈</a></li>
+                <li><a href="index.html#best-sellers">대표모델</a></li>
+                <li><a href="cases.html">제작사례</a></li>
+                <li><a href="index.html#contact">고객지원</a></li>
             </ul>
         </nav>
+        <a href="index.html#contact" class="gnb-cta">견적문의</a>
     </header>
 
-    <div class="fullscreen-slider">
-        <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1618220179428-22790b461013?auto=format&fit=crop&w=1920&q=80');">
-            <div class="slide-content">
-                <h2>친환경 이동의 새로운 기준, 드림전동차</h2>
+    <!-- Hero Slider -->
+    <section class="hero">
+        <div class="hero-slider" id="heroSlider">
+            <div class="hero-slide" style="background-image: url('https://source.unsplash.com/featured/1920x1080/?electric,vehicle');">
+                <div class="hero-content">
+                    <h1 class="hero-slogan">이동의 한계를 넘다, <span>DREAM EV</span></h1>
+                </div>
+            </div>
+            <div class="hero-slide" style="background-image: url('https://source.unsplash.com/featured/1920x1080/?future,factory');">
+                <div class="hero-content">
+                    <h1 class="hero-slogan">이동의 한계를 넘다, <span>DREAM EV</span></h1>
+                </div>
+            </div>
+            <div class="hero-slide" style="background-image: url('https://source.unsplash.com/featured/1920x1080/?clean,energy');">
+                <div class="hero-content">
+                    <h1 class="hero-slogan">이동의 한계를 넘다, <span>DREAM EV</span></h1>
+                </div>
             </div>
         </div>
-        <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1920&q=80');">
-            <div class="slide-content">
-                <h2>압도적인 등판 능력과 배터리 수명</h2>
-            </div>
+    </section>
+
+    <!-- Best Sellers -->
+    <section class="section" id="best-sellers">
+        <h2 class="section-title">Dream EV <span>대표 라인업</span></h2>
+        <div class="best-sellers-grid">
+            <article class="best-card">
+                <img class="best-card-image" src="https://source.unsplash.com/featured/600x400/?forklift,factory" alt="산업용 전동차">
+                <div class="best-card-body">
+                    <h3 class="best-card-title">산업용</h3>
+                    <p class="best-card-desc">강력한 견인력의 토잉카. 물류·공장 현장에 최적화된 산업용 전동차.</p>
+                    <a href="#" class="btn-spec">상세 스펙 보기</a>
+                </div>
+            </article>
+            <article class="best-card">
+                <img class="best-card-image" src="https://source.unsplash.com/featured/600x400/?tractor,farm,vehicle" alt="농업용 전동차">
+                <div class="best-card-body">
+                    <h3 class="best-card-title">농업용</h3>
+                    <p class="best-card-desc">험로 주행 최적화 운반차. 농장·온실·스마트팜까지 다양한 환경 대응.</p>
+                    <a href="#" class="btn-spec">상세 스펙 보기</a>
+                </div>
+            </article>
+            <article class="best-card">
+                <img class="best-card-image" src="https://source.unsplash.com/featured/600x400/?welding,blueprint" alt="특수제작">
+                <div class="best-card-body">
+                    <h3 class="best-card-title">특수제작</h3>
+                    <p class="best-card-desc">고객 맞춤형 커스텀 솔루션. 용도에 맞춘 설계·제작이 가능합니다.</p>
+                    <a href="#" class="btn-spec">상세 스펙 보기</a>
+                </div>
+            </article>
         </div>
-        <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=1920&q=80');">
-            <div class="slide-content">
-                <h2>지금 바로 시승을 예약하세요</h2>
-            </div>
-        </div>
-    </div>
+    </section>
 
-    <main class="container">
-        <section id="flagship-preview">
-            <h2 class="section-title">대표 모델</h2>
-            <div class="product-grid">
-                <div class="product-card">
-                    <img src="https://images.unsplash.com/photo-1701849473471-666bf2b0158e?auto=format&fit=crop&w=1200&q=80" alt="전동 지게차">
-                    <div class="product-card-content">
-                        <h3>전동 지게차 A-1</h3>
-                        <p>강력한 성능과 긴 배터리 수명을 자랑하는 최신형 전동 지게차.</p>
-                        <a href="#" class="btn-more">자세히 보기</a>
-                    </div>
-                </div>
-                <div class="product-card">
-                    <img src="https://img.freepik.com/premium-photo/blue-golf-cart-with-white-seat-is-shown-in-a-white-background_902639-9993.jpg?w=1060" alt="전동 카트">
-                    <div class="product-card-content">
-                        <h3>다목적 전동 카트 B-3</h3>
-                        <p>넓은 적재 공간과 안정적인 주행 성능으로 활용도가 높습니다.</p>
-                        <a href="#" class="btn-more">자세히 보기</a>
-                    </div>
-                </div>
-                <div class="product-card">
-                    <img src="https://img.freepik.com/premium-photo/a-blue-and-white-golf-cart-is-parked-in-a-white-room_902639-9831.jpg?w=1060" alt="전동 운반차">
-                    <div class="product-card-content">
-                        <h3>대형 전동 운반차 C-MAX</h3>
-                        <p>중량물 운반을 위한 견고한 설계와 파워풀한 모터를 탑재했습니다.</p>
-                        <a href="#" class="btn-more">자세히 보기</a>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section id="trust-points-section">
-            <div class="trust-points">
-                <div class="trust-point">
-                    <h3>1위</h3>
-                    <p>국내 산업용 전동차 시장 점유율</p>
-                </div>
-                <div class="trust-point">
-                    <h3>98%</h3>
-                    <p>고객 AS 만족도</p>
-                </div>
-                <div class="trust-point">
-                    <h3>500+</h3>
-                    <p>누적 고객사 수</p>
-                </div>
-            </div>
-        </section>
-
-        <section id="portfolio-snippet">
-            <h2 class="section-title">제작 사례</h2>
-            <!-- Portfolio grid will go here -->
-             <p style="text-align: center;">다양한 산업 현장에서 활약하는 드림 전동차의 모습을 확인해보세요.</p>
-            <a href="archive.html" class="btn-more" style="display: block; text-align: center; margin-top: 20px;">더 많은 제작 사례 보기</a>
-        </section>
-    </main>
-    
-    <a href="support.html#contact-form" class="floating-btn">시승 및 구매 문의</a>
-
-    <footer>
-        <p>
-            <strong>사업자등록번호:</strong> 560-86-02294 <br>
-            <strong>주소:</strong> 경기도 양주시 광적면 부흥로956번길174 <br>
-            <strong>E-MAIL:</strong> changho135@naver.com <br>
-            <strong>대표이사:</strong> 배창호 <br>
-            <strong>TEL:</strong> 010-3789-7653
-        </p>
-        <p>&copy; 2026 Dream EV. All rights reserved.</p>
+    <footer id="contact">
+        <p>© Dream EV. All rights reserved.</p>
     </footer>
 
+    <script src="js/script.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const slider = document.querySelector('.fullscreen-slider');
-            const slides = document.querySelectorAll('.fullscreen-slider .slide');
-            const totalSlides = slides.length;
-            let currentSlide = 0;
-
-            function slideNext() {
-                currentSlide = (currentSlide + 1) % totalSlides;
-                slider.style.transform = `translateX(-${currentSlide * 100}vw)`;
+        // GNB scroll → glassmorphism
+        (function() {
+            var gnb = document.getElementById('gnb');
+            if (!gnb) return;
+            function onScroll() {
+                gnb.classList.toggle('scrolled', window.scrollY > 50);
             }
+            window.addEventListener('scroll', onScroll);
+            onScroll();
+        })();
 
-            // Automatic slide every 5 seconds (5000 milliseconds)
-            setInterval(slideNext, 5000);
-        });
+        // Hero auto slider
+        (function() {
+            var slider = document.getElementById('heroSlider');
+            if (!slider) return;
+            var slides = slider.querySelectorAll('.hero-slide');
+            var total = slides.length;
+            var idx = 0;
+            setInterval(function() {
+                idx = (idx + 1) % total;
+                slider.style.transform = 'translateX(-' + idx * 100 + '%)';
+            }, 5000);
+        })();
     </script>
 </body>
 </html>

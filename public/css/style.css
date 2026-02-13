@@ -1,551 +1,395 @@
 @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
 
-/* General Body Styles */
+/* ===== Design System: Clean Tech & Dark Mode ===== */
+:root {
+    --bg-deep: #111827;
+    --bg-dark: #1F2937;
+    --point-mint: #00FFA3;
+    --text-white: #F9FAFB;
+    --glass-bg: rgba(31, 41, 55, 0.7);
+    --glass-border: rgba(255, 255, 255, 0.08);
+}
+
+* {
+    box-sizing: border-box;
+}
+
 html {
-    overflow-y: scroll; /* 페이지 길이가 달라도 항상 스크롤바 공간 고정 */
+    overflow-y: scroll;
+    scroll-behavior: smooth;
 }
 
 body {
-    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #FFFFFF;
-    color: #333333; /* Softer black for text */
+    background: linear-gradient(180deg, var(--bg-deep) 0%, var(--bg-dark) 100%);
+    color: var(--text-white);
+    min-height: 100vh;
 }
 
-/* Header Styles */
-header {
-    background-color: #4A90E2; /* Brighter, welcoming blue */
-    color: #FFFFFF;
-    padding: 1rem 2rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    position: fixed; /* Make header fixed */
-    width: 100%;
-    box-sizing: border-box; /* Include padding in width to avoid layout shift */
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+/* ===== GNB Header (Sticky + Glassmorphism) ===== */
+.gnb {
+    position: fixed;
     top: 0;
     left: 0;
-    z-index: 100;
-    transition: background-color 0.3s;
+    right: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 2rem;
+    transition: background 0.3s, backdrop-filter 0.3s;
 }
 
-header h1 {
-    margin: 0;
-    font-size: 1.8rem;
+.gnb.scrolled {
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--glass-border);
 }
 
-nav ul {
+.gnb-logo {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-white);
+}
+
+.gnb-logo span {
+    color: var(--point-mint);
+}
+
+.gnb-nav {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
     list-style: none;
     margin: 0;
     padding: 0;
-    display: flex;
 }
 
-nav ul li {
-    margin-left: 20px;
-}
-
-nav a {
-    color: #FFFFFF;
-    text-decoration: none;
-    font-weight: bold;
-    padding: 5px 10px;
-    border-radius: 5px;
-    transition: background-color 0.3s;
-}
-
-nav a:hover {
-    background-color: #50E3C2; /* Vibrant mint/teal accent */
-}
-
-/* Fullscreen Image Slider */
-.fullscreen-slider {
+.gnb-nav a {
+    color: var(--text-white);
+    font-weight: 500;
+    padding: 0.5rem 0;
     position: relative;
-    width: 100vw;
-    height: 90vh; /* Adjusted height */
-    overflow: hidden; /* Ensure only one slide is visible at a time */
-    background-color: #333; /* Fallback color */
-    display: flex; /* Arrange slides in a row */
-    transition: transform 1s ease-in-out; /* Smooth transition for sliding */
+    transition: color 0.3s;
 }
 
-.slide {
-    flex: 0 0 100%; /* Each slide takes full width of the slider */
-    position: relative;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    overflow: hidden; /* Clip content if it overflows */
-    background-size: cover;          /* 배경 이미지를 슬라이드 전체에 채움 */
-    background-position: center;     /* 가운데 정렬 */
-    background-repeat: no-repeat;    /* 반복 없음 */
+.gnb-nav a:hover {
+    color: var(--point-mint);
 }
 
-/* Add an overlay to the slides for better text readability */
-.slide::after {
+.gnb-nav a::after {
     content: '';
     position: absolute;
-    top: 0;
+    bottom: 0;
     left: 0;
+    width: 0;
+    height: 2px;
+    background: var(--point-mint);
+    transition: width 0.3s;
+}
+
+.gnb-nav a:hover::after {
+    width: 100%;
+}
+
+.gnb-cta {
+    display: inline-block;
+    padding: 0.6rem 1.5rem;
+    background: var(--point-mint);
+    color: var(--bg-deep);
+    font-weight: 600;
+    border-radius: 8px;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.gnb-cta:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 255, 163, 0.35);
+}
+
+/* ===== Hero Slider (100vh) ===== */
+.hero {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hero-slider {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hero-slide {
+    flex: 0 0 100%;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.4); /* Slightly darker overlay */
+    position: relative;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.hero-slide::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(17, 24, 39, 0.5) 0%, rgba(17, 24, 39, 0.85) 100%);
+}
+
+.hero-content {
+    position: relative;
     z-index: 2;
-}
-
-.slide-content {
-    color: #FFFFFF;
-    z-index: 3; /* Ensure text is above the overlay */
-    padding: 20px;
-    position: relative; /* Position relative to allow z-index to work */
-}
-
-.slide-content h2 {
-    font-size: 3rem;
-    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
-    margin: 0;
-}
-
-/* Remove old background-image rules */
-.slide:nth-child(1) {
-    animation-delay: 0s;
-}
-
-.slide:nth-child(2) {
-    animation-delay: 6s;
-}
-
-.slide:nth-child(3) {
-    animation-delay: 12s;
-}
-
-/* Remove old fadeEffect keyframes since we're using JS for sliding */
-/* @keyframes fadeEffect {
-    0% { opacity: 0; }
-    16.66% { opacity: 1; }
-    33.33% { opacity: 1; }
-    50% { opacity: 0; }
-    100% { opacity: 0; }
-} */
-
-
-/* Main Content Styles */
-main {
+    text-align: center;
     padding: 2rem;
-    background-color: #FFFFFF;
-    position: relative; /* Ensure it appears on top of the slider */
-    z-index: 2; /* Higher z-index than the slider */
-    margin-top: 90vh; /* Push content below the slider */
 }
 
+.hero-slogan {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 700;
+    line-height: 1.2;
+    margin: 0;
+    text-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
+}
 
-.container {
+.hero-slogan span {
+    color: var(--point-mint);
+}
+
+/* ===== Section Common ===== */
+.section {
     max-width: 1200px;
     margin: 0 auto;
+    padding: 4rem 2rem;
 }
 
-section {
-    background-color: #FFFFFF;
-    margin-bottom: 3rem;
-}
-
-h2.section-title {
-    color: #333333;
-    border-bottom: 3px solid #50E3C2; /* Vibrant accent color */
-    padding-bottom: 10px;
-    margin-bottom: 2rem;
+.section-title {
     font-size: 2rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 3rem;
+    color: var(--text-white);
 }
 
-/* Product Grid Styles */
-.product-grid {
+.section-title span {
+    color: var(--point-mint);
+}
+
+/* ===== Best Sellers (3 cards, Glassmorphism + Hover) ===== */
+.best-sellers-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 2rem;
 }
 
-.product-card {
-    background-color: #FFFFFF;
-    border: 1px solid #eee;
-    border-radius: 8px;
+.best-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
     overflow: hidden;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-    transition: transform 0.3s, box-shadow 0.3s;
+    transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
 }
 
-.product-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+.best-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(0, 255, 163, 0.12);
+    border-color: rgba(0, 255, 163, 0.3);
 }
 
-.product-card img {
+.best-card-image {
     width: 100%;
-    height: 200px;
+    height: 220px;
     object-fit: cover;
+    display: block;
 }
 
-.product-card-content {
+.best-card-body {
     padding: 1.5rem;
 }
 
-.product-card-content h3 {
-    color: #333333;
-    margin-top: 0;
-}
-
-/* Footer Styles */
-footer {
-    background-color: #333333; /* Dark footer for contrast */
-    color: #FFFFFF;
-    padding: 2rem 4rem; /* Increased padding */
-    text-align: left; /* Left-align text */
-    position: relative;
-    z-index: 2;
-}
-
-footer p {
-    line-height: 1.6; /* Add line-height for better readability */
-    margin: 0.5rem 0;
-}
-
-/* Trust Points Section */
-.trust-points {
-    display: flex;
-    justify-content: space-around;
-    background-color: #F8F9FA; /* Light gray background */
-    padding: 2rem 0;
-    text-align: center;
-    border-top: 1px solid #eee;
-    border-bottom: 1px solid #eee;
-}
-
-.trust-point {
-    flex: 1;
-}
-
-.trust-point h3 {
-    font-size: 2.5rem;
-    color: #4A90E2; /* Brighter blue */
+.best-card-title {
+    font-size: 1.25rem;
+    font-weight: 700;
     margin: 0 0 0.5rem 0;
+    color: var(--text-white);
 }
 
-.trust-point p {
-    font-size: 1.1rem;
-    color: #333333;
-    margin: 0;
+.best-card-desc {
+    font-size: 0.95rem;
+    color: rgba(249, 250, 251, 0.8);
+    margin: 0 0 1.25rem 0;
+    line-height: 1.5;
 }
 
-/* Floating Button Styles */
-.floating-btn {
-    position: fixed;
-    bottom: 30px;
-    right: 30px;
-    background-color: #4A90E2; /* Brighter blue */
-    color: white;
-    padding: 15px 25px;
-    border-radius: 30px;
-    text-decoration: none;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-    font-weight: bold;
-    z-index: 1000;
-    transition: background-color 0.3s;
-}
-
-.floating-btn:hover {
-    background-color: #50E3C2; /* Vibrant accent on hover */
-}
-
-/* About Page Specific Styles */
-.about-section {
-    display: flex;
-    align-items: center;
-    gap: 3rem;
-    margin-bottom: 4rem;
-}
-.about-section img {
-    width: 300px;
-    height: 300px;
-    object-fit: cover;
-    border-radius: 50%;
-}
-.about-section .text {
-    flex: 1;
-}
-.about-section .text h3 {
-    color: #333333;
-    font-size: 1.8rem;
-    margin-top: 0;
-}
-
-.tech-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 1.5rem;
-    text-align: center;
-}
-.tech-item img {
-    width: 100%;
-    height: 180px;
-    object-fit: cover;
-    border-radius: 8px;
-    margin-bottom: 1rem;
-}
-.tech-item h4 {
-    margin: 0;
-    color: #333333;
-}
-
-.map-container {
-    position: relative;
-    width: 100%;
-    height: 450px;
-    border-radius: 8px;
-    overflow: hidden;
-}
-.map-container img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-.map-placeholder {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.5);
-    color: white;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 1.5rem;
-    font-weight: bold;
-}
-
-/* Products Page Styles */
-.product-page-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-    gap: 2.5rem;
-    margin-top: 3rem;
-}
-.btn-detail {
+.btn-spec {
     display: inline-block;
-    margin-top: 1rem;
-    background-color: #4A90E2;
-    color: white;
-    padding: 10px 20px;
-    text-decoration: none;
-    border-radius: 5px;
-    font-weight: bold;
-    transition: background-color 0.3s;
-}
-.btn-detail:hover {
-    background-color: #333333;
-}
-
-/* Product Detail Page Styles */
-.product-detail-container {
-    display: flex;
-    gap: 3rem;
-    margin-top: 2rem;
-}
-.product-image-gallery {
-    flex: 1;
-}
-.product-image-gallery img {
-    width: 100%;
+    padding: 0.6rem 1.25rem;
+    background: transparent;
+    color: var(--point-mint);
+    border: 2px solid var(--point-mint);
+    font-weight: 600;
     border-radius: 8px;
-}
-.product-info {
-    flex: 1;
-}
-.product-info h2 {
-    font-size: 2.5rem;
-    color: #333333;
-    margin-top: 0;
-    margin-bottom: 1rem;
-}
-.specs-list {
-    list-style: none;
-    padding: 0;
-    margin: 2rem 0;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
-}
-.specs-list li {
-    background-color: #F8F9FA;
-    padding: 1rem;
-    border-radius: 5px;
-    border: 1px solid #eee;
-}
-.specs-list strong {
-    display: block;
-    color: #333333;
-    font-size: 1.1rem;
-    margin-bottom: 0.5rem;
-}
-.custom-options h3 {
-    font-size: 1.5rem;
-    color: #333333;
-    margin-bottom: 1rem;
-}
-.color-swatches {
-    display: flex;
-    gap: 10px;
-}
-.swatch {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    cursor: pointer;
-    border: 2px solid #ccc;
-}
-.swatch.active {
-    border-color: #4A90E2;
+    transition: background 0.3s, color 0.3s;
 }
 
-/* Archive Page Styles */
+.btn-spec:hover {
+    background: var(--point-mint);
+    color: var(--bg-deep);
+}
+
+/* ===== Cases Page: 2x2 Category Nav ===== */
+.cases-hero {
+    padding-top: 6rem;
+    padding-bottom: 2rem;
+}
+
 .category-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 2rem;
+    gap: 1.5rem;
+    max-width: 900px;
+    margin: 0 auto 4rem;
 }
 
-.category-button {
+.category-box {
     position: relative;
-    display: block;
+    aspect-ratio: 16/10;
+    border-radius: 16px;
     overflow: hidden;
-    border-radius: 8px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    transition: transform 0.3s, box-shadow 0.3s;
-    text-decoration: none;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: border-color 0.3s, transform 0.3s;
 }
 
-.category-button:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+.category-box:hover {
+    border-color: var(--point-mint);
+    transform: scale(1.02);
+    box-shadow: 0 0 30px rgba(0, 255, 163, 0.2);
 }
 
-.category-button img {
-    width: 100%;
-    height: 250px;
-    object-fit: cover;
-    transition: transform 0.3s;
+.category-box-bg {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    transition: filter 0.3s, transform 0.3s;
 }
 
-.category-button:hover img {
+.category-box:hover .category-box-bg {
+    filter: brightness(0.7);
     transform: scale(1.05);
 }
 
-.category-button::after {
-    content: '';
+.category-box-overlay {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 50%);
-}
-
-.category-text {
-    position: absolute;
-    bottom: 20px;
-    left: 20px;
-    color: white;
-    z-index: 2;
-}
-
-.category-text h3 {
-    margin: 0;
-    font-size: 1.8rem;
-    text-shadow: 1px 1px 5px rgba(0,0,0,0.5);
-}
-
-/* Support Page Styles */
-.support-container {
+    inset: 0;
+    background: linear-gradient(180deg, transparent 0%, rgba(17, 24, 39, 0.85) 100%);
     display: flex;
-    gap: 4rem;
-}
-.faq-section {
-    flex: 2;
-}
-.inquiry-section {
-    flex: 1;
-    background-color: #F8F9FA;
-    padding: 2rem;
-    border-radius: 8px;
-    border: 1px solid #eee;
-}
-
-.faq-item {
-    border-bottom: 1px solid #ddd;
-    padding: 1rem 0;
-}
-.faq-question {
-    font-weight: bold;
-    cursor: pointer;
-    display: flex;
-    justify-content: space-between;
     align-items: center;
-}
-.faq-answer {
-    margin-top: 1rem;
-    display: none; /* Initially hidden */
+    justify-content: center;
 }
 
-.form-group {
-    margin-bottom: 1.5rem;
+.category-box span {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-white);
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+    z-index: 1;
 }
-.form-group label {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-weight: bold;
+
+.category-box.active {
+    border-color: var(--point-mint);
+    box-shadow: 0 0 24px rgba(0, 255, 163, 0.3);
 }
-.form-group input,
-.form-group select,
-.form-group textarea {
+
+/* ===== Masonry Gallery (Cases) ===== */
+.gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+
+.gallery-item {
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.gallery-item:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 28px rgba(0, 255, 163, 0.15);
+}
+
+.gallery-item img {
     width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-}
-.submit-btn {
-    width: 100%;
-    padding: 15px;
-    background-color: #4A90E2;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    font-size: 1.1rem;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-.submit-btn:hover {
-    background-color: #333333;
-}
-.news-list {
-    list-style: none;
-    padding: 0;
-}
-.news-item {
-    border-bottom: 1px solid #eee;
-    padding: 1rem 0;
-}
-.news-item a {
-    text-decoration: none;
-    color: #333333;
-    font-weight: bold;
-}
-.news-item span {
+    height: 220px;
+    object-fit: cover;
     display: block;
+}
+
+.gallery-item.hidden {
+    display: none !important;
+}
+
+/* ===== Footer ===== */
+footer {
+    margin-top: 4rem;
+    padding: 2rem;
+    text-align: center;
+    color: rgba(249, 250, 251, 0.6);
     font-size: 0.9rem;
-    color: #888;
-    margin-top: 0.5rem;
+    border-top: 1px solid var(--glass-border);
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+    .gnb {
+        flex-wrap: wrap;
+        padding: 1rem;
+    }
+
+    .gnb-nav {
+        order: 3;
+        width: 100%;
+        justify-content: center;
+        gap: 1rem;
+        margin-top: 0.5rem;
+    }
+
+    .gnb-nav a {
+        font-size: 0.9rem;
+    }
+
+    .category-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .hero-slogan {
+        font-size: 1.75rem;
+    }
+
+    .best-sellers-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .gallery {
+        grid-template-columns: 1fr;
+    }
 }

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>제작사례 - Dream EV</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- GNB -->
+    <header class="gnb" id="gnb">
+        <a href="index.html" class="gnb-logo">DREAM <span>EV</span></a>
+        <nav>
+            <ul class="gnb-nav">
+                <li><a href="index.html">홈</a></li>
+                <li><a href="index.html#best-sellers">대표모델</a></li>
+                <li><a href="cases.html">제작사례</a></li>
+                <li><a href="index.html#contact">고객지원</a></li>
+            </ul>
+        </nav>
+        <a href="index.html#contact" class="gnb-cta">견적문의</a>
+    </header>
+
+    <!-- 2x2 Category Nav -->
+    <section class="section cases-hero">
+        <h2 class="section-title">제작 <span>사례</span></h2>
+        <p style="text-align: center; margin-bottom: 1.5rem;">
+            <button type="button" class="btn-spec" id="filterAll">전체 보기</button>
+        </p>
+        <div class="category-grid" id="categoryNav">
+            <div class="category-box" data-filter="industrial">
+                <div class="category-box-bg" style="background-image: url('https://source.unsplash.com/featured/800x500/?warehouse,logistics');"></div>
+                <div class="category-box-overlay"><span>산업용</span></div>
+            </div>
+            <div class="category-box" data-filter="agricultural">
+                <div class="category-box-bg" style="background-image: url('https://source.unsplash.com/featured/800x500/?smart,farm,greenhouse');"></div>
+                <div class="category-box-overlay"><span>농업용</span></div>
+            </div>
+            <div class="category-box" data-filter="multipurpose">
+                <div class="category-box-bg" style="background-image: url('https://source.unsplash.com/featured/800x500/?golf,course,resort');"></div>
+                <div class="category-box-overlay"><span>다목적</span></div>
+            </div>
+            <div class="category-box" data-filter="custom">
+                <div class="category-box-bg" style="background-image: url('https://source.unsplash.com/featured/800x500/?engineering,mechanic');"></div>
+                <div class="category-box-overlay"><span>맞춤제작</span></div>
+            </div>
+        </div>
+
+        <!-- Gallery -->
+        <div class="gallery" id="gallery">
+            <div class="gallery-item" data-category="industrial">
+                <img src="https://source.unsplash.com/random/800x600/?warehouse" alt="산업용 사례 1">
+            </div>
+            <div class="gallery-item" data-category="industrial">
+                <img src="https://source.unsplash.com/random/800x600/?logistics" alt="산업용 사례 2">
+            </div>
+            <div class="gallery-item" data-category="agricultural">
+                <img src="https://source.unsplash.com/random/800x600/?smart,farm" alt="농업용 사례 1">
+            </div>
+            <div class="gallery-item" data-category="agricultural">
+                <img src="https://source.unsplash.com/random/800x600/?greenhouse" alt="농업용 사례 2">
+            </div>
+            <div class="gallery-item" data-category="multipurpose">
+                <img src="https://source.unsplash.com/random/800x600/?golf,course" alt="다목적 사례 1">
+            </div>
+            <div class="gallery-item" data-category="multipurpose">
+                <img src="https://source.unsplash.com/random/800x600/?resort" alt="다목적 사례 2">
+            </div>
+            <div class="gallery-item" data-category="custom">
+                <img src="https://source.unsplash.com/random/800x600/?engineering" alt="맞춤제작 사례 1">
+            </div>
+            <div class="gallery-item" data-category="custom">
+                <img src="https://source.unsplash.com/random/800x600/?mechanic" alt="맞춤제작 사례 2">
+            </div>
+            <div class="gallery-item" data-category="industrial">
+                <img src="https://source.unsplash.com/random/800x600/?factory" alt="산업용 사례 3">
+            </div>
+            <div class="gallery-item" data-category="agricultural">
+                <img src="https://source.unsplash.com/random/800x600/?farm" alt="농업용 사례 3">
+            </div>
+        </div>
+    </section>
+
+    <footer id="contact">
+        <p>© Dream EV. All rights reserved.</p>
+    </footer>
+
+    <script src="js/script.js"></script>
+    <script>
+        // GNB scroll
+        (function() {
+            var gnb = document.getElementById('gnb');
+            if (!gnb) return;
+            function onScroll() { gnb.classList.toggle('scrolled', window.scrollY > 50); }
+            window.addEventListener('scroll', onScroll);
+            onScroll();
+        })();
+    </script>
+</body>
+</html>
