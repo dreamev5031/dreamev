@@ -3,27 +3,18 @@ backend:
   repo: dreamev5031/dreamev
   branch: main
 
-media_folder: public/images
-public_folder: images
+media_folder: "public/images"
+public_folder: "images"
 
 collections:
   - name: "cases"
     label: "제작사례"
-    label_singular: "제작사례"
-    file: "public/data/cases.json"
-    format: "json"
+    folder: "public/content/cases"
     create: true
+    slug: "{{slug}}"
     fields:
-      - { label: "제작사례 목록", name: "cases", widget: "list", fields:
-          - { label: "제목", name: "title", widget: "string", required: true }
-          - { 
-              label: "카테고리", 
-              name: "category", 
-              widget: "select", 
-              options: ["industrial", "agricultural", "multipurpose", "custom"],
-              required: true 
-            }
-          - { label: "이미지", name: "image", widget: "image", required: true }
-          - { label: "날짜", name: "date", widget: "date", required: true }
-          - { label: "설명", name: "description", widget: "text", required: false }
-        }
+      - {label: "제목", name: "title", widget: "string"}
+      - {label: "카테고리", name: "category", widget: "select", options: ["산업용", "농업용", "다목적", "맞춤제작"]}
+      - {label: "대표 이미지", name: "image", widget: "image"}
+      - {label: "작업 날짜", name: "date", widget: "datetime"}
+      - {label: "상세 내용", name: "body", widget: "markdown"}
