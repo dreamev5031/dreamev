@@ -763,14 +763,210 @@ a {
     transform: translateY(0);
 }
 
-/* ===== Footer ===== */
-footer {
-    margin-top: 4rem;
-    padding: 2rem;
+/* ===== Trust Section ===== */
+.trust-section {
+    padding-top: 5rem;
+    background: var(--bg-main);
+}
+
+.trust-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.trust-card {
+    background: var(--bg-card);
+    padding: 2.5rem 2rem;
+    border-radius: 16px;
+    border: 1px solid var(--glass-border);
     text-align: center;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.trust-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(16, 185, 129, 0.15);
+    border-color: var(--primary);
+}
+
+.trust-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.trust-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-main);
+    margin: 0 0 1rem 0;
+}
+
+.trust-desc {
     color: var(--text-muted);
+    line-height: 1.7;
+    margin: 0;
+    font-size: 1rem;
+}
+
+.trust-desc strong {
+    color: var(--primary);
+    font-weight: 600;
+}
+
+/* ===== Contact Bar ===== */
+.contact-bar {
+    background: linear-gradient(135deg, #047857 0%, #065f46 100%);
+    padding: 3rem 2rem;
+    margin-top: 5rem;
+}
+
+.contact-bar-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+
+.contact-bar-text {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #FFFFFF;
+    margin: 0;
+    flex: 1;
+    min-width: 300px;
+}
+
+.contact-bar-buttons {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.contact-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.9rem 1.5rem;
+    background: #FFFFFF;
+    color: #1F2937;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+    white-space: nowrap;
+}
+
+.contact-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.contact-btn span:first-child {
+    font-size: 1.3rem;
+}
+
+.contact-btn-kakao {
+    background: #FEE500;
+}
+
+/* ===== Wide Footer ===== */
+.wide-footer {
+    background: #111827;
+    padding: 3rem 2rem 2rem;
+    margin-top: 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.footer-info {
+    margin-bottom: 2rem;
+}
+
+.footer-company {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-main);
+    margin: 0 0 0.75rem 0;
+}
+
+.footer-address {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    margin: 0 0 0.5rem 0;
+    line-height: 1.6;
+}
+
+.footer-details {
     font-size: 0.9rem;
-    border-top: 1px solid var(--glass-border);
+    color: var(--text-muted);
+    margin: 0;
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.footer-details span {
+    display: inline-block;
+}
+
+.footer-copyright {
+    font-size: 0.85rem;
+    color: #6B7280;
+    margin: 2rem 0 0 0;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    text-align: center;
+}
+
+@media (max-width: 768px) {
+    .trust-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .trust-card {
+        padding: 2rem 1.5rem;
+    }
+
+    .contact-bar {
+        padding: 2rem 1.5rem;
+    }
+
+    .contact-bar-content {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .contact-bar-text {
+        font-size: 1.1rem;
+        min-width: auto;
+    }
+
+    .contact-bar-buttons {
+        width: 100%;
+        flex-direction: column;
+    }
+
+    .contact-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .footer-details {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
 }
 
 /* ===== Responsive ===== */
