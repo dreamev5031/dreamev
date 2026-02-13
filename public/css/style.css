@@ -592,8 +592,8 @@ nav {
 }
 
 .category-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
     gap: 1.5rem;
     max-width: 900px;
     margin: 0 auto 4rem;
@@ -1503,7 +1503,7 @@ nav {
 }
 
     .category-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr !important; /* 모바일은 1열이 기본, 2열 원하면 repeat(2, 1fr)로 수정 */
     }
 
     .hero-line1 {
