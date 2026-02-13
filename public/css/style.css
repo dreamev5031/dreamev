@@ -2555,3 +2555,9 @@ nav {
         position: relative !important;
     }
 }
+
+@media (max-width: 768px) {
+    .gnb-logo, .gnb-logo a, .gnb-logo span {
+        color: skyblue !important; /* 업데이트 확인용 하늘색 */
+    }
+}
