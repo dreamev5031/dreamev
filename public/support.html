@@ -351,7 +351,7 @@
                 menuToggle.onclick = function(e) {
                     e.preventDefault();
                     this.classList.toggle('active'); // 햄버거 버튼을 X로 바꿈
-                    gnbNav.classList.toggle('show-menu'); // 메뉴판을 화면에 띄움
+                    gnbNav.classList.toggle('active'); // 메뉴판을 화면에 띄움
                 };
 
                 // 메뉴 항목 클릭 시 자동으로 닫히게 만들기
@@ -359,7 +359,7 @@
                 navLinks.forEach(function(link) {
                     link.onclick = function() {
                         menuToggle.classList.remove('active');
-                        gnbNav.classList.remove('show-menu');
+                        gnbNav.classList.remove('active');
                     };
                 });
             }
