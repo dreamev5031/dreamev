@@ -106,7 +106,7 @@ export async function onRequestGet(context) {
   try {
     // Exchange code for access token
     const tokenUrl = 'https://github.com/login/oauth/access_token';
-    const redirectUri = 'https://dreamev-site.pages.dev/callback';
+    const redirectUri = 'https://dreamev.kr/callback';
     
     const tokenResponse = await fetch(tokenUrl, {
       method: 'POST',
@@ -186,7 +186,7 @@ export async function onRequestGet(context) {
     }
     
     // Success: Send token to parent window
-    const target = 'https://dreamev-site.pages.dev';
+    const target = 'https://dreamev.kr';
     // Escape token for use in HTML/JS
     const escapedToken = accessToken.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '\\"');
     const tokenJson = '{"token":"' + escapedToken + '","provider":"github"}';
@@ -207,7 +207,7 @@ export async function onRequestGet(context) {
       window.close();
     } else {
       // Fallback: redirect to admin with token in hash
-      window.location.href = 'https://dreamev-site.pages.dev/admin/#access_token=${accessToken}&token_type=bearer&state=${state || ''}';
+      window.location.href = 'https://dreamev.kr/admin/#access_token=${accessToken}&token_type=bearer&state=${state || ''}';
     }
   </script>
 </body>
