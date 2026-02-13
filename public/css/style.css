@@ -175,16 +175,23 @@ a {
     padding: 2rem;
 }
 
-.hero-slogan {
-    font-size: clamp(2rem, 5vw, 3.5rem);
+.hero-title {
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+    font-size: 3.5rem;
     font-weight: 700;
     line-height: 1.2;
     margin: 0;
-    text-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
+    color: #FFFFFF;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
-.hero-slogan span {
+.brand-name {
+    display: block;
+    font-size: 4.5rem;
+    font-weight: 800;
     color: var(--primary);
+    margin-top: 10px;
+    text-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
 }
 
 /* ===== Section Common ===== */
@@ -537,8 +544,13 @@ footer {
         grid-template-columns: 1fr;
     }
 
-    .hero-slogan {
-        font-size: 1.75rem;
+    .hero-title {
+        font-size: 2rem;
+    }
+
+    .brand-name {
+        font-size: 2.5rem;
+        margin-top: 8px;
     }
 
     .model-item,
