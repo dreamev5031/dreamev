@@ -2439,9 +2439,16 @@ nav {
     /* 햄버거 버튼 표시 */
     .mobile-menu-toggle {
         display: flex !important;
+        flex-direction: column !important;
+        justify-content: space-between !important;
         width: 30px !important;
         height: 22px !important;
+        padding: 0 !important;
+        background: transparent !important;
+        border: none !important;
         z-index: 10005 !important;
+        position: relative !important;
+        cursor: pointer !important;
     }
 
     .mobile-menu-toggle span {
@@ -2517,17 +2524,17 @@ nav {
         z-index: 1000005 !important;
     }
 
-    /* 1. 사라진 버튼 강제 소환 (형광색 배경으로 위치 확인) */
+    /* 1. 햄버거 버튼 강제 표시 (분홍색 배경 제거) */
     .mobile-menu-toggle {
-        display: flex !important; /* 무조건 보이게 */
+        display: flex !important;
         flex-direction: column !important;
         justify-content: space-between !important;
-        width: 35px !important;
-        height: 25px !important;
-        padding: 5px !important;
-        background-color: #ff00ff !important; /* 형광 분홍 (확인 후 삭제 예정) */
+        width: 30px !important;
+        height: 22px !important;
+        padding: 0 !important;
+        background: transparent !important;
         border: none !important;
-        z-index: 1000005 !important;
+        z-index: 10005 !important;
         position: relative !important;
         cursor: pointer !important;
     }
@@ -2539,6 +2546,17 @@ nav {
         height: 3px !important;
         background-color: #ffffff !important;
         border-radius: 2px !important;
+    }
+
+    /* 버튼 클릭 시 X로 변환 */
+    .mobile-menu-toggle.active span:nth-child(1) {
+        transform: translateY(9.5px) rotate(45deg) !important;
+    }
+    .mobile-menu-toggle.active span:nth-child(2) {
+        opacity: 0 !important;
+    }
+    .mobile-menu-toggle.active span:nth-child(3) {
+        transform: translateY(-9.5px) rotate(-45deg) !important;
     }
 
     /* 3. 메뉴판 초기 상태 (완전 숨김) */
