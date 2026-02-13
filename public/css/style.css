@@ -298,6 +298,11 @@ nav {
     color: var(--primary);
 }
 
+/* Support page section titles */
+.support-page .section-title {
+    color: #FFFFFF;
+}
+
 /* ===== Best Sellers (Scroll List Layout) ===== */
 .models-list {
     display: flex;
@@ -880,6 +885,12 @@ nav {
     padding: 2.5rem;
     border-radius: 16px;
     border: 1px solid var(--glass-border);
+}
+
+/* Remove white background for support page inquiry form */
+.support-page .global-inquiry-container {
+    background: rgba(55, 65, 81, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .global-inquiry-form,
@@ -1550,8 +1561,27 @@ nav {
 .support-faq-section-top {
     padding-top: 5rem;
     padding-bottom: 3rem;
-    background: #FFFFFF;
+    background: transparent;
     border-radius: 0;
+}
+
+/* Remove white background for support page sections */
+.support-page .section {
+    background: transparent;
+    box-shadow: none;
+    border-radius: 0;
+}
+
+.support-page .support-faq-section-top {
+    background: transparent;
+}
+
+.support-page .support-location-section-large {
+    background: transparent;
+}
+
+.support-page .global-inquiry-section {
+    background: transparent;
 }
 
 /* Support FAQ Hero Section */
@@ -1580,14 +1610,14 @@ nav {
 .support-faq-title {
     font-size: clamp(1.8rem, 4vw, 2.5rem);
     font-weight: 800;
-    color: #1F2937;
+    color: #FFFFFF;
     margin: 0 0 1rem 0;
     line-height: 1.4;
 }
 
 .support-faq-subtitle {
     font-size: clamp(1rem, 2vw, 1.2rem);
-    color: #6B7280;
+    color: #D1D5DB;
     margin: 0;
     line-height: 1.6;
 }
@@ -1740,7 +1770,7 @@ nav {
 
 /* Support page FAQ answer style */
 .support-faq-section-top .faq-answer {
-    background: #F8F9FA;
+    background: rgba(255, 255, 255, 0.05);
     border-radius: 0 0 12px 12px;
     margin-top: 0.5rem;
     padding: 0 1.5rem;
@@ -1752,7 +1782,7 @@ nav {
 }
 
 .support-faq-section-top .faq-answer p {
-    color: #374151;
+    color: #D1D5DB;
     font-size: 1rem;
     animation: fadeIn 0.3s ease-in;
 }
@@ -1954,7 +1984,7 @@ nav {
 .support-location-section-large {
     padding-top: 5rem;
     padding-bottom: 5rem;
-    background: #FFFFFF;
+    background: transparent;
 }
 
 .support-location-large {
@@ -1980,10 +2010,18 @@ nav {
     line-height: 1.6;
 }
 
+.support-page .location-address-large {
+    color: #FFFFFF;
+}
+
 .location-hours-large {
     font-size: 1.1rem;
     color: var(--text-muted);
     margin: 0;
+}
+
+.support-page .location-hours-large {
+    color: #D1D5DB;
 }
 
 .location-buttons-large {
