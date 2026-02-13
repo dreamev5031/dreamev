@@ -142,16 +142,15 @@ a {
 .hero-slider {
     position: absolute;
     inset: 0;
-    display: flex;
-    transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-    will-change: transform;
+    width: 100%;
+    height: 100%;
 }
 
 .hero-slide {
-    flex: 0 0 100%;
+    position: absolute;
+    inset: 0;
     width: 100%;
     height: 100%;
-    position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -161,7 +160,14 @@ a {
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    will-change: transform;
+    opacity: 0;
+    transition: opacity 1.5s ease-in-out;
+    will-change: opacity;
+    transform: translateZ(0);
+}
+
+.hero-slide.active {
+    opacity: 1;
 }
 
 .hero-slide::before {
@@ -169,6 +175,21 @@ a {
     position: absolute;
     inset: 0;
     background: rgba(0, 0, 0, 0.5);
+    z-index: 1;
+}
+
+/* Ken Burns 효과: 천천히 확대 */
+.hero-slide.active {
+    animation: kenBurns 20s ease-in-out infinite;
+}
+
+@keyframes kenBurns {
+    0%, 100% {
+        transform: translateZ(0) scale(1);
+    }
+    50% {
+        transform: translateZ(0) scale(1.1);
+    }
 }
 
 .hero-content {
@@ -176,6 +197,12 @@ a {
     z-index: 2;
     text-align: center;
     padding: 2rem;
+    opacity: 0;
+    transition: opacity 0.8s ease-in-out 0.3s;
+}
+
+.hero-slide.active .hero-content {
+    opacity: 1;
 }
 
 .hero-title {
