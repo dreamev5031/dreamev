@@ -2507,50 +2507,45 @@ nav {
     }
 }
 
-/* ----- 모바일 전용 (768px 이하) ----- */
 @media (max-width: 768px) {
-    /* 1. 헤더 초기화 */
-    .gnb {
-        height: 60px !important;
-        padding: 0 1.5rem !important;
-        margin: 0 !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: space-between !important;
-        position: sticky !important; top: 0 !important; z-index: 10000 !important;
-    }
-
-    /* 2. 기존 메뉴 숨기기 */
+    /* 1. 기본 메뉴 숨김 */
     .gnb-nav {
         display: none !important;
     }
 
-    /* 3. 햄버거 버튼 노출 및 최상위 배치 */
+    /* 2. 메뉴 활성화 시 (.show-me 클래스 추가 시) */
+    .gnb-nav.show-me {
+        display: flex !important;
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        background-color: #1a202c !important; /* 다크 배경 */
+        z-index: 99999 !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        align-items: center !important;
+        gap: 30px !important;
+    }
+
+    .gnb-nav.show-me a {
+        font-size: 2rem !important;
+        color: white !important;
+        font-weight: bold !important;
+    }
+
+    /* 3. 햄버거 버튼 위치 사수 */
     .mobile-menu-toggle {
         display: block !important;
-        z-index: 100002 !important;
+        z-index: 100000 !important;
         position: relative !important;
     }
+}
 
-    /* 4. 새로운 모바일 전용 오버레이 메뉴 (활성화 시) */
-    /* .active 클래스가 붙으면 나타나게 설정 */
-    .gnb-nav.active {
-        display: flex !important;
-        position: fixed !important; /* 화면에 고정 */
-        top: 0 !important; left: 0 !important;
-        width: 100vw !important; height: 100vh !important;
-        background-color: #1a202c !important; /* 드림전동차 다크 배경 */
-        z-index: 100001 !important; /* 헤더보다 위, 버튼보다 아래 */
-        flex-direction: column !important;
-        justify-content: center !important; align-items: center !important;
-        gap: 2.5rem !important; padding-top: 60px !important;
-    }
-
-    /* 5. 모바일 메뉴 글자 스타일 */
-    .gnb-nav.active li { list-style: none !important; }
-    .gnb-nav.active a {
-        font-size: 2rem !important; color: #ffffff !important;
-        font-weight: 800 !important; text-decoration: none !important;
-        display: block !important;
+@media (max-width: 768px) {
+    /* 왼쪽 상단 텍스트 색상 강제 변경 */
+    .gnb-logo, .gnb-logo span {
+        color: skyblue !important; 
     }
 }

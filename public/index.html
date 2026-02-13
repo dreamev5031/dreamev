@@ -323,19 +323,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const nav = document.querySelector('.gnb-nav');
 
     if (btn && nav) {
-        // 기존 이벤트 제거 후 새로 등록 (중복 방지)
-        btn.replaceWith(btn.cloneNode(true));
-        const newBtn = document.querySelector('.mobile-menu-toggle');
-
-        newBtn.addEventListener('click', function(e) {
+        btn.onclick = function(e) {
             e.preventDefault();
-            // 버튼과 메뉴에 동시에 'active' 클래스 토글
-            this.classList.toggle('active');
-            nav.classList.toggle('active');
-            
-            // 메뉴 열릴 때 배경 스크롤 막기
-            document.body.style.overflow = nav.classList.contains('active') ? 'hidden' : 'auto';
-        });
+            nav.classList.toggle('show-me');
+            btn.classList.toggle('active');
+            console.log("글자색은 하늘색인가요? 메뉴 상태:", nav.classList.contains('show-me'));
+        };
     }
 });
 </script>
