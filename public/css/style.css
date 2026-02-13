@@ -30,10 +30,11 @@
 }
 
 html {
-    overflow-x: hidden;
+    overflow-x: hidden !important;
     overflow-y: scroll;
     scroll-behavior: smooth;
     width: 100%;
+    max-width: 100%;
     position: relative;
 }
 
@@ -49,12 +50,13 @@ body {
     font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
     margin: 0;
     padding: 0;
-    background: #F8F9FA;
+    background: #2D3748;
     color: var(--text-main);
     min-height: 100vh;
     line-height: 1.6;
-    overflow-x: hidden;
+    overflow-x: hidden !important;
     width: 100%;
+    max-width: 100%;
     position: relative;
 }
 
@@ -95,18 +97,18 @@ nav {
     align-items: center;
     justify-content: space-between;
     padding: 1rem 2rem;
-    background: #0F172A;
+    background: #1a202c;
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     transition: border-color 0.3s, box-shadow 0.3s;
     box-sizing: border-box;
     border-bottom: 2px solid rgba(16, 185, 129, 0.3);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25), 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .gnb.scrolled {
     border-bottom: 2px solid rgba(16, 185, 129, 0.5);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.3), 0 2px 12px rgba(0, 0, 0, 0.2);
 }
 
 .gnb-logo {
@@ -966,16 +968,66 @@ nav {
 /* ===== Global Footer: Official Footer ===== */
 .global-footer,
 .final-footer {
-    background: #111827;
-    padding: 2.5rem 2rem;
+    background: #1F2937;
+    padding: 3rem 2rem 2rem;
     margin-top: 0;
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    border-top: 2px solid rgba(16, 185, 129, 0.2);
 }
 
 .global-footer-content,
 .final-footer-content {
     max-width: 1200px;
     margin: 0 auto;
+}
+
+.global-footer-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 3rem;
+    margin-bottom: 2rem;
+}
+
+.global-footer-col {
+    display: flex;
+    flex-direction: column;
+}
+
+.global-footer-logo {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #FFFFFF;
+    margin-bottom: 0.75rem;
+}
+
+.global-footer-logo span {
+    color: var(--primary);
+}
+
+.global-footer-tagline {
+    font-size: 0.95rem;
+    color: #D1D5DB;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.global-footer-col-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #FFFFFF;
+    margin: 0 0 1rem 0;
+}
+
+.global-footer-address,
+.global-footer-contact {
+    font-size: 0.9rem;
+    color: #D1D5DB;
+    line-height: 1.8;
+    margin: 0;
+}
+
+.global-footer-contact strong {
+    color: #FFFFFF;
+    font-weight: 600;
 }
 
 .global-footer-row,
@@ -1012,7 +1064,7 @@ nav {
     color: #6B7280;
     margin: 2rem 0 0 0;
     padding-top: 2rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
     text-align: center;
 }
 
@@ -1173,8 +1225,8 @@ nav {
 @media (max-width: 768px) {
     .gnb {
         flex-wrap: nowrap;
-        padding: 1rem;
-        justify-content: space-between;
+        padding: 1rem 0.5rem 1rem 1rem;
+        justify-content: flex-start;
         position: relative;
     }
 
@@ -1182,6 +1234,7 @@ nav {
         font-size: 1.2rem;
         flex-shrink: 0;
         z-index: 1000;
+        margin-right: auto;
     }
 
     .gnb-nav {
@@ -1191,16 +1244,18 @@ nav {
 
     .gnb-cta {
         order: 3;
-        position: absolute;
-        right: 1rem;
-        top: 50%;
-        transform: translateY(-50%);
-        padding: 0.5rem 1rem;
+        position: fixed;
+        right: 0.5rem;
+        top: 0.75rem;
+        padding: 0.6rem 1rem;
         font-size: 0.85rem;
         flex-shrink: 0;
-        margin-left: auto;
         white-space: nowrap;
         z-index: 1002;
+        background: var(--primary);
+        color: #FFFFFF;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
     }
 
     .gnb-nav a {
@@ -1527,31 +1582,22 @@ nav {
     border-radius: 12px;
     cursor: pointer;
     user-select: none;
-    transition: background 0.3s, transform 0.2s, box-shadow 0.2s;
+    transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
     box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
 }
 
 .support-faq-section-top .faq-question:hover {
-    background: var(--primary-hover);
+    background: #059669;
     transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(16, 185, 129, 0.3);
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
 }
 
 .support-faq-section-top .faq-question:active {
     transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
 }
 
 .support-faq-section-top .faq-question span:first-child {
-    font-weight: 700;
-    color: #FFFFFF;
-    font-size: 1.1rem;
-    min-width: 30px;
-    background: rgba(255, 255, 255, 0.2);
-    padding: 0.3rem 0.6rem;
-    border-radius: 6px;
-}
-
-.support-faq-section-top .faq-question span:nth-child(2) {
     flex: 1;
     font-weight: 600;
     color: #FFFFFF;
@@ -1651,6 +1697,7 @@ nav {
     border-radius: 0 0 12px 12px;
     margin-top: 0.5rem;
     padding: 0 1.5rem;
+    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), padding 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .support-faq-section-top .faq-item.active .faq-answer {
@@ -1660,6 +1707,18 @@ nav {
 .support-faq-section-top .faq-answer p {
     color: #374151;
     font-size: 1rem;
+    animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .support-location-section {
@@ -2028,6 +2087,20 @@ nav {
     .support-location-section-large {
         padding-top: 2rem;
         padding-bottom: 2rem;
+    }
+
+    .global-footer-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+
+    .global-footer-col {
+        text-align: center;
+    }
+
+    .global-footer-address,
+    .global-footer-contact {
+        text-align: center;
     }
 
     .global-footer-row,
