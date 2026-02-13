@@ -46,28 +46,34 @@
     <!-- Best Sellers -->
     <section class="section" id="best-sellers">
         <h2 class="section-title">드림전동차 <span>대표 라인업</span></h2>
-        <div class="best-sellers-grid">
-            <article class="best-card">
-                <img class="best-card-image" src="images/industrial.jpg" alt="산업용 전동차">
-                <div class="best-card-body">
-                    <h3 class="best-card-title">산업용 전동차</h3>
-                    <p class="best-card-desc">거친 공사 현장의 든든한 파트너. 벽돌, 시멘트, 철근 등 무거운 자재도 가볍게 나르는 압도적 내구성과 파워.</p>
+        <div class="models-list">
+            <article class="model-item scroll-reveal">
+                <div class="model-image-wrap">
+                    <img class="model-image" src="images/industrial.jpg" alt="산업용 전동차">
+                </div>
+                <div class="model-content">
+                    <h3 class="model-title">산업용 전동차</h3>
+                    <p class="model-desc">거친 공사 현장의 든든한 파트너. 압도적 내구성과 파워.</p>
                     <a href="#" class="btn-spec">상세 스펙 보기</a>
                 </div>
             </article>
-            <article class="best-card">
-                <img class="best-card-image" src="images/farm.jpg" alt="농업용 전동차">
-                <div class="best-card-body">
-                    <h3 class="best-card-title">농업용 전동차</h3>
-                    <p class="best-card-desc">험로 주행 최적화 운반차. 농장·온실·스마트팜까지 다양한 환경 대응.</p>
+            <article class="model-item model-item-reverse scroll-reveal">
+                <div class="model-image-wrap">
+                    <img class="model-image" src="images/farm.jpg" alt="농업용 전동차">
+                </div>
+                <div class="model-content">
+                    <h3 class="model-title">농업용 전동차</h3>
+                    <p class="model-desc">농장과 과수원, 험로 어디든 자유롭게. 농업 효율의 극대화.</p>
                     <a href="#" class="btn-spec">상세 스펙 보기</a>
                 </div>
             </article>
-            <article class="best-card">
-                <img class="best-card-image" src="images/custom.jpg" alt="맞춤제작 전동차">
-                <div class="best-card-body">
-                    <h3 class="best-card-title">맞춤제작 전동차</h3>
-                    <p class="best-card-desc">고객 맞춤형 커스텀 솔루션. 용도에 맞춘 설계·제작이 가능합니다.</p>
+            <article class="model-item scroll-reveal">
+                <div class="model-image-wrap">
+                    <img class="model-image" src="images/custom.jpg" alt="맞춤제작 전동차">
+                </div>
+                <div class="model-content">
+                    <h3 class="model-title">맞춤제작 전동차</h3>
+                    <p class="model-desc">기성품에 맞추지 마세요. 사장님의 현장에 딱 맞는 맞춤형 설계.</p>
                     <a href="#" class="btn-spec">상세 스펙 보기</a>
                 </div>
             </article>
@@ -102,6 +108,19 @@
                 idx = (idx + 1) % total;
                 slider.style.transform = 'translateX(-' + idx * 100 + '%)';
             }, 5000);
+        })();
+
+        // Scroll reveal for model items
+        (function() {
+            var revealEls = document.querySelectorAll('.scroll-reveal');
+            var observer = new IntersectionObserver(function(entries) {
+                entries.forEach(function(entry) {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                    }
+                });
+            }, { rootMargin: '0px 0px -100px 0px', threshold: 0.1 });
+            revealEls.forEach(function(el) { observer.observe(el); });
         })();
     </script>
 </body>

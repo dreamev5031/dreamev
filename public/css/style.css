@@ -208,54 +208,70 @@ a {
     color: var(--primary);
 }
 
-/* ===== Best Sellers (3 cards, Glassmorphism + Hover) ===== */
-.best-sellers-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 2rem;
+/* ===== Best Sellers (Scroll List Layout) ===== */
+.models-list {
+    display: flex;
+    flex-direction: column;
+    gap: 150px;
+    margin-top: 3rem;
 }
 
-.best-card {
-    background: var(--bg-card);
-    border: 1px solid var(--glass-border);
+.model-item {
+    display: flex;
+    align-items: center;
+    gap: 3rem;
+    opacity: 0;
+    transform: translateX(-60px);
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.model-item-reverse {
+    flex-direction: row-reverse;
+    transform: translateX(60px);
+}
+
+.model-item.is-visible {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.model-image-wrap {
+    flex: 1;
+    max-width: 500px;
     border-radius: 16px;
     overflow: hidden;
-    transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
 }
 
-.best-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 20px 40px rgba(16, 185, 129, 0.1);
-    border-color: rgba(16, 185, 129, 0.35);
-}
-
-.best-card-image {
+.model-image {
     width: 100%;
-    height: 220px;
+    height: 400px;
     object-fit: cover;
     display: block;
-    background-color: var(--bg-card);
-    color: var(--text-muted);
-    font-size: 0.9rem;
-    text-align: center;
-    line-height: 220px;
+    transition: transform 0.3s;
 }
 
-.best-card-body {
-    padding: 1.5rem;
+.model-image:hover {
+    transform: scale(1.05);
 }
 
-.best-card-title {
-    font-size: 1.25rem;
+.model-content {
+    flex: 1;
+    max-width: 500px;
+}
+
+.model-title {
+    font-size: 2rem;
     font-weight: 700;
-    margin: 0 0 0.5rem 0;
+    margin: 0 0 1rem 0;
     color: var(--text-main);
+    line-height: 1.4;
 }
 
-.best-card-desc {
-    font-size: 0.95rem;
+.model-desc {
+    font-size: 1.1rem;
     color: var(--text-muted);
-    margin: 0 0 1.25rem 0;
+    margin: 0 0 1.5rem 0;
     line-height: 1.6;
 }
 
@@ -525,8 +541,26 @@ footer {
         font-size: 1.75rem;
     }
 
-    .best-sellers-grid {
-        grid-template-columns: 1fr;
+    .model-item,
+    .model-item-reverse {
+        flex-direction: column;
+        gap: 2rem;
+    }
+
+    .model-image-wrap {
+        max-width: 100%;
+    }
+
+    .model-content {
+        max-width: 100%;
+    }
+
+    .model-title {
+        font-size: 1.5rem;
+    }
+
+    .models-list {
+        gap: 100px;
     }
 
     .gallery {
