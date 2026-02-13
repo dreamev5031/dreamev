@@ -1130,16 +1130,28 @@ a {
 /* ===== Responsive ===== */
 @media (max-width: 768px) {
     .gnb {
-        flex-wrap: wrap;
+        flex-wrap: nowrap;
         padding: 1rem;
+        justify-content: space-between;
+    }
+
+    .gnb-logo {
+        font-size: 1.2rem;
+        flex-shrink: 0;
     }
 
     .gnb-nav {
+        order: 2;
+        display: none; /* 햄버거 메뉴로 숨김 (향후 구현 시 활성화) */
+    }
+
+    .gnb-cta {
         order: 3;
-        width: 100%;
-        justify-content: center;
-        gap: 1rem;
-        margin-top: 0.5rem;
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+        flex-shrink: 0;
+        margin-left: auto;
+        white-space: nowrap;
     }
 
     .gnb-nav a {
@@ -1383,8 +1395,10 @@ a {
     transform: translateY(-1px);
 }
 
-.support-faq-section {
+.support-faq-section,
+.support-faq-section-top {
     padding-top: 5rem;
+    padding-bottom: 3rem;
 }
 
 .faq-container {
