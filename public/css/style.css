@@ -68,6 +68,7 @@ body {
     font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
     margin: 0;
     padding: 0;
+    padding-top: 0 !important;
     background: #2D3748;
     color: var(--text-main);
     min-height: 100vh;
@@ -106,12 +107,12 @@ nav {
 
 /* ===== GNB Header (Sticky + Glassmorphism) ===== */
 .gnb {
-    position: fixed;
+    position: sticky;
     top: 0;
     left: 0;
     width: 100%;
     max-width: 100%;
-    z-index: 1000;
+    z-index: 9999;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -327,7 +328,8 @@ nav {
     width: 100%;
     min-height: 100vh;
     height: 100vh;
-    padding-top: 150px;
+    margin-top: 0 !important;
+    padding-top: 0 !important;
     box-sizing: border-box;
     overflow-x: hidden;
     overflow-y: visible;
@@ -368,7 +370,8 @@ nav {
     display: flex;
     justify-content: center;
     align-items: center;
-    padding-top: 150px;
+    margin-top: 0 !important;
+    padding-top: 0 !important;
     box-sizing: border-box;
     background-color: #1F2937;
     background-size: cover;
@@ -1442,34 +1445,45 @@ nav {
 /* ===== Responsive ===== */
 @media (max-width: 768px) {
     .gnb {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 1rem 1rem;
-        flex-wrap: nowrap;
-        position: relative;
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        padding: 0.75rem 1rem !important;
+        flex-wrap: nowrap !important;
+        position: sticky !important;
+        top: 0 !important;
+        height: auto !important;
+        min-height: 60px !important;
+        max-height: 70px !important;
     }
 
     .gnb-logo {
         font-size: 1.2rem;
         flex-shrink: 0;
         z-index: 10003;
+        margin: 0;
     }
 
     .gnb-nav {
-        display: none; /* Desktop menu hidden on mobile */
+        display: none !important; /* Force hide desktop menu on mobile */
+        visibility: hidden !important;
+        opacity: 0 !important;
+        height: 0 !important;
+        overflow: hidden !important;
     }
 
     /* Show hamburger menu toggle on mobile */
     .mobile-menu-toggle {
-        display: block;
+        display: block !important;
+        visibility: visible !important;
     }
 
     .gnb-right-group {
-        display: flex;
-        align-items: center;
-        gap: 10px;
+        display: flex !important;
+        align-items: center !important;
+        gap: 10px !important;
         z-index: 10003;
+        flex-shrink: 0;
     }
 
     .gnb-cta {
@@ -1487,6 +1501,18 @@ nav {
     .gnb-nav a {
         font-size: 0.9rem;
     }
+    
+    /* Remove any padding-top from hero on mobile */
+    .hero {
+        margin-top: 0 !important;
+        padding-top: 0 !important;
+    }
+    
+    .hero-slide {
+        margin-top: 0 !important;
+        padding-top: 0 !important;
+    }
+}
 
     .category-grid {
         grid-template-columns: 1fr;
