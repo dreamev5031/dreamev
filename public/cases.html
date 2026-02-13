@@ -96,6 +96,126 @@
             window.addEventListener('scroll', onScroll);
             onScroll();
         })();
+
+        // Load CMS cases data
+        (function() {
+            var gallery = document.getElementById('gallery');
+            if (!gallery) return;
+
+            // Category mapping: 한글 -> 영문
+            var categoryMap = {
+                '산업용': 'industrial',
+                '농업용': 'agricultural',
+                '다목적': 'multipurpose',
+                '맞춤제작': 'custom'
+            };
+
+            // Parse frontmatter from markdown content
+            function parseFrontmatter(content) {
+                var frontmatter = {};
+                var match = content.match(/^---\s*\n([\s\S]*?)\n---\s*\n([\s\S]*)$/);
+                if (match) {
+                    var fmText = match[1];
+                    var lines = fmText.split('\n');
+                    lines.forEach(function(line) {
+                        var colonIndex = line.indexOf(':');
+                        if (colonIndex > 0) {
+                            var key = line.substring(0, colonIndex).trim();
+                            var value = line.substring(colonIndex + 1).trim().replace(/^["']|["']$/g, '');
+                            frontmatter[key] = value;
+                        }
+                    });
+                }
+                return frontmatter;
+            }
+
+            // Create gallery item from CMS data
+            function createGalleryItem(data) {
+                var item = document.createElement('div');
+                item.className = 'gallery-item';
+                item.setAttribute('data-category', data.category);
+                
+                var img = document.createElement('img');
+                img.src = data.image;
+                img.alt = data.title || '제작사례';
+                img.loading = 'lazy';
+                
+                item.appendChild(img);
+                return item;
+            }
+
+            // Load cases from GitHub
+            function loadCases() {
+                // GitHub API: Get folder contents
+                var apiUrl = 'https://api.github.com/repos/dreamev5031/dreamev/contents/public/content/cases';
+                
+                fetch(apiUrl)
+                    .then(function(response) {
+                        if (!response.ok) {
+                            throw new Error('Failed to load cases');
+                        }
+                        return response.json();
+                    })
+                    .then(function(files) {
+                        // Filter markdown files
+                        var mdFiles = files.filter(function(file) {
+                            return file.type === 'file' && file.name.endsWith('.md');
+                        });
+
+                        if (mdFiles.length === 0) {
+                            console.log('No CMS cases found');
+                            return;
+                        }
+
+                        // Load each markdown file
+                        var promises = mdFiles.map(function(file) {
+                            return fetch(file.download_url)
+                                .then(function(response) { return response.text(); })
+                                .then(function(content) {
+                                    var frontmatter = parseFrontmatter(content);
+                                    var category = categoryMap[frontmatter.category] || frontmatter.category.toLowerCase();
+                                    
+                                    return {
+                                        title: frontmatter.title || '',
+                                        category: category,
+                                        image: frontmatter.image || '',
+                                        date: frontmatter.date || ''
+                                    };
+                                })
+                                .catch(function(err) {
+                                    console.error('Error loading file:', file.name, err);
+                                    return null;
+                                });
+                        });
+
+                        Promise.all(promises)
+                            .then(function(cases) {
+                                // Filter out null values
+                                cases = cases.filter(function(c) { return c && c.image; });
+                                
+                                // Create gallery items and prepend to gallery (CMS items appear first)
+                                cases.forEach(function(caseData) {
+                                    var item = createGalleryItem(caseData);
+                                    gallery.insertBefore(item, gallery.firstChild);
+                                });
+
+                                // Update filter to include new CMS items
+                                if (window.filterGallery) {
+                                    window.filterGallery(window.currentFilter || 'all');
+                                }
+                            })
+                            .catch(function(err) {
+                                console.error('Error processing cases:', err);
+                            });
+                    })
+                    .catch(function(err) {
+                        console.error('Error loading cases from GitHub:', err);
+                    });
+            }
+
+            // Load cases on page load
+            loadCases();
+        })();
     </script>
 </body>
 </html>

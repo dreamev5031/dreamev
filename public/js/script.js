@@ -14,8 +14,11 @@
     var boxes = categoryNav.querySelectorAll('.category-box');
     var items = gallery.querySelectorAll('.gallery-item');
 
-    function filterGallery(activeFilter) {
-        items.forEach(function(item) {
+    // Make filterGallery globally accessible
+    window.filterGallery = function(activeFilter) {
+        // Refresh items list to include dynamically added CMS items
+        var allItems = gallery.querySelectorAll('.gallery-item');
+        allItems.forEach(function(item) {
             var category = item.getAttribute('data-category');
             if (activeFilter === 'all' || category === activeFilter) {
                 item.classList.remove('hidden');
@@ -25,7 +28,10 @@
                 item.style.display = 'none';
             }
         });
-    }
+    };
+    
+    // Store current filter for later use
+    window.currentFilter = 'all';
 
     function setActiveBox(clickedBox) {
         boxes.forEach(function(box) {
@@ -40,17 +46,19 @@
         box.addEventListener('click', function() {
             var filter = box.getAttribute('data-filter');
             setActiveBox(box);
-            filterGallery(filter);
+            window.currentFilter = filter;
+            window.filterGallery(filter);
         });
     });
 
     if (filterAllBtn) {
         filterAllBtn.addEventListener('click', function() {
             setActiveBox(null);
-            filterGallery('all');
+            window.currentFilter = 'all';
+            window.filterGallery('all');
         });
     }
 
     // 초기: 전체 노출
-    filterGallery('all');
+    window.filterGallery('all');
 })();
