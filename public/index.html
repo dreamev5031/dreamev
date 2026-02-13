@@ -225,18 +225,6 @@
                 // 다음 슬라이드 활성화
                 slides[idx].classList.add('active');
             }, 5000);
-            
-            // Ensure scroll events are never blocked
-            // Use passive listeners to prevent scroll blocking
-            var hero = document.querySelector('.hero');
-            if (hero) {
-                // Prevent any wheel/touch event handlers from blocking scroll
-                ['wheel', 'mousewheel', 'touchstart', 'touchmove'].forEach(function(eventType) {
-                    hero.addEventListener(eventType, function(e) {
-                        // Don't prevent default - allow scroll
-                    }, { passive: true, capture: false });
-                });
-            }
         })();
 
         // Scroll reveal for model items (optimized)
