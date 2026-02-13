@@ -130,8 +130,8 @@ a {
 .hero {
     position: relative;
     width: 100%;
-    min-height: 100vh;
-    padding-top: 120px;
+    height: 100vh;
+    padding-top: 150px;
     box-sizing: border-box;
     overflow: hidden;
     display: flex;
@@ -154,7 +154,7 @@ a {
     display: flex;
     justify-content: center;
     align-items: center;
-    padding-top: 120px;
+    padding-top: 150px;
     box-sizing: border-box;
     background-size: cover;
     background-position: center;
