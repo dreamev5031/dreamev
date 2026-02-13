@@ -8,7 +8,7 @@ export async function onRequestGet(context) {
   
   // GitHub OAuth parameters
   const clientId = env.GITHUB_CLIENT_ID;
-  const redirectUri = `${url.origin}/auth/callback`;
+  const redirectUri = `https://dreamev-site.pages.dev/callback`;
   
   if (!clientId) {
     return new Response('GitHub Client ID not configured', { status: 500 });
