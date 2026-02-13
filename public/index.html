@@ -111,8 +111,8 @@
         </div>
     </section>
 
-    <!-- FAQ Section: 자주 묻는 질문 -->
-    <section class="section index-faq-section">
+    <!-- Global Footer: FAQ Section -->
+    <section class="section global-faq-section">
         <h2 class="section-title">자주 묻는 <span>질문</span></h2>
         <div class="faq-container">
             <div class="faq-item">
@@ -148,60 +148,45 @@
         </div>
     </section>
 
-    <!-- Inquiry Section: 견적 및 A/S 접수 -->
-    <section class="section index-inquiry-section">
+    <!-- Global Footer: Inquiry Section -->
+    <section class="section global-inquiry-section">
         <h2 class="section-title">더 궁금하신 점이 있나요? <span>상담 신청하기</span></h2>
-        <div class="index-inquiry-container">
-            <form id="indexInquiryForm" class="index-inquiry-form">
+        <div class="global-inquiry-container">
+            <form id="globalInquiryForm" class="global-inquiry-form">
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="inquiryName">성함 <span class="required">*</span></label>
-                        <input type="text" id="inquiryName" name="name" required placeholder="홍길동">
+                        <label for="globalInquiryName">성함 <span class="required">*</span></label>
+                        <input type="text" id="globalInquiryName" name="name" required placeholder="홍길동">
                     </div>
                     <div class="form-group">
-                        <label for="inquiryPhone">연락처 <span class="required">*</span></label>
-                        <input type="tel" id="inquiryPhone" name="phone" required placeholder="010-1234-5678">
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="inquiryModel">차종/모델</label>
-                        <input type="text" id="inquiryModel" name="model" placeholder="예: 산업용 전동차">
-                    </div>
-                    <div class="form-group">
-                        <label for="inquiryType">문의 유형 <span class="required">*</span></label>
-                        <select id="inquiryType" name="inquiryType" required>
-                            <option value="">선택해주세요</option>
-                            <option value="신규견적">신규 견적</option>
-                            <option value="AS요청">A/S 요청</option>
-                            <option value="기타">기타 문의</option>
-                        </select>
+                        <label for="globalInquiryPhone">연락처 <span class="required">*</span></label>
+                        <input type="tel" id="globalInquiryPhone" name="phone" required placeholder="010-1234-5678">
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="inquiryMessage">상세 내용 <span class="required">*</span></label>
-                    <textarea id="inquiryMessage" name="message" rows="6" required placeholder="문의하실 내용을 자세히 적어주시면 더 정확한 답변을 드릴 수 있습니다."></textarea>
+                    <label for="globalInquiryMessage">문의 내용 <span class="required">*</span></label>
+                    <textarea id="globalInquiryMessage" name="message" rows="6" required placeholder="문의하실 내용을 자세히 적어주시면 더 정확한 답변을 드릴 수 있습니다."></textarea>
                 </div>
                 <button type="submit" class="btn-submit">상담 신청하기</button>
             </form>
         </div>
     </section>
 
-    <!-- Final Footer: 공식 사업자 정보 -->
-    <footer class="final-footer" id="contact">
-        <div class="final-footer-content">
-            <div class="final-footer-row">
-                <span class="final-footer-item"><strong>상호명:</strong> 드림전동차</span>
-                <span class="final-footer-separator">|</span>
-                <span class="final-footer-item"><strong>대표번호:</strong> 010-3789-7653</span>
+    <!-- Global Footer: Official Footer -->
+    <footer class="global-footer" id="contact">
+        <div class="global-footer-content">
+            <div class="global-footer-row">
+                <span class="global-footer-item"><strong>상호명:</strong> 드림전동차</span>
+                <span class="global-footer-separator">|</span>
+                <span class="global-footer-item"><strong>대표번호:</strong> 010-3789-7653</span>
             </div>
-            <div class="final-footer-row">
-                <span class="final-footer-item">경기도 양주시 광적면 부흥로 956번길 174</span>
+            <div class="global-footer-row">
+                <span class="global-footer-item">경기도 양주시 광적면 부흥로 956번길 174</span>
             </div>
-            <div class="final-footer-row">
-                <span class="final-footer-item">사업자등록번호: 560-86-02294</span>
+            <div class="global-footer-row">
+                <span class="global-footer-item">사업자등록번호: 560-86-02294</span>
             </div>
-            <p class="final-footer-copyright">© 드림전동차. All rights reserved.</p>
+            <p class="global-footer-copyright">© 드림전동차. All rights reserved.</p>
         </div>
     </footer>
 
@@ -256,15 +241,16 @@
             revealEls.forEach(function(el) { observer.observe(el); });
         })();
 
-        // FAQ Accordion
+        // Global Footer initialization
         (function() {
-            var faqItems = document.querySelectorAll('.index-faq-section .faq-item');
+            // FAQ Accordion
+            var faqItems = document.querySelectorAll('.global-faq-section .faq-item');
             faqItems.forEach(function(item) {
                 var question = item.querySelector('.faq-question');
                 var answer = item.querySelector('.faq-answer');
                 var toggle = item.querySelector('.faq-toggle');
                 
-                if (!question || !answer) return;
+                if (!question || !answer || !toggle) return;
                 
                 question.addEventListener('click', function() {
                     var isOpen = item.classList.contains('active');
@@ -288,29 +274,24 @@
                     }
                 });
             });
-        })();
 
-        // Inquiry Form submission
-        (function() {
-            var form = document.getElementById('indexInquiryForm');
-            if (!form) return;
-            
-            form.addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                var formData = new FormData(form);
-                var data = {};
-                formData.forEach(function(value, key) {
-                    data[key] = value;
+            // Global Inquiry Form submission
+            var form = document.getElementById('globalInquiryForm');
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    var formData = new FormData(form);
+                    var data = {};
+                    formData.forEach(function(value, key) {
+                        data[key] = value;
+                    });
+                    
+                    console.log('Global inquiry submitted:', data);
+                    alert('상담 신청이 접수되었습니다.\n빠른 시일 내에 연락드리겠습니다.');
+                    form.reset();
                 });
-                
-                // 여기에 실제 전송 로직을 추가하세요
-                console.log('Inquiry submitted:', data);
-                
-                // 임시 알림
-                alert('상담 신청이 접수되었습니다.\n빠른 시일 내에 연락드리겠습니다.');
-                form.reset();
-            });
+            }
         })();
     </script>
 </body>

@@ -46,117 +46,68 @@
         </div>
     </section>
 
-    <!-- 견적 및 A/S 접수 폼 -->
-    <section class="section support-form-section">
-        <h2 class="section-title">견적 및 <span>A/S 접수</span></h2>
-        <div class="support-form-container">
-            <form id="supportForm" class="support-form">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="name">성함 <span class="required">*</span></label>
-                        <input type="text" id="name" name="name" required placeholder="홍길동">
-                    </div>
-                    <div class="form-group">
-                        <label for="phone">연락처 <span class="required">*</span></label>
-                        <input type="tel" id="phone" name="phone" required placeholder="010-3789-7653">
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="model">모델명</label>
-                        <input type="text" id="model" name="model" placeholder="예: 산업용 전동차">
-                    </div>
-                    <div class="form-group">
-                        <label for="inquiryType">문의 유형 <span class="required">*</span></label>
-                        <select id="inquiryType" name="inquiryType" required>
-                            <option value="">선택해주세요</option>
-                            <option value="견적">견적 문의</option>
-                            <option value="수리">A/S 및 수리</option>
-                            <option value="기타">기타 문의</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="message">문의 내용 <span class="required">*</span></label>
-                    <textarea id="message" name="message" rows="6" required placeholder="문의하실 내용을 자세히 적어주시면 더 정확한 답변을 드릴 수 있습니다."></textarea>
-                </div>
-                <button type="submit" class="btn-submit">문의 접수하기</button>
-            </form>
+    <!-- 긴급 상담 전화 버튼 -->
+    <section class="section support-urgent-section">
+        <div class="support-urgent-content">
+            <h2 class="support-urgent-title">긴급 상담은 전화로 연락주세요</h2>
+            <a href="tel:010-3789-7653" class="support-urgent-btn">
+                <span class="support-urgent-icon">📞</span>
+                <span class="support-urgent-text">
+                    <strong>010-3789-7653</strong>
+                    <small>24시간 상담 가능</small>
+                </span>
+            </a>
         </div>
     </section>
 
-    <!-- FAQ 섹션 -->
-    <section class="section support-faq-section">
-        <h2 class="section-title">자주 묻는 <span>질문</span></h2>
-        <div class="faq-container">
-            <div class="faq-item">
-                <div class="faq-question">
-                    <span>Q.</span>
-                    <span>배터리 수명은 얼마나 되나요?</span>
-                    <span class="faq-toggle">+</span>
-                </div>
-                <div class="faq-answer">
-                    <p>딥사이클 배터리를 사용하는 저희 제품은 일반적으로 3~5년 정도 사용 가능합니다. 사용 빈도와 충전 습관에 따라 차이가 있을 수 있으며, 정기적인 점검을 통해 배터리 상태를 확인해드립니다.</p>
-                </div>
+    <!-- A/S 프로세스 -->
+    <section class="section support-process-section">
+        <h2 class="section-title">A/S <span>프로세스</span></h2>
+        <div class="process-steps">
+            <div class="process-step">
+                <div class="process-number">01</div>
+                <h3 class="process-title">접수</h3>
+                <p class="process-desc">전화 또는 카카오톡으로 A/S 접수</p>
             </div>
-            <div class="faq-item">
-                <div class="faq-question">
-                    <span>Q.</span>
-                    <span>맞춤형 전동차 제작도 가능한가요?</span>
-                    <span class="faq-toggle">+</span>
-                </div>
-                <div class="faq-answer">
-                    <p>네, 가능합니다. 현장 환경과 용도에 맞춰 프레임 크기, 적재함 형태, 배터리 용량 등을 커스터마이징하여 제작해드립니다. 상담을 통해 구체적인 요구사항을 확인한 후 맞춤 견적을 제공해드립니다.</p>
-                </div>
+            <div class="process-arrow">→</div>
+            <div class="process-step">
+                <div class="process-number">02</div>
+                <h3 class="process-title">현장방문/수거</h3>
+                <p class="process-desc">기술자가 직접 현장 방문하여 점검</p>
             </div>
-            <div class="faq-item">
-                <div class="faq-question">
-                    <span>Q.</span>
-                    <span>A/S는 어떻게 받을 수 있나요?</span>
-                    <span class="faq-toggle">+</span>
-                </div>
-                <div class="faq-answer">
-                    <p>전화(010-3789-7653) 또는 카카오톡으로 접수해주시면, 기술자가 직접 현장을 방문하여 점검 및 수리를 진행합니다. 구매 후 평생 기술 지원을 약속드리며, 기술자 출신 대표가 직접 챙겨드립니다.</p>
-                </div>
+            <div class="process-arrow">→</div>
+            <div class="process-step">
+                <div class="process-number">03</div>
+                <h3 class="process-title">수리</h3>
+                <p class="process-desc">전문 기술자가 신속하게 수리 진행</p>
             </div>
-            <div class="faq-item">
-                <div class="faq-question">
-                    <span>Q.</span>
-                    <span>제작 기간은 얼마나 걸리나요?</span>
-                    <span class="faq-toggle">+</span>
-                </div>
-                <div class="faq-answer">
-                    <p>기성품의 경우 1주일 내 배송 가능하며, 맞춤 제작의 경우 설계 및 제작 기간을 포함하여 약 3~4주 정도 소요됩니다. 급한 경우 상담을 통해 가능 여부를 확인해드립니다.</p>
-                </div>
-            </div>
-            <div class="faq-item">
-                <div class="faq-question">
-                    <span>Q.</span>
-                    <span>충전은 어떻게 하나요?</span>
-                    <span class="faq-toggle">+</span>
-                </div>
-                <div class="faq-answer">
-                    <p>220V 가정용 콘센트로 간편하게 충전할 수 있습니다. 완속 충전기 설치도 가능하며, 충전 시간은 배터리 용량에 따라 6~8시간 정도 소요됩니다. 충전기 관련 문의도 언제든지 연락주세요.</p>
-                </div>
+            <div class="process-arrow">→</div>
+            <div class="process-step">
+                <div class="process-number">04</div>
+                <h3 class="process-title">사후점검</h3>
+                <p class="process-desc">수리 후 안정성 확인 및 사용법 안내</p>
             </div>
         </div>
     </section>
 
-    <!-- 지도 섹션 -->
-    <section class="section support-location-section">
+    <!-- 오시는 길 (확대) -->
+    <section class="section support-location-section-large">
         <h2 class="section-title">오시는 <span>길</span></h2>
-        <div class="support-location-info">
-            <div class="location-details">
-                <p class="location-address">경기도 양주시 광적면 부흥로956번길 174</p>
-                <p class="location-hours">운영시간: 평일 09:00 - 18:00</p>
-                <a href="https://map.naver.com/v5/search/경기도 양주시 광적면 부흥로956번길 174" target="_blank" class="btn-directions">네이버 지도에서 길찾기</a>
+        <div class="support-location-large">
+            <div class="location-info-large">
+                <p class="location-address-large">경기도 양주시 광적면 부흥로 956번길 174</p>
+                <p class="location-hours-large">운영시간: 평일 09:00 - 18:00</p>
+                <div class="location-buttons-large">
+                    <a href="https://map.naver.com/v5/search/경기도 양주시 광적면 부흥로956번길 174" target="_blank" class="btn-directions-large">네이버 지도에서 길찾기</a>
+                    <a href="https://map.kakao.com/link/search/경기도 양주시 광적면 부흥로956번길 174" target="_blank" class="btn-directions-large btn-kakao-map">카카오맵에서 길찾기</a>
+                </div>
             </div>
-            <div class="location-map">
+            <div class="location-map-large">
                 <iframe
                     src="https://www.google.com/maps?q=%EA%B2%BD%EA%B8%B0%EB%8F%84+%EC%96%91%EC%A3%BC%EC%8B%9C+%EA%B4%91%EC%A0%81%EB%A9%B4+%EB%B6%80%ED%9D%A5%EB%A1%9C956%EB%B2%88%EA%B8%B8+174&output=embed"
                     width="100%"
-                    height="400"
-                    style="border:0; border-radius: 12px;"
+                    height="500"
+                    style="border:0; border-radius: 16px;"
                     allowfullscreen=""
                     loading="lazy"
                     referrerpolicy="no-referrer-when-downgrade"
@@ -166,8 +117,83 @@
         </div>
     </section>
 
-    <footer id="contact">
-        <p>© 드림전동차. All rights reserved.</p>
+    <!-- Global Footer: FAQ Section -->
+    <section class="section global-faq-section">
+        <h2 class="section-title">자주 묻는 <span>질문</span></h2>
+        <div class="faq-container">
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span>Q.</span>
+                    <span>정말 녹이 안 슬까요?</span>
+                    <span class="faq-toggle">+</span>
+                </div>
+                <div class="faq-answer">
+                    <p>네, 드림전동차는 전 기종 <strong>올 스테인리스(Stainless Steel)</strong> 바디를 채택하여 축사나 농장 등 습기가 많은 환경에서도 부식 걱정 없이 반영구적으로 사용 가능합니다.</p>
+                </div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span>Q.</span>
+                    <span>한 번 충전하면 얼마나 쓰나요?</span>
+                    <span class="faq-toggle">+</span>
+                </div>
+                <div class="faq-answer">
+                    <p>검증된 고성능 <strong>딥사이클 배터리</strong>를 표준 장착하여, 작업 환경에 따라 다르지만 넉넉한 주행 거리와 강력한 파워를 보장합니다.</p>
+                </div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span>Q.</span>
+                    <span>운전이 어렵지는 않나요?</span>
+                    <span class="faq-toggle">+</span>
+                </div>
+                <div class="faq-answer">
+                    <p>안정적인 <strong>국산 컨트롤러</strong>를 탑재하여 부드러운 가감속이 가능합니다. 초보자나 어르신도 금방 적응하실 수 있을 만큼 조작이 직관적이고 안전합니다.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Global Footer: Inquiry Section -->
+    <section class="section global-inquiry-section">
+        <h2 class="section-title">더 궁금하신 점이 있나요? <span>상담 신청하기</span></h2>
+        <div class="global-inquiry-container">
+            <form id="globalInquiryForm" class="global-inquiry-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="globalInquiryNameSupport">성함 <span class="required">*</span></label>
+                        <input type="text" id="globalInquiryNameSupport" name="name" required placeholder="홍길동">
+                    </div>
+                    <div class="form-group">
+                        <label for="globalInquiryPhoneSupport">연락처 <span class="required">*</span></label>
+                        <input type="tel" id="globalInquiryPhoneSupport" name="phone" required placeholder="010-1234-5678">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="globalInquiryMessageSupport">문의 내용 <span class="required">*</span></label>
+                    <textarea id="globalInquiryMessageSupport" name="message" rows="6" required placeholder="문의하실 내용을 자세히 적어주시면 더 정확한 답변을 드릴 수 있습니다."></textarea>
+                </div>
+                <button type="submit" class="btn-submit">상담 신청하기</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Global Footer: Official Footer -->
+    <footer class="global-footer" id="contact">
+        <div class="global-footer-content">
+            <div class="global-footer-row">
+                <span class="global-footer-item"><strong>상호명:</strong> 드림전동차</span>
+                <span class="global-footer-separator">|</span>
+                <span class="global-footer-item"><strong>대표번호:</strong> 010-3789-7653</span>
+            </div>
+            <div class="global-footer-row">
+                <span class="global-footer-item">경기도 양주시 광적면 부흥로 956번길 174</span>
+            </div>
+            <div class="global-footer-row">
+                <span class="global-footer-item">사업자등록번호: 560-86-02294</span>
+            </div>
+            <p class="global-footer-copyright">© 드림전동차. All rights reserved.</p>
+        </div>
     </footer>
 
     <script src="js/script.js"></script>
@@ -181,20 +207,20 @@
             onScroll();
         })();
 
-        // FAQ Accordion
+        // Global Footer initialization
         (function() {
-            var faqItems = document.querySelectorAll('.faq-item');
+            // FAQ Accordion
+            var faqItems = document.querySelectorAll('.global-faq-section .faq-item');
             faqItems.forEach(function(item) {
                 var question = item.querySelector('.faq-question');
                 var answer = item.querySelector('.faq-answer');
                 var toggle = item.querySelector('.faq-toggle');
                 
-                if (!question || !answer) return;
+                if (!question || !answer || !toggle) return;
                 
                 question.addEventListener('click', function() {
                     var isOpen = item.classList.contains('active');
                     
-                    // Close all other items
                     faqItems.forEach(function(otherItem) {
                         if (otherItem !== item) {
                             otherItem.classList.remove('active');
@@ -203,7 +229,6 @@
                         }
                     });
                     
-                    // Toggle current item
                     if (isOpen) {
                         item.classList.remove('active');
                         toggle.textContent = '+';
@@ -213,37 +238,20 @@
                     }
                 });
             });
-        })();
 
-        // Form submission
-        (function() {
-            var form = document.getElementById('supportForm');
-            if (!form) return;
-            
-            form.addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                var formData = new FormData(form);
-                var data = {};
-                formData.forEach(function(value, key) {
-                    data[key] = value;
+            // Global Inquiry Form submission
+            var form = document.getElementById('globalInquiryForm');
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    var formData = new FormData(form);
+                    var data = {};
+                    formData.forEach(function(value, key) { data[key] = value; });
+                    console.log('Global inquiry submitted:', data);
+                    alert('상담 신청이 접수되었습니다.\n빠른 시일 내에 연락드리겠습니다.');
+                    form.reset();
                 });
-                
-                // 여기에 실제 전송 로직을 추가하세요
-                // 예: Formspree, EmailJS, 또는 백엔드 API 호출
-                console.log('Form submitted:', data);
-                
-                // 임시 알림 (실제로는 이메일/카카오톡 연동 필요)
-                alert('문의가 접수되었습니다.\n빠른 시일 내에 연락드리겠습니다.');
-                form.reset();
-                
-                // 실제 연동 예시:
-                // fetch('https://your-api-endpoint.com/send-email', {
-                //     method: 'POST',
-                //     headers: { 'Content-Type': 'application/json' },
-                //     body: JSON.stringify(data)
-                // });
-            });
+            }
         })();
     </script>
 </body>
