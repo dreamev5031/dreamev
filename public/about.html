@@ -3,66 +3,100 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>브랜드 스토리 - Dream EV</title>
+    <title>브랜드 스토리 - 드림전동차</title>
     <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/responsive.css">
 </head>
 <body>
-    <header>
-        <h1><a href="index.html" style="color: #fff; text-decoration: none;">Dream EV</a></h1>
+    <!-- GNB -->
+    <header class="gnb" id="gnb">
+        <a href="index.html" class="gnb-logo">드림<span>전동차</span></a>
         <nav>
-            <ul>
+            <ul class="gnb-nav">
+                <li><a href="index.html">홈</a></li>
+                <li><a href="index.html#best-sellers">대표모델</a></li>
+                <li><a href="cases.html">제작사례</a></li>
                 <li><a href="about.html">브랜드 스토리</a></li>
-                <li><a href="products.html">대표 모델</a></li>
-                <li><a href="archive.html">제작사례</a></li>
-                <li><a href="support.html">고객지원</a></li>
+                <li><a href="index.html#contact">고객지원</a></li>
             </ul>
         </nav>
+        <a href="index.html#contact" class="gnb-cta">견적문의</a>
     </header>
 
-    <main class="container">
-        <section id="vision">
-            <h2 class="section-title">우리의 비전</h2>
-            <div class="about-section">
-                <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=1974&auto=format&fit=crop" alt="CEO">
-                <div class="text">
-                    <h3>더 나은 이동의 가치를 만들다</h3>
-                    <p>안녕하십니까, Dream EV 대표입니다. 저희는 단순히 전동차를 만드는 것을 넘어, 사람과 환경, 그리고 미래를 생각하는 이동 솔루션을 제공하고자 합니다. 최고의 기술력과 안전에 대한 확고한 신념으로 고객 여러분의 일상과 비즈니스에 가장 신뢰할 수 있는 파트너가 될 것을 약속드립니다. Dream EV와 함께 지속가능한 미래를 향한 움직임에 동참해주십시오.</p>
-                </div>
-            </div>
-        </section>
+    <!-- 1. 인트로 (Brand Story) -->
+    <section class="about-intro scroll-fade">
+        <div class="about-intro-overlay"></div>
+        <div class="about-intro-content">
+            <h1 class="about-intro-title">이동의 한계를 넘다</h1>
+            <p class="about-intro-desc">드림전동차는 단순한 운송 수단을 넘어, 현장의 효율을 혁신하는 파트너입니다.</p>
+        </div>
+    </section>
 
-        <section id="tech">
-            <h2 class="section-title">기술력 & 인증</h2>
-            <p style="text-align:center; margin-bottom: 2rem;">고객의 안전을 최우선으로 생각합니다. Dream EV는 엄격한 품질 관리와 자체 기술 연구소를 통해 세계적 수준의 기술력과 안전성을 확보했습니다.</p>
-            <div class="tech-grid">
-                <div class="tech-item">
-                    <img src="https://img.freepik.com/free-vector/professional-certificate-template_23-2148419619.jpg?w=1380" alt="특허 인증서">
-                    <h4>자체 개발 BMS 특허</h4>
-                </div>
-                <div class="tech-item">
-                    <img src="https://images.unsplash.com/photo-1567789884554-0b844b597180?q=80&w=2070&auto=format&fit=crop" alt="생산 라인">
-                    <h4>스마트 팩토리 생산 라인</h4>
-                </div>
-                <div class="tech-item">
-                    <img src="https://via.placeholder.com/300x200.png?text=ISO+9001" alt="품질 경영 인증">
-                    <h4>ISO 9001 품질 경영 인증</h4>
-                </div>
-            </div>
-        </section>
+    <!-- 2. 핵심 경쟁력 (Core Values) -->
+    <section class="section about-values" id="core-values">
+        <h2 class="section-title scroll-fade">왜 <span>드림전동차</span>인가?</h2>
+        <div class="core-values-grid">
+            <article class="core-card scroll-fade">
+                <h3 class="core-card-title">현장 맞춤 설계</h3>
+                <p class="core-card-desc">기성품이 아닙니다. 공사 현장, 비좁은 농로 등 작업 환경에 딱 맞춰 직접 설계하고 제작합니다.</p>
+            </article>
+            <article class="core-card scroll-fade">
+                <h3 class="core-card-title">압도적 내구</h3>
+                <p class="core-card-desc">거친 흙바닥도 문제없습니다. 고강도 스테인리스 프레임과 통타이어로 잔고장 없이 버티는 탱크 같은 내구성.</p>
+            </article>
+            <article class="core-card scroll-fade">
+                <h3 class="core-card-title">검증된 부품</h3>
+                <p class="core-card-desc">유지보수가 쉬운 <strong>딥사이클 배터리</strong>와 신뢰할 수 있는 <strong>국산 컨트롤러</strong>만 고집합니다.</p>
+            </article>
+            <article class="core-card scroll-fade">
+                <h3 class="core-card-title">평생 기술 지원</h3>
+                <p class="core-card-desc">팔고 나면 끝이 아닙니다. 기술자 출신 대표가 직접 챙기는 확실한 A/S를 약속드립니다.</p>
+            </article>
+        </div>
+    </section>
 
-        <section id="location">
-            <h2 class="section-title">오시는 길</h2>
-            <div class="map-container">
-                <img src="https://images.unsplash.com/photo-1569336415962-a4bd9f69cd83?q=80&w=1931&auto=format&fit=crop" alt="회사 위치 지도">
-                <div class="map-placeholder">실제 지도 연동 예정</div>
-            </div>
-            <p style="text-align:center; margin-top: 1rem;"><strong>본사 및 전시장:</strong> 서울특별시 강남구 테헤란로 123 드림타워</p>
-        </section>
-    </main>
+    <!-- 3. 오시는 길 (Location) -->
+    <section class="section about-location scroll-fade" id="location">
+        <h2 class="section-title">오시는 <span>길</span></h2>
+        <p class="about-address">경기도 양주시 광적면 부흥로956번길 174</p>
+        <div class="about-map-wrap">
+            <iframe
+                src="https://www.google.com/maps?q=%EA%B2%BD%EA%B8%B0%EB%8F%84+%EC%96%91%EC%A3%BC%EC%8B%9C+%EA%B4%91%EC%A0%81%EB%A9%B4+%EB%B6%80%ED%9D%A5%EB%A1%9C956%EB%B2%88%EA%B8%B8+174&output=embed"
+                width="100%"
+                height="400"
+                style="border:0; border-radius: 12px;"
+                allowfullscreen=""
+                loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade"
+                title="드림전동차 오시는 길">
+            </iframe>
+        </div>
+    </section>
 
-    <footer>
-        <p>&copy; 2026 Dream EV. 모든 권리 보유.</p>
+    <footer id="contact">
+        <p>© 드림전동차. All rights reserved.</p>
     </footer>
+
+    <script src="js/script.js"></script>
+    <script>
+        (function() {
+            var gnb = document.getElementById('gnb');
+            if (gnb) {
+                function onScroll() { gnb.classList.toggle('scrolled', window.scrollY > 50); }
+                window.addEventListener('scroll', onScroll);
+                onScroll();
+            }
+
+            var fadeEls = document.querySelectorAll('.scroll-fade');
+            var observer = new IntersectionObserver(function(entries) {
+                entries.forEach(function(entry) {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                    }
+                });
+            }, { rootMargin: '0px 0px -60px 0px', threshold: 0.1 });
+
+            fadeEls.forEach(function(el) { observer.observe(el); });
+        })();
+    </script>
 </body>
 </html>
