@@ -1,5 +1,11 @@
 @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
 
+/* Font optimization: prevent FOIT (Flash of Invisible Text) */
+@font-face {
+    font-family: 'Pretendard';
+    font-display: swap;
+}
+
 /* ===== Design System: Eye-comfort Dark (프리미엄 다크) ===== */
 :root {
     /* 배경: 부드러운 차콜 그레이 */
@@ -26,6 +32,12 @@
 html {
     overflow-y: scroll;
     scroll-behavior: smooth;
+}
+
+/* Performance optimization: contain layout and paint */
+img {
+    content-visibility: auto;
+    contain-intrinsic-size: 400px;
 }
 
 body {
@@ -181,6 +193,7 @@ a {
 /* Ken Burns 효과: 천천히 확대 */
 .hero-slide.active {
     animation: kenBurns 20s ease-in-out infinite;
+    will-change: transform;
 }
 
 @keyframes kenBurns {
@@ -200,6 +213,7 @@ a {
     opacity: 0;
     transform: translateY(50px);
     transition: opacity 1s ease-out 0.3s, transform 1s ease-out 0.3s;
+    will-change: transform, opacity;
 }
 
 .hero-slide.active .hero-content {
@@ -282,6 +296,7 @@ a {
     object-fit: cover;
     display: block;
     transition: transform 0.3s;
+    will-change: transform;
 }
 
 .model-image:hover {
@@ -405,6 +420,7 @@ a {
     background: var(--bg-card);
     border: 1px solid var(--glass-border);
     transition: transform 0.3s, box-shadow 0.3s;
+    will-change: transform;
 }
 
 .gallery-item:hover {
@@ -422,6 +438,7 @@ a {
     height: 220px;
     object-fit: cover;
     display: block;
+    will-change: transform;
 }
 
 .gallery-item::after {
@@ -755,6 +772,10 @@ a {
     border: 1px solid var(--glass-border);
     text-align: center;
     transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.trust-card {
+    will-change: transform;
 }
 
 .trust-card:hover {

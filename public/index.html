@@ -61,7 +61,7 @@
         <div class="models-list">
             <article class="model-item scroll-reveal">
                 <div class="model-image-wrap">
-                    <img class="model-image" src="images/industrial.webp" alt="산업용 전동차" loading="lazy">
+                    <img class="model-image" src="images/industrial.webp" alt="산업용 전동차" loading="lazy" decoding="async">
                 </div>
                 <div class="model-content">
                     <h3 class="model-title">산업용 전동차</h3>
@@ -71,7 +71,7 @@
             </article>
             <article class="model-item model-item-reverse scroll-reveal">
                 <div class="model-image-wrap">
-                    <img class="model-image" src="images/farm.webp" alt="농업용 전동차" loading="lazy">
+                    <img class="model-image" src="images/farm.webp" alt="농업용 전동차" loading="lazy" decoding="async">
                 </div>
                 <div class="model-content">
                     <h3 class="model-title">농업용 전동차</h3>
@@ -81,7 +81,7 @@
             </article>
             <article class="model-item scroll-reveal">
                 <div class="model-image-wrap">
-                    <img class="model-image" src="images/custom.webp" alt="맞춤제작 전동차" loading="lazy">
+                    <img class="model-image" src="images/custom.webp" alt="맞춤제작 전동차" loading="lazy" decoding="async">
                 </div>
                 <div class="model-content">
                     <h3 class="model-title">맞춤제작 전동차</h3>
@@ -195,15 +195,26 @@
 
     <script src="js/script.js"></script>
     <script>
-        // GNB scroll → glassmorphism
+        // GNB scroll → glassmorphism (optimized with requestAnimationFrame)
         (function() {
             var gnb = document.getElementById('gnb');
             if (!gnb) return;
-            function onScroll() {
+            var ticking = false;
+            
+            function updateScroll() {
                 gnb.classList.toggle('scrolled', window.scrollY > 50);
+                ticking = false;
             }
-            window.addEventListener('scroll', onScroll);
-            onScroll();
+            
+            function onScroll() {
+                if (!ticking) {
+                    window.requestAnimationFrame(updateScroll);
+                    ticking = true;
+                }
+            }
+            
+            window.addEventListener('scroll', onScroll, { passive: true });
+            updateScroll();
         })();
 
         // Hero auto slider with cross-fade effect
@@ -231,16 +242,21 @@
             }, 5000);
         })();
 
-        // Scroll reveal for model items
+        // Scroll reveal for model items (optimized)
         (function() {
             var revealEls = document.querySelectorAll('.scroll-reveal');
+            if (revealEls.length === 0) return;
+            
             var observer = new IntersectionObserver(function(entries) {
                 entries.forEach(function(entry) {
                     if (entry.isIntersecting) {
                         entry.target.classList.add('is-visible');
+                        // Stop observing once visible for performance
+                        observer.unobserve(entry.target);
                     }
                 });
             }, { rootMargin: '0px 0px -100px 0px', threshold: 0.1 });
+            
             revealEls.forEach(function(el) { observer.observe(el); });
         })();
 

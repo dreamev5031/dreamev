@@ -51,25 +51,25 @@
         <!-- Gallery -->
         <div class="gallery" id="gallery">
             <div class="gallery-item" data-category="industrial">
-                <img src="images/industrial.webp" alt="산업용 전동차 사례 1" loading="lazy">
+                <img src="images/industrial.webp" alt="산업용 전동차 사례 1" loading="lazy" decoding="async">
             </div>
             <div class="gallery-item" data-category="industrial">
                 <img src="images/industrial.webp" alt="산업용 전동차 사례 2" loading="lazy">
             </div>
             <div class="gallery-item" data-category="agricultural">
-                <img src="images/farm.webp" alt="농업용 사례 1" loading="lazy">
+                <img src="images/farm.webp" alt="농업용 사례 1" loading="lazy" decoding="async">
             </div>
             <div class="gallery-item" data-category="agricultural">
                 <img src="images/farm.webp" alt="농업용 사례 2" loading="lazy">
             </div>
             <div class="gallery-item" data-category="multipurpose">
-                <img src="images/main2.webp" alt="다목적 사례 1" loading="lazy">
+                <img src="images/main2.webp" alt="다목적 사례 1" loading="lazy" decoding="async">
             </div>
             <div class="gallery-item" data-category="multipurpose">
                 <img src="images/main2.webp" alt="다목적 사례 2" loading="lazy">
             </div>
             <div class="gallery-item" data-category="custom">
-                <img src="images/custom.webp" alt="맞춤제작 사례 1" loading="lazy">
+                <img src="images/custom.webp" alt="맞춤제작 사례 1" loading="lazy" decoding="async">
             </div>
             <div class="gallery-item" data-category="custom">
                 <img src="images/custom.webp" alt="맞춤제작 사례 2" loading="lazy">
@@ -89,7 +89,7 @@
         <div class="case-modal-content">
             <button class="case-modal-close" id="modalClose">&times;</button>
             <div class="case-modal-image-wrap">
-                <img id="modalImage" src="" alt="" class="case-modal-image">
+                <img id="modalImage" src="" alt="" class="case-modal-image" loading="lazy" decoding="async">
             </div>
             <div class="case-modal-body">
                 <div class="case-modal-header">
@@ -182,13 +182,26 @@
 
     <script src="js/script.js"></script>
     <script>
-        // GNB scroll
+        // GNB scroll (optimized with requestAnimationFrame)
         (function() {
             var gnb = document.getElementById('gnb');
             if (!gnb) return;
-            function onScroll() { gnb.classList.toggle('scrolled', window.scrollY > 50); }
-            window.addEventListener('scroll', onScroll);
-            onScroll();
+            var ticking = false;
+            
+            function updateScroll() {
+                gnb.classList.toggle('scrolled', window.scrollY > 50);
+                ticking = false;
+            }
+            
+            function onScroll() {
+                if (!ticking) {
+                    window.requestAnimationFrame(updateScroll);
+                    ticking = true;
+                }
+            }
+            
+            window.addEventListener('scroll', onScroll, { passive: true });
+            updateScroll();
         })();
 
         // Load CMS cases data
@@ -241,6 +254,7 @@
                 img.src = data.image;
                 img.alt = data.title || '제작사례';
                 img.loading = 'lazy';
+                img.decoding = 'async';
                 
                 item.appendChild(img);
                 
