@@ -22,11 +22,9 @@
         </nav>
         <div class="gnb-right-group">
             <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="메뉴 열기">
-                <span class="hamburger-icon">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </span>
+                <span></span>
+                <span></span>
+                <span></span>
             </button>
             <a href="support.html" class="gnb-cta">견적문의</a>
         </div>
@@ -471,12 +469,15 @@ document.addEventListener('DOMContentLoaded', function() {
     const nav = document.querySelector('.gnb-nav');
 
     if (btn && nav) {
-        btn.onclick = function(e) {
+        // 기존 이벤트 제거를 위한 클론 처리
+        const newBtn = btn.cloneNode(true);
+        btn.parentNode.replaceChild(newBtn, btn);
+
+        newBtn.onclick = function(e) {
             e.preventDefault();
-            const isActive = nav.classList.toggle('active');
-            btn.classList.toggle('active');
-            document.body.style.overflow = isActive ? 'hidden' : 'auto';
-            console.log("메뉴가 열렸나요?:", isActive);
+            const isOpen = nav.classList.toggle('active');
+            this.classList.toggle('active');
+            document.body.style.overflow = isOpen ? 'hidden' : 'auto';
         };
     }
 });

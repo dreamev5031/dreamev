@@ -2508,45 +2508,46 @@ nav {
 }
 
 @media (max-width: 768px) {
-    /* [체크용] 드림전동차 글자색 하늘색 유지 */
+    /* [테스트용] 드림전동차 글자색 하늘색 유지 */
     .gnb-logo, .gnb-logo a, .gnb-logo span { 
         color: skyblue !important; 
-        z-index: 1000002 !important; /* 메뉴와 버튼보다 위에 표시 */
-        position: relative !important;
+        position: relative !important; 
+        z-index: 1000005 !important; 
     }
 
-    /* 햄버거 버튼 & X 버튼 최상단 배치 */
+    /* 1. 햄버거 버튼 복구 (세 줄 그리기) */
     .mobile-menu-toggle {
         display: flex !important;
-        z-index: 1000001 !important;
-        position: relative !important;
+        flex-direction: column !important;
+        justify-content: space-between !important;
+        width: 28px !important; height: 20px !important;
+        background: transparent !important; border: none !important;
+        z-index: 1000005 !important; position: relative !important;
+    }
+    .mobile-menu-toggle span {
+        display: block !important; width: 100% !important; height: 3px !important;
+        background-color: #ffffff !important; border-radius: 2px !important;
+        transition: 0.3s !important;
     }
 
-    /* 메뉴판 (기본 숨김) */
-    .gnb-nav {
-        display: none !important;
-    }
+    /* 2. 버튼 클릭 시 X로 변신 */
+    .mobile-menu-toggle.active span:nth-child(1) { transform: translateY(8.5px) rotate(45deg) !important; }
+    .mobile-menu-toggle.active span:nth-child(2) { opacity: 0 !important; }
+    .mobile-menu-toggle.active span:nth-child(3) { transform: translateY(-8.5px) rotate(-45deg) !important; }
 
-    /* 메뉴판 활성화 (무조건 보이게 강제 노출) */
+    /* 3. 메뉴판 (기본 숨김) */
+    .gnb-nav { display: none !important; }
+
+    /* 4. 메뉴판 활성화 (전체 화면 & 불투명 배경) */
     .gnb-nav.active {
         display: flex !important;
-        visibility: visible !important;
-        opacity: 1 !important;
-        position: fixed !important;
-        top: 0 !important; left: 0 !important;
+        position: fixed !important; top: 0 !important; left: 0 !important;
         width: 100vw !important; height: 100vh !important;
-        background-color: #1a202c !important;
-        z-index: 1000000 !important;
+        background-color: #1a202c !important; /* 투명도 없는 진한 배경 */
+        z-index: 1000000 !important; /* 로고(1000005)보다는 아래 */
         flex-direction: column !important;
-        justify-content: center !important;
-        align-items: center !important;
-        gap: 2rem !important;
+        justify-content: center !important; align-items: center !important;
+        gap: 3rem !important; margin: 0 !important;
     }
-
-    .gnb-nav.active a {
-        font-size: 2rem !important;
-        color: #ffffff !important;
-        font-weight: 800 !important;
-        display: block !important;
-    }
+    .gnb-nav.active a { font-size: 2rem !important; color: #fff !important; font-weight: 800 !important; }
 }
