@@ -189,30 +189,6 @@ nav {
     gap: 10px;
 }
 
-/* ===== Mobile Menu Toggle Button ===== */
-.mobile-menu-toggle {
-    display: none; /* Hidden on desktop */
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    padding: 0;
-    width: 30px;
-    height: 22px;
-    flex-direction: column;
-    justify-content: space-between;
-    z-index: 10002;
-    position: relative;
-}
-
-.mobile-menu-toggle span {
-    display: block;
-    width: 100%;
-    height: 3px;
-    background-color: #ffffff;
-    border-radius: 2px;
-    transition: all 0.3s ease;
-}
-
 /* ===== Hero Slider (100vh) ===== */
 .hero {
     position: relative;
@@ -2409,198 +2385,47 @@ nav {
     }
 }
 
+/* PC 기본 설정: 햄버거 버튼 숨김 */
+.mobile-menu-toggle { display: none; }
+
+/* 모바일 전용 스타일 (768px 이하) */
 @media (max-width: 768px) {
-    /* 로고 스타일 유지 */
-    .gnb-logo, .gnb-logo a, .gnb-logo span { 
-        color: skyblue !important; 
-        z-index: 10005 !important; 
-        position: relative !important;
-    }
-
-    /* 오른쪽 버튼 그룹 표시 */
-    .gnb-right-group {
-        display: flex !important;
-        align-items: center !important;
-        gap: 10px !important;
-        z-index: 10005 !important;
-    }
-
-    /* 견적문의 버튼 표시 유지 */
-    .gnb-cta {
-        display: inline-block !important;
-        padding: 0.6rem 1rem !important;
-        font-size: 0.85rem !important;
-        background: var(--primary) !important;
-        color: #FFFFFF !important;
-        border-radius: 8px !important;
-        text-decoration: none !important;
-    }
-
-    /* 햄버거 버튼 표시 */
+    /* 1. 햄버거 버튼 스타일 */
     .mobile-menu-toggle {
-        display: flex !important;
-        flex-direction: column !important;
-        justify-content: space-between !important;
-        width: 30px !important;
-        height: 22px !important;
-        padding: 0 !important;
-        background: transparent !important;
-        border: none !important;
-        z-index: 10005 !important;
-        position: relative !important;
-        cursor: pointer !important;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        width: 30px; height: 20px;
+        background: transparent; border: none; cursor: pointer;
+        z-index: 100000 !important; /* 메뉴판보다 위에 있어야 함 */
+        position: relative;
     }
-
     .mobile-menu-toggle span {
-        display: block !important;
-        width: 100% !important;
-        height: 3px !important;
-        background-color: #ffffff !important;
-        border-radius: 2px !important;
+        width: 100%; height: 3px; background-color: #fff; border-radius: 2px;
+        transition: 0.3s;
     }
 
-    /* 햄버거 버튼 클릭 시 X 모양으로 변환 */
-    .mobile-menu-toggle.active span:nth-child(1) {
-        transform: translateY(9.5px) rotate(45deg) !important;
-    }
-    .mobile-menu-toggle.active span:nth-child(2) {
-        opacity: 0 !important;
-    }
-    .mobile-menu-toggle.active span:nth-child(3) {
-        transform: translateY(-9.5px) rotate(-45deg) !important;
-    }
+    /* 2. 버튼 클릭 시 X로 변신 */
+    .mobile-menu-toggle.active span:nth-child(1) { transform: translateY(8px) rotate(45deg); }
+    .mobile-menu-toggle.active span:nth-child(2) { opacity: 0; }
+    .mobile-menu-toggle.active span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
 
-    /* 기본 메뉴 숨김 */
+    /* 3. 메뉴판 초기 상태 (숨김) */
     .gnb-nav {
-        display: none !important;
+        display: none; /* 평소엔 안 보임 */
     }
 
-    /* 메뉴 활성화 시 전체 화면 오버레이 - z-index 최상위로 강제 */
+    /* 4. 메뉴판 활성화 상태 (전체 화면 오버레이) */
     .gnb-nav.active {
         display: flex !important;
-        visibility: visible !important;
-        opacity: 1 !important;
-        position: fixed !important;
-        top: 0 !important;
-        left: 0 !important;
-        width: 100vw !important;
-        height: 100vh !important;
-        background-color: #1a202c !important; /* 진한 배경 - 불투명 */
-        z-index: 9999999 !important; /* 모든 요소 위에 표시 */
-        flex-direction: column !important;
-        justify-content: center !important;
-        align-items: center !important;
-        gap: 2.5rem !important;
-        margin: 0 !important;
-        padding: 0 !important;
+        flex-direction: column;
+        justify-content: center; align-items: center;
+        position: fixed; top: 0; left: 0;
+        width: 100vw; height: 100vh;
+        background-color: #1a202c; /* 배경색 (필수) */
+        z-index: 99999; /* 버튼 바로 아래 */
+        gap: 2rem;
     }
-
-    /* 부모 nav와 header도 메뉴가 가려지지 않도록 */
-    .gnb nav {
-        z-index: auto !important;
-    }
-
-    .gnb-nav.active li {
-        list-style: none !important;
-        margin: 0 !important;
-        padding: 0 !important;
-    }
-
-    .gnb-nav.active a {
-        font-size: 2rem !important;
-        color: #ffffff !important;
-        font-weight: 800 !important;
-        text-decoration: none !important;
-        display: block !important;
-        padding: 1rem 0 !important;
-    }
-}
-
-/* ===== 모바일 햄버거 강제 노출 (우선순위 최상위) ===== */
-@media (max-width: 768px) {
-    /* [체크용] 드림전동차 글자색 하늘색 유지 */
-    .gnb-logo, .gnb-logo a, .gnb-logo span {
-        color: skyblue !important;
-        z-index: 1000005 !important;
-    }
-
-    /* 1. 햄버거 버튼 강제 표시 (분홍색 배경 제거) */
-    .mobile-menu-toggle {
-        display: flex !important;
-        flex-direction: column !important;
-        justify-content: space-between !important;
-        width: 30px !important;
-        height: 22px !important;
-        padding: 0 !important;
-        background: transparent !important;
-        border: none !important;
-        z-index: 10005 !important;
-        position: relative !important;
-        cursor: pointer !important;
-    }
-
-    /* 2. 버튼 세 줄 (흰색) */
-    .mobile-menu-toggle span {
-        display: block !important;
-        width: 100% !important;
-        height: 3px !important;
-        background-color: #ffffff !important;
-        border-radius: 2px !important;
-    }
-
-    /* 버튼 클릭 시 X로 변환 */
-    .mobile-menu-toggle.active span:nth-child(1) {
-        transform: translateY(9.5px) rotate(45deg) !important;
-    }
-    .mobile-menu-toggle.active span:nth-child(2) {
-        opacity: 0 !important;
-    }
-    .mobile-menu-toggle.active span:nth-child(3) {
-        transform: translateY(-9.5px) rotate(-45deg) !important;
-    }
-
-    /* 3. 메뉴판 초기 상태 (완전 숨김) */
-    .gnb-nav {
-        display: none !important;
-    }
-
-    /* 4. 메뉴판 활성화 상태 (전체 화면) - z-index 최상위로 강제 */
-    .gnb-nav.active {
-        display: flex !important;
-        visibility: visible !important;
-        opacity: 1 !important;
-        position: fixed !important;
-        top: 0 !important;
-        left: 0 !important;
-        width: 100vw !important;
-        height: 100vh !important;
-        background-color: #1a202c !important; /* 진한 배경 - 불투명 */
-        z-index: 9999999 !important; /* 모든 요소 위에 표시 */
-        flex-direction: column !important;
-        justify-content: center !important;
-        align-items: center !important;
-        gap: 3rem !important;
-        margin: 0 !important;
-        padding: 0 !important;
-    }
-
-    /* 부모 nav와 header도 메뉴가 가려지지 않도록 */
-    .gnb nav {
-        z-index: auto !important;
-    }
-
-    .gnb-nav.active li {
-        list-style: none !important;
-        margin: 0 !important;
-        padding: 0 !important;
-    }
-
-    .gnb-nav.active a {
-        font-size: 2rem !important;
-        color: #ffffff !important;
-        font-weight: 800 !important;
-        text-decoration: none !important;
-        display: block !important;
-        padding: 1rem 0 !important;
-    }
+    .gnb-nav.active li { margin: 0; }
+    .gnb-nav.active a { font-size: 1.5rem; color: white; font-weight: bold; }
 }
