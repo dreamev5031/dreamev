@@ -9,25 +9,25 @@
 </head>
 <body>
     <!-- GNB -->
-    <header class="gnb" id="gnb">
-        <a href="index.html" class="gnb-logo">드림<span>전동차</span></a>
+    <header class="gnb">
+        <a href="index.html" class="gnb-logo">드림전동차</a>
+
+        <nav class="gnb-nav">
+            <ul>
+                <li><a href="about.html">회사소개</a></li>
+                <li><a href="cases.html">제작사례</a></li>
+                <li><a href="support.html">고객센터</a></li>
+                <li><a href="support.html">견적문의</a></li>
+            </ul>
+        </nav>
+
         <button class="mobile-menu-toggle" aria-label="메뉴 열기">
             <span></span>
             <span></span>
             <span></span>
         </button>
-        <nav>
-            <ul class="gnb-nav">
-                <li><a href="index.html">홈</a></li>
-                <li><a href="about.html">브랜드 스토리</a></li>
-                <li><a href="index.html#best-sellers">대표모델</a></li>
-                <li><a href="cases.html">제작사례</a></li>
-                <li><a href="support.html">고객지원</a></li>
-            </ul>
-        </nav>
-        <div class="gnb-right-group">
-            <a href="support.html" class="gnb-cta">견적문의</a>
-        </div>
+
+        <a href="support.html" class="header-btn btn-primary">견적문의</a>
     </header>
 
     <!-- 2x2 Category Nav -->
@@ -456,17 +456,22 @@ document.addEventListener('DOMContentLoaded', () => {
     const nav = document.querySelector('.gnb-nav');
 
     if (btn && nav) {
-        // 기존 이벤트 복제해서 초기화
         const newBtn = btn.cloneNode(true);
         btn.parentNode.replaceChild(newBtn, btn);
 
         newBtn.addEventListener('click', (e) => {
             e.preventDefault();
-            newBtn.classList.toggle('active'); // 버튼 X 변신
-            nav.classList.toggle('active');    // 메뉴판 열기
-
-            // 스크롤 제어
+            newBtn.classList.toggle('active');
+            nav.classList.toggle('active');
             document.body.style.overflow = nav.classList.contains('active') ? 'hidden' : 'auto';
+        });
+
+        nav.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                newBtn.classList.remove('active');
+                nav.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            });
         });
     }
 });

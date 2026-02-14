@@ -736,28 +736,6 @@ nav {
     margin-bottom: 0.5rem;
 }
 
-@media (max-width: 768px) {
-    .case-modal {
-        padding: 1rem;
-    }
-    
-    .case-modal-content {
-        max-height: 95vh;
-    }
-    
-    .case-modal-image-wrap {
-        height: 250px;
-    }
-    
-    .case-modal-body {
-        padding: 1.5rem;
-    }
-    
-    .case-modal-title {
-        font-size: 1.4rem;
-    }
-}
-
 /* ===== About Page ===== */
 .about-intro {
     position: relative;
@@ -1266,170 +1244,6 @@ nav {
     padding-top: 2rem;
     border-top: 1px solid rgba(255, 255, 255, 0.05);
     text-align: center;
-}
-
-@media (max-width: 768px) {
-    .trust-grid {
-        grid-template-columns: 1fr;
-        gap: 1.5rem;
-    }
-
-    .trust-card {
-        padding: 2rem 1.5rem;
-    }
-
-    .contact-bar {
-        padding: 2rem 1.5rem;
-    }
-
-    .contact-bar-content {
-        flex-direction: column;
-        text-align: center;
-    }
-
-    .contact-bar-text {
-        font-size: 1.1rem;
-        min-width: auto;
-    }
-
-    .contact-bar-buttons {
-        width: 100%;
-        flex-direction: column;
-    }
-
-    .contact-btn {
-        width: 100%;
-        justify-content: center;
-    }
-
-    .footer-details {
-        flex-direction: column;
-        gap: 0.5rem;
-    }
-}
-
-/* ===== Responsive ===== */
-@media (max-width: 768px) {
-    .gnb {
-        display: flex !important;
-        justify-content: space-between !important;
-        align-items: center !important;
-        padding: 0.75rem 1rem !important;
-        flex-wrap: nowrap !important;
-        position: sticky !important;
-        top: 0 !important;
-        height: auto !important;
-        min-height: 60px !important;
-        max-height: 70px !important;
-    }
-
-    .gnb-logo {
-        font-size: 1.2rem;
-        flex-shrink: 0;
-        z-index: 10003;
-        margin: 0;
-    }
-
-
-    .gnb-right-group {
-        display: flex !important;
-        align-items: center !important;
-        gap: 10px !important;
-        z-index: 10003;
-        flex-shrink: 0;
-    }
-
-    .gnb-cta {
-        padding: 0.6rem 1rem;
-        font-size: 0.85rem;
-        flex-shrink: 0;
-        white-space: nowrap;
-        background: var(--primary);
-        color: #FFFFFF;
-        border-radius: 8px;
-        box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
-        text-decoration: none;
-    }
-
-    /* Remove any padding-top from hero on mobile */
-    .hero {
-        margin-top: 0 !important;
-        padding-top: 0 !important;
-    }
-    
-    .hero-slide {
-        margin-top: 0 !important;
-        padding-top: 0 !important;
-    }
-    
-    .category-grid {
-        grid-template-columns: 1fr !important; /* 모바일은 1열이 기본, 2열 원하면 repeat(2, 1fr)로 수정 */
-    }
-
-    .hero-line1 {
-        font-size: 2.5rem;
-    }
-
-    .brand-name {
-        font-size: 3.5rem;
-        margin-top: 0.5rem;
-    }
-
-    .model-item,
-    .model-item-reverse {
-        flex-direction: column;
-        gap: 2rem;
-    }
-
-    .model-image-wrap {
-        max-width: 100%;
-    }
-
-    .model-image {
-        height: 250px;
-    }
-
-    .model-content {
-        max-width: 100%;
-    }
-
-    .model-title {
-        font-size: 1.5rem;
-    }
-
-    .models-list {
-        gap: 100px;
-    }
-
-    .gallery {
-        grid-template-columns: 1fr;
-    }
-
-    .gallery-item img {
-        max-width: 100%;
-        height: auto;
-    }
-
-    .core-values-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .about-intro {
-        min-height: 50vh;
-        padding: 120px 1rem 3rem;
-        background-size: cover;
-        background-position: center;
-    }
-
-    .hero-slide {
-        background-size: cover;
-        background-position: center;
-    }
-
-    .category-box-bg {
-        background-size: cover;
-        background-position: center;
-    }
 }
 
 /* ===== Support Page ===== */
@@ -2153,286 +1967,72 @@ nav {
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
 
-@media (max-width: 768px) {
-    /* Hero Slider Mobile */
-    .hero-content {
-        margin-left: 0;
-        text-align: center;
-        padding: 1.5rem;
-    }
-
-    .hero-main-copy {
-        font-size: 1.8rem;
-        margin-bottom: 1rem;
-    }
-
-    .hero-sub-copy {
-        font-size: 1rem;
-        margin-bottom: 2rem;
-    }
-
-    .hero-cta-btn {
-        padding: 1rem 2rem;
-        font-size: 1rem;
-    }
-
-    .support-hero-banner {
-        height: 350px;
-        margin-top: 0 !important;
-    }
-
-    .support-hero-banner-content {
-        padding: 1.5rem;
-    }
-
-    .support-hero-banner-title {
-        font-size: 1.8rem;
-        margin-bottom: 1rem;
-    }
-
-    .support-hero-banner-subtitle {
-        font-size: 1rem;
-    }
-
-    .support-hero {
-        padding: 150px 1rem 3rem;
-    }
-
-    .support-hero-title {
-        font-size: 2rem;
-    }
-
-    .support-hero-subtitle {
-        font-size: 1rem;
-    }
-
-    .support-hero-buttons {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .support-btn {
-        min-width: auto;
-    }
-
-    .support-form-container {
-        padding: 1.5rem;
-    }
-
-    .form-row {
-        grid-template-columns: 1fr;
-    }
-
-    .support-location-info {
-        grid-template-columns: 1fr;
-    }
-
-    .support-location-large {
-        grid-template-columns: 1fr;
-    }
-
-    .location-address-large {
-        font-size: 1.1rem;
-    }
-
-    .location-hours-large {
-        font-size: 1rem;
-    }
-
-    .location-map-large {
-        width: 100%;
-    }
-
-    .location-map-large iframe {
-        height: 400px;
-    }
-
-    /* Hide inquiry form on mobile for support.html */
-    .support-page .global-inquiry-section {
-        display: none;
-    }
-
-    /* Reduce padding for mobile */
-    .support-faq-section-top {
-        padding-top: 3rem;
-        padding-bottom: 2rem;
-    }
-
-    .support-faq-hero {
-        padding: 1.5rem 0;
-        margin-bottom: 2rem;
-    }
-
-    .support-faq-icon {
-        font-size: 3rem;
-        margin-bottom: 1rem;
-    }
-
-    .support-faq-title {
-        font-size: 1.8rem;
-    }
-
-    .support-faq-subtitle {
-        font-size: 1rem;
-    }
-
-    .support-location-section-large {
-        padding-top: 2rem;
-        padding-bottom: 2rem;
-    }
-
-    .global-footer-grid {
-        grid-template-columns: 1fr;
-        gap: 2rem;
-    }
-
-    .global-footer-col {
-        text-align: center;
-    }
-
-    .global-footer-address,
-    .global-footer-contact {
-        text-align: center;
-    }
-
-    .global-footer-row,
-    .final-footer-row {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0.5rem;
-    }
-
-    .global-footer-separator,
-    .final-footer-separator {
-        display: none;
-    }
-
-    /* Mobile Inquiry Form Styles */
-    .global-inquiry-container,
-    .index-inquiry-container {
-        width: 95%;
-        max-width: 100%;
-        padding: 1.5rem 1rem;
-        margin: 0 auto;
-    }
-
-    .global-inquiry-form,
-    .index-inquiry-form {
-        gap: 1.8rem;
-    }
-
-    .global-inquiry-form .form-row,
-    .index-inquiry-form .form-row {
-        grid-template-columns: 1fr;
-        gap: 1.8rem;
-    }
-
-    .global-inquiry-form .form-group,
-    .index-inquiry-form .form-group {
-        gap: 0.8rem;
-        margin-bottom: 0;
-        width: 100%;
-    }
-
-    .global-inquiry-form .form-group label,
-    .index-inquiry-form .form-group label {
-        font-size: 1rem;
-        margin-bottom: 0.5rem;
-    }
-
-    .global-inquiry-form .form-group input,
-    .global-inquiry-form .form-group textarea,
-    .index-inquiry-form .form-group input,
-    .index-inquiry-form .form-group textarea {
-        width: 100%;
-        padding: 1rem 1.2rem;
-        font-size: 16px; /* Prevent iOS auto-zoom */
-        min-height: 48px; /* Touch-friendly height */
-        box-sizing: border-box;
-    }
-
-    .global-inquiry-form .form-group select,
-    .index-inquiry-form .form-group select {
-        width: 100%;
-        padding: 1rem 1.2rem;
-        font-size: 16px; /* Prevent iOS auto-zoom */
-        min-height: 48px; /* Touch-friendly height */
-        box-sizing: border-box;
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        appearance: none;
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2310B981' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
-        background-repeat: no-repeat;
-        background-position: right 1rem center;
-        padding-right: 3rem;
-    }
-
-    .global-inquiry-form .form-group textarea,
-    .index-inquiry-form .form-group textarea {
-        min-height: 140px;
-        padding: 1rem 1.2rem;
-        font-size: 16px;
-    }
-
-    .global-inquiry-form .btn-submit,
-    .index-inquiry-form .btn-submit {
-        display: block;
-        width: 100%;
-        padding: 1.2rem 2rem;
-        font-size: 1.1rem;
-        min-height: 52px; /* Touch-friendly button height */
-        margin-top: 0.5rem;
-    }
+/* === 공통 (PC/Mobile) === */
+.gnb {
+    position: sticky; top: 0; z-index: 10000;
+    background-color: #1a202c; height: 60px;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 0 1.5rem;
 }
 
-/* PC에서는 햄버거 버튼 숨김 */
-.mobile-menu-toggle { display: none !important; }
+/* === PC 버전 (769px 이상) === */
+@media (min-width: 769px) {
+    .mobile-menu-toggle { display: none; } /* PC에선 햄버거 숨김 */
+    .gnb-nav ul { display: flex; gap: 2rem; list-style: none; margin: 0; padding: 0; } /* 메뉴 가로 정렬 */
+    .gnb-nav a { color: white; font-weight: bold; text-decoration: none; }
+}
 
-/* 모바일 전용 스타일 (768px 이하) */
+.header-btn.btn-primary {
+    display: inline-block;
+    padding: 0.6rem 1.5rem;
+    background: var(--primary);
+    color: #fff;
+    font-weight: 600;
+    border-radius: 8px;
+    text-decoration: none;
+}
+.header-btn.btn-primary:hover {
+    background: var(--primary-hover);
+}
+
+/* === 모바일 버전 (768px 이하) === */
 @media (max-width: 768px) {
-    /* 1. 헤더 레이아웃 고정 */
-    .gnb {
-        display: flex !important; justify-content: space-between !important; align-items: center !important;
-        height: 60px !important; padding: 0 1.5rem !important;
-        background-color: #1a202c !important;
-        position: sticky !important; top: 0 !important; z-index: 10000 !important;
-    }
-
-    /* 2. 햄버거 버튼 디자인 (무조건 보이게 설정) */
+    /* 1. 햄버거 버튼 디자인 */
     .mobile-menu-toggle {
-        display: flex !important;
-        flex-direction: column !important; justify-content: space-between !important;
-        width: 30px !important; height: 20px !important;
-        background: transparent !important; border: none !important; cursor: pointer !important;
-        position: relative !important;
-        z-index: 100002 !important; /* ★ 메뉴판(100001)보다 위! */
+        display: flex; flex-direction: column; justify-content: space-between;
+        width: 30px; height: 20px;
+        background: transparent; border: none; cursor: pointer;
+        position: relative; z-index: 10001; /* ★ 최상단 노출 */
     }
     .mobile-menu-toggle span {
-        width: 100% !important; height: 3px !important;
-        background-color: #ffffff !important; border-radius: 2px !important;
-        transition: 0.3s !important;
+        width: 100%; height: 3px; background-color: white; border-radius: 2px; transition: 0.3s;
     }
 
-    /* 3. 버튼 클릭 시 X로 변신 */
-    .mobile-menu-toggle.active span:nth-child(1) { transform: translateY(8.5px) rotate(45deg) !important; }
-    .mobile-menu-toggle.active span:nth-child(2) { opacity: 0 !important; }
-    .mobile-menu-toggle.active span:nth-child(3) { transform: translateY(-8.5px) rotate(-45deg) !important; }
+    /* 2. 버튼 클릭 시 X 변신 */
+    .mobile-menu-toggle.active span:nth-child(1) { transform: translateY(8.5px) rotate(45deg); }
+    .mobile-menu-toggle.active span:nth-child(2) { opacity: 0; }
+    .mobile-menu-toggle.active span:nth-child(3) { transform: translateY(-8.5px) rotate(-45deg); }
 
-    /* 4. 메뉴판 초기 상태 (숨김) */
-    .gnb-nav { display: none !important; }
+    /* 3. 로고 & 견적버튼도 위로 올림 */
+    .gnb-logo, .header-btn { position: relative; z-index: 10001; }
 
-    /* 5. 메뉴판 활성화 (전체 화면 덮기 + 진한 남색 배경) */
+    /* 4. 메뉴판 (초기 숨김 -> 활성화 시 전체화면) */
+    .gnb-nav {
+        display: none; /* 평소엔 숨김 */
+    }
     .gnb-nav.active {
         display: flex !important;
-        position: fixed !important; top: 0 !important; left: 0 !important;
-        width: 100vw !important; height: 100vh !important;
-        background-color: #1a202c !important; /* ★ 투명도 없는 진한 배경 */
-        z-index: 100001 !important; /* ★ 버튼보다는 아래, 헤더보다는 위 */
-        flex-direction: column !important; justify-content: center !important; align-items: center !important;
-        gap: 2rem !important; margin: 0 !important; padding: 0 !important;
+        position: fixed; top: 0; left: 0;
+        width: 100vw; height: 100vh;
+        background-color: #1a202c; /* 배경색 필수 */
+        z-index: 9000; /* ★ 버튼 아래에 깔림 */
+        flex-direction: column; justify-content: center; align-items: center;
     }
-    .gnb-nav.active a { font-size: 2rem !important; color: #fff !important; font-weight: 800 !important; }
-
-    /* 6. 로고도 메뉴판 위로 끄집어내기 */
-    .gnb-logo { position: relative !important; z-index: 100002 !important; }
+    .gnb-nav.active ul {
+        display: flex; flex-direction: column; gap: 2.5rem; text-align: center;
+        padding: 0; margin: 0; list-style: none;
+    }
+    .gnb-nav.active a {
+        font-size: 1.8rem; color: white; font-weight: 800; text-decoration: none;
+    }
 }
