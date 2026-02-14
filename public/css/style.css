@@ -2385,47 +2385,54 @@ nav {
     }
 }
 
-/* PC 기본 설정: 햄버거 버튼 숨김 */
-.mobile-menu-toggle { display: none; }
+/* PC에서는 햄버거 버튼 숨김 */
+.mobile-menu-toggle { display: none !important; }
 
 /* 모바일 전용 스타일 (768px 이하) */
 @media (max-width: 768px) {
-    /* 1. 햄버거 버튼 스타일 */
+    /* 1. 헤더 레이아웃 고정 */
+    .gnb {
+        display: flex !important; justify-content: space-between !important; align-items: center !important;
+        height: 60px !important; padding: 0 1.5rem !important;
+        background-color: #1a202c !important;
+        position: sticky !important; top: 0 !important; z-index: 10000 !important;
+    }
+
+    /* 2. 햄버거 버튼 디자인 (무조건 보이게 설정) */
     .mobile-menu-toggle {
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        width: 30px; height: 20px;
-        background: transparent; border: none; cursor: pointer;
-        z-index: 100000 !important; /* 메뉴판보다 위에 있어야 함 */
-        position: relative;
+        display: flex !important;
+        flex-direction: column !important; justify-content: space-between !important;
+        width: 30px !important; height: 20px !important;
+        background: transparent !important; border: none !important; cursor: pointer !important;
+        position: relative !important;
+        z-index: 100002 !important; /* ★ 메뉴판(100001)보다 위! */
     }
     .mobile-menu-toggle span {
-        width: 100%; height: 3px; background-color: #fff; border-radius: 2px;
-        transition: 0.3s;
+        width: 100% !important; height: 3px !important;
+        background-color: #ffffff !important; border-radius: 2px !important;
+        transition: 0.3s !important;
     }
 
-    /* 2. 버튼 클릭 시 X로 변신 */
-    .mobile-menu-toggle.active span:nth-child(1) { transform: translateY(8px) rotate(45deg); }
-    .mobile-menu-toggle.active span:nth-child(2) { opacity: 0; }
-    .mobile-menu-toggle.active span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
+    /* 3. 버튼 클릭 시 X로 변신 */
+    .mobile-menu-toggle.active span:nth-child(1) { transform: translateY(8.5px) rotate(45deg) !important; }
+    .mobile-menu-toggle.active span:nth-child(2) { opacity: 0 !important; }
+    .mobile-menu-toggle.active span:nth-child(3) { transform: translateY(-8.5px) rotate(-45deg) !important; }
 
-    /* 3. 메뉴판 초기 상태 (숨김) */
-    .gnb-nav {
-        display: none; /* 평소엔 안 보임 */
-    }
+    /* 4. 메뉴판 초기 상태 (숨김) */
+    .gnb-nav { display: none !important; }
 
-    /* 4. 메뉴판 활성화 상태 (전체 화면 오버레이) */
+    /* 5. 메뉴판 활성화 (전체 화면 덮기 + 진한 남색 배경) */
     .gnb-nav.active {
         display: flex !important;
-        flex-direction: column;
-        justify-content: center; align-items: center;
-        position: fixed; top: 0; left: 0;
-        width: 100vw; height: 100vh;
-        background-color: #1a202c; /* 배경색 (필수) */
-        z-index: 99999; /* 버튼 바로 아래 */
-        gap: 2rem;
+        position: fixed !important; top: 0 !important; left: 0 !important;
+        width: 100vw !important; height: 100vh !important;
+        background-color: #1a202c !important; /* ★ 투명도 없는 진한 배경 */
+        z-index: 100001 !important; /* ★ 버튼보다는 아래, 헤더보다는 위 */
+        flex-direction: column !important; justify-content: center !important; align-items: center !important;
+        gap: 2rem !important; margin: 0 !important; padding: 0 !important;
     }
-    .gnb-nav.active li { margin: 0; }
-    .gnb-nav.active a { font-size: 1.5rem; color: white; font-weight: bold; }
+    .gnb-nav.active a { font-size: 2rem !important; color: #fff !important; font-weight: 800 !important; }
+
+    /* 6. 로고도 메뉴판 위로 끄집어내기 */
+    .gnb-logo { position: relative !important; z-index: 100002 !important; }
 }

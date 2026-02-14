@@ -452,21 +452,21 @@
     </script>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    const toggleBtn = document.querySelector('.mobile-menu-toggle');
-    const menu = document.querySelector('.gnb-nav');
+    const btn = document.querySelector('.mobile-menu-toggle');
+    const nav = document.querySelector('.gnb-nav');
 
-    if (toggleBtn && menu) {
-        toggleBtn.addEventListener('click', (e) => {
+    if (btn && nav) {
+        // 기존 이벤트 복제해서 초기화
+        const newBtn = btn.cloneNode(true);
+        btn.parentNode.replaceChild(newBtn, btn);
+
+        newBtn.addEventListener('click', (e) => {
             e.preventDefault();
-            toggleBtn.classList.toggle('active'); // 버튼 X로 변신
-            menu.classList.toggle('active');      // 메뉴판 등장
-            
-            // 메뉴 열렸을 때 스크롤 막기
-            if (menu.classList.contains('active')) {
-                document.body.style.overflow = 'hidden';
-            } else {
-                document.body.style.overflow = 'auto';
-            }
+            newBtn.classList.toggle('active'); // 버튼 X 변신
+            nav.classList.toggle('active');    // 메뉴판 열기
+
+            // 스크롤 제어
+            document.body.style.overflow = nav.classList.contains('active') ? 'hidden' : 'auto';
         });
     }
 });

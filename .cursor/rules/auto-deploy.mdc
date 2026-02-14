@@ -1,0 +1,12 @@
+---
+description: 자동 배포 - 변경 후 GitHub 푸시로 배포
+alwaysApply: true
+---
+
+# 자동 배포
+
+- **public/** 또는 배포에 영향을 주는 파일을 수정한 뒤에는 반드시 GitHub에 푸시해서 배포한다.
+- 순서: `git add` → `git commit` → `git push origin main`
+- PowerShell 사용 시 `&&` 대신 `;`로 명령 구분.
+- 커밋 메시지는 변경 내용을 간단히 영어로 (예: "Fix mobile menu z-index", "Update support page").
+- 사용자가 "배포해", "올려줘", "푸시해" 등으로 요청해도 같은 절차로 실행한다.
