@@ -25,6 +25,18 @@
     --glass-border: rgba(255, 255, 255, 0.1);
 }
 
+/* 지도 상자: 부모 높이 상속, iframe 꽉 채움 */
+#map {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 500px;
+}
+#map iframe {
+    width: 100% !important;
+    height: 100% !important;
+    display: block;
+}
+
 * {
     box-sizing: border-box;
     margin: 0;
