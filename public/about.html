@@ -6,7 +6,7 @@
     <title>브랜드 스토리 - 드림전동차</title>
     <link rel="stylesheet" href="css/style.css?v=20260214-999">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
-    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=9b9e04fba3fef284186cd531a730a60f&libraries=services"></script>
+    <script type="text/javascript" src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=ev9ulljphi"></script>
 </head>
 <body>
     <!-- GNB -->
@@ -119,30 +119,25 @@
                 </div>
             </div>
             <div class="map-frame">
-                <div id="map" style="width:100%; height:450px; background-color:#eee; position:relative; overflow:hidden !important;"></div>
+                <div id="map" style="width:100%; height:550px;"></div>
                 <script>
-                window.addEventListener('load', function() {
-                    kakao.maps.load(function() {
-                        var container = document.getElementById('map');
-                        var lat = 37.83062;
-                        var lng = 127.02268;
-
-                        var options = {
-                            center: new kakao.maps.LatLng(lat, lng),
-                            level: 3
-                        };
-
-                        var map = new kakao.maps.Map(container, options);
-                        var marker = new kakao.maps.Marker({ position: options.center });
-                        marker.setMap(map);
-
-                        setTimeout(function() {
-                            map.relayout();
-                            map.setCenter(new kakao.maps.LatLng(lat, lng));
-                            console.log("드림전동차 지도 강제 렌더링 완료:", lat, lng);
-                        }, 500);
+                window.onload = function() {
+                    var position = new naver.maps.LatLng(37.83062, 127.02268);
+                    var map = new naver.maps.Map('map', {
+                        center: position,
+                        zoom: 16
                     });
-                });
+
+                    var marker = new naver.maps.Marker({
+                        position: position,
+                        map: map
+                    });
+
+                    var infowindow = new naver.maps.InfoWindow({
+                        content: '<div style="padding:10px;min-width:150px;text-align:center;font-weight:bold;">드림전동차</div>'
+                    });
+                    infowindow.open(map, marker);
+                };
                 </script>
             </div>
         </div>
