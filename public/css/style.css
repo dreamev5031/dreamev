@@ -127,6 +127,28 @@ nav {
     color: var(--primary);
 }
 
+/* === 로고 이미지 스타일 (배경 제거 트릭 포함) === */
+.main-logo-link {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+}
+
+.logo-img {
+    height: 50px; /* PC 기준 헤더 높이에 맞게 조절 */
+    width: auto;  /* 비율 유지 */
+    /* [핵심] 배경 제거: 어두운 배경은 투명, 밝은 부분(글자)만 남김 */
+    mix-blend-mode: lighten;
+    object-fit: contain;
+    display: block;
+}
+
+@media (max-width: 768px) {
+    .logo-img {
+        height: 35px; /* 모바일에서는 조금 작게 */
+    }
+}
+
 .gnb-nav {
     display: flex;
     align-items: center;
