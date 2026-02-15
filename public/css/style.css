@@ -150,14 +150,36 @@ nav {
 
 @media (min-width: 769px) {
     .gnb {
-        padding: 1rem 2rem; /* 헤더 높이 시원하게 */
+        min-height: 110px;
+        padding: 0 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .main-logo-link {
+        padding: 5px; /* 화살표 잘림 방지 */
+        display: flex;
+        align-items: center;
+    }
+    .logo-img {
+        height: 85px !important;
+        padding: 5px;
+        object-fit: contain;
+        display: block;
+    }
+    .gnb-nav {
+        gap: 50px;
+    }
+    .gnb-nav a {
+        font-size: 1.3rem !important;
+        font-weight: 800 !important;
     }
 }
 
 .gnb-nav {
     display: flex;
     align-items: center;
-    gap: 45px; /* 메뉴 간격 */
+    gap: 45px; /* 메뉴 간격 (모바일) */
     list-style: none !important;
     margin: 0;
     padding: 0;
