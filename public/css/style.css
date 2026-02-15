@@ -2467,11 +2467,13 @@ nav {
     }
 }
 
-/* [모바일 방어] support-hero 모바일에서도 정상 표시 */
+/* === 모바일 고객지원 디자인 원상복구 (768px 이하) === */
 @media (max-width: 768px) {
-    .support-hero {
-        padding: 60px 20px !important;
-        background: #1a202c !important;
+    .support-hero,
+    .support-info-section {
+        background-color: #0b1a2d !important;
+        padding: 50px 20px !important;
+        text-align: center !important;
     }
 
     .support-container {
@@ -2481,12 +2483,75 @@ nav {
     .support-text-group {
         width: 100% !important;
         text-align: center !important;
-        margin-bottom: 40px !important;
+    }
+
+    .support-text-group h1 {
+        font-size: 1.8rem !important;
+        color: #ffffff !important;
+        margin-bottom: 10px !important;
+    }
+
+    .support-text-group p {
+        font-size: 1rem !important;
+        color: #cbd5e0 !important;
+        line-height: 1.5 !important;
     }
 
     .support-contact-card {
+        background-color: #ffffff !important;
+        border-radius: 25px !important;
+        padding: 40px 25px !important;
+        margin: 30px auto !important;
         width: 100% !important;
-        padding: 30px !important;
+        max-width: 350px !important;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2) !important;
+        color: #2d3748 !important;
+    }
+
+    .card-header h3 {
+        font-size: 1.2rem !important;
+        color: #4a5568 !important;
+    }
+
+    .phone-number {
+        display: block !important;
+        font-size: 2.2rem !important;
+        font-weight: 800 !important;
+        color: #2d3748 !important;
+        margin: 15px 0 !important;
+        text-decoration: none !important;
+    }
+
+    .info-list {
+        list-style: none !important;
+        padding: 0 !important;
+        margin: 20px 0 !important;
+        display: inline-block !important;
+        text-align: left !important;
+    }
+
+    .info-list li {
+        display: flex !important;
+        align-items: center !important;
+        margin-bottom: 12px !important;
+        font-size: 0.95rem !important;
+        color: #4a5568 !important;
+    }
+
+    .info-list .icon {
+        margin-right: 10px !important;
+        font-size: 1.1rem !important;
+    }
+
+    .btn-inquiry {
+        display: block !important;
+        background-color: #48bb78 !important;
+        color: #ffffff !important;
+        padding: 15px !important;
+        border-radius: 12px !important;
+        text-decoration: none !important;
+        font-weight: bold !important;
+        margin-top: 20px !important;
     }
 }
 
@@ -2602,6 +2667,45 @@ nav {
     }
 }
 
+/* === 고객지원 페이지 PC 전용: FAQ ↔ 오시는 길 순서 바꿈 + 보기 좋게 === */
+@media (min-width: 769px) {
+    .support-main-content {
+        display: flex !important;
+        flex-direction: column !important;
+        width: 100% !important;
+    }
+
+    /* PC에서 자주 묻는 질문을 위로, 오시는 길을 아래로 */
+    .support-main-content .global-faq-section {
+        order: 1 !important;
+    }
+
+    .support-main-content .location-section {
+        order: 2 !important;
+    }
+
+    /* FAQ 섹션 보기 좋게: 여백·최대폭 */
+    .support-page .support-main-content .global-faq-section,
+    body.support-page .support-main-content .global-faq-section {
+        max-width: 900px !important;
+        margin: 0 auto !important;
+        padding: 80px 24px 60px !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+    }
+
+    .support-page .support-main-content .global-faq-section .section-title,
+    body.support-page .support-main-content .global-faq-section .section-title {
+        margin-bottom: 40px !important;
+        font-size: 2.25rem !important;
+    }
+
+    /* 오시는 길 섹션 아래 여백 정리 */
+    .support-main-content .location-section {
+        margin-bottom: 0 !important;
+    }
+}
+
 /* [모바일 보호] 오시는 길 모바일 세로 배치 유지 */
 @media (max-width: 768px) {
     .location-container {
@@ -2619,6 +2723,39 @@ nav {
         height: 300px !important;
         border-radius: 15px !important;
         overflow: hidden !important;
+    }
+
+    /* === 모바일 세로 찌그러짐 최종 해결 (768px 이하) === */
+    .trust-grid,
+    .features-grid {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 20px !important;
+        padding: 0 20px !important;
+    }
+
+    .trust-card,
+    .feature-item {
+        width: 100% !important;
+        min-width: unset !important;
+        max-width: none !important;
+        padding: 30px 20px !important;
+        text-align: center !important;
+    }
+
+    .trust-title,
+    .feature-item h4 {
+        font-size: 1.5rem !important;
+        word-break: keep-all !important;
+        white-space: normal !important;
+        display: block !important;
+    }
+
+    .trust-desc,
+    .feature-item p {
+        font-size: 1rem !important;
+        line-height: 1.6 !important;
+        word-break: keep-all !important;
     }
 }
 
