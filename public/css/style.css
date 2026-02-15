@@ -1107,6 +1107,7 @@ nav {
     background-color: #1a202c;
     padding: 100px 20px;
     text-align: center;
+    overflow: visible !important;
 }
 
 .featured-section-header h2 {
@@ -1128,21 +1129,27 @@ nav {
     gap: 28px;
     max-width: 1200px;
     margin: 0 auto;
+    padding: 50px 20px;
+    overflow: visible !important;
 }
 
 .model-card {
+    position: relative;
     background: #2d3748;
     border-radius: 20px;
     overflow: hidden;
     text-decoration: none;
     display: block;
     border: 1px solid rgba(255, 255, 255, 0.08);
-    transition: transform 0.3s, box-shadow 0.3s;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    z-index: 1;
+    touch-action: pan-y !important;
 }
 
 .model-card:hover {
-    transform: scale(1.05);
-    box-shadow: 0 20px 48px rgba(0, 0, 0, 0.4);
+    transform: translateY(-10px) scale(1.05);
+    z-index: 50;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
 }
 
 .model-card-image-wrap {
@@ -1433,9 +1440,11 @@ nav {
     .featured-model-grid {
         grid-template-columns: 1fr;
         gap: 24px;
+        padding: 40px 16px;
     }
     .model-card:hover {
-        transform: scale(1.02);
+        transform: translateY(-6px) scale(1.02);
+        z-index: 50;
     }
 }
 
