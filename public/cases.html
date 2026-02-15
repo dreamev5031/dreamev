@@ -479,77 +479,93 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 제작 사례 갤러리: cases.json 로드 후 갤러리 렌더 + 카테고리 필터 (h3 텍스트와 JSON category 연동)
+    // 제작 사례 갤러리: cases.json + 정적 플레이스홀더. 카테고리 매칭은 띄어쓰기 무시(버튼 "산업용 전동차" ↔ JSON "산업용")
     var categoryNav = document.getElementById('caseCategoryNav');
     var caseGallery = document.getElementById('caseGallery');
     var btnAllCases = document.getElementById('btnAllCases');
+    var galleryWrap = document.querySelector('.case-gallery-wrap');
 
     function norm(s) {
         return (s || '').trim().replace(/\s+/g, '');
     }
 
+    // 띄어쓰기 제거 후 서로 포함 관계면 매칭 (버튼 "산업용 전동차" ↔ DB "산업용")
+    function matchCategory(buttonTitle, jsonCategory) {
+        var cleanTarget = norm(buttonTitle);
+        var cleanItem = norm(jsonCategory || '');
+        if (!cleanTarget || !cleanItem) return false;
+        return cleanTarget.indexOf(cleanItem) !== -1 || cleanItem.indexOf(cleanTarget) !== -1;
+    }
+
     function filterGallery(categoryKey) {
+        if (!caseGallery) return;
         var items = caseGallery.querySelectorAll('.gallery-item');
         var cards = categoryNav ? categoryNav.querySelectorAll('.case-item-card') : [];
 
         items.forEach(function(el) {
-        var itemNorm = el.getAttribute('data-category-norm') || '';
+            var itemNorm = el.getAttribute('data-category-norm') || '';
             var show = categoryKey === 'all' ||
-                (itemNorm && (norm(categoryKey) === itemNorm || norm(categoryKey).indexOf(itemNorm) !== -1 || itemNorm.indexOf(norm(categoryKey)) !== -1));
+                (itemNorm && matchCategory(categoryKey, itemNorm));
             el.classList.toggle('hidden', !show);
         });
         cards.forEach(function(c) {
             var h3 = c.querySelector('.text-box h3');
             var cardNorm = h3 ? norm(h3.textContent) : '';
-            var isActive = categoryKey === 'all' ? false : (cardNorm && norm(categoryKey) === cardNorm);
+            var isActive = categoryKey === 'all' ? false : (cardNorm && matchCategory(categoryKey, cardNorm));
             c.classList.toggle('active', isActive);
             c.setAttribute('aria-pressed', isActive);
         });
+    }
+
+    // 정적 플레이스홀더 (카테고리별 기본 이미지) — JSON에 없어도 카테고리 클릭 시 표시
+    var staticPlaceholders = ''
+        + '<div class="gallery-item" data-category="industrial" data-category-norm="산업용"><img src="images/industrial.webp" alt="산업용 전동차 사례 1" loading="lazy"></div>'
+        + '<div class="gallery-item" data-category="industrial" data-category-norm="산업용"><img src="images/industrial.webp" alt="산업용 전동차 사례 2" loading="lazy"></div>'
+        + '<div class="gallery-item" data-category="agricultural" data-category-norm="농업용"><img src="images/farm.webp" alt="농업용 전동차 사례 1" loading="lazy"></div>'
+        + '<div class="gallery-item" data-category="agricultural" data-category-norm="농업용"><img src="images/farm.webp" alt="농업용 전동차 사례 2" loading="lazy"></div>'
+        + '<div class="gallery-item" data-category="multipurpose" data-category-norm="다목적"><img src="images/main2.webp" alt="다목적 전동차 사례 1" loading="lazy"></div>'
+        + '<div class="gallery-item" data-category="multipurpose" data-category-norm="다목적"><img src="images/main2.webp" alt="다목적 전동차 사례 2" loading="lazy"></div>'
+        + '<div class="gallery-item" data-category="custom" data-category-norm="맞춤제작"><img src="images/custom.webp" alt="맞춤제작 사례 1" loading="lazy"></div>'
+        + '<div class="gallery-item" data-category="custom" data-category-norm="맞춤제작"><img src="images/custom.webp" alt="맞춤제작 사례 2" loading="lazy"></div>';
+
+    function renderGallery(list) {
+        if (!caseGallery) return;
+        var jsonHtml = '';
+        (list || []).forEach(function(item) {
+            if (!item.image) return;
+            var categoryNorm = norm(item.category || '');
+            jsonHtml += '<div class="gallery-item" data-category="' + (item.slug || '') + '" data-category-norm="' + categoryNorm + '">';
+            jsonHtml += '<img src="/' + item.image + '" alt="' + (item.title || '').replace(/"/g, '&quot;') + '" loading="lazy">';
+            jsonHtml += '</div>';
+        });
+        caseGallery.innerHTML = staticPlaceholders + jsonHtml;
+    }
+
+    function setupCategoryCards() {
+        if (!categoryNav || !caseGallery) return;
+        var cards = categoryNav.querySelectorAll('.case-item-card');
+        cards.forEach(function(card) {
+            card.addEventListener('click', function() {
+                var h3 = card.querySelector('.text-box h3');
+                var categoryName = h3 ? h3.textContent.trim() : '';
+                if (galleryWrap) galleryWrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                filterGallery(categoryName);
+            });
+        });
+        if (btnAllCases) btnAllCases.addEventListener('click', function() { filterGallery('all'); });
+        filterGallery('all');
     }
 
     fetch('/cases.json')
         .then(function(r) { return r.ok ? r.json() : []; })
         .then(function(list) {
             window.allCasesData = list || [];
-            if (!caseGallery) return;
-
-            var html = '';
-            (list || []).forEach(function(item) {
-                if (!item.image) return;
-                var slug = item.slug || '';
-                var categoryNorm = norm(item.category || '');
-                html += '<div class="gallery-item" data-category="' + slug + '" data-category-norm="' + categoryNorm + '">';
-                html += '<img src="/' + item.image + '" alt="' + (item.title || '') + '" loading="lazy">';
-                html += '</div>';
-            });
-            if (html) caseGallery.innerHTML = html;
-
-            if (categoryNav && caseGallery) {
-                var cards = categoryNav.querySelectorAll('.case-item-card');
-                cards.forEach(function(card) {
-                    card.addEventListener('click', function() {
-                        var h3 = card.querySelector('.text-box h3');
-                        var categoryName = h3 ? h3.textContent.trim() : '';
-                        filterGallery(categoryName);
-                    });
-                });
-                if (btnAllCases) {
-                    btnAllCases.addEventListener('click', function() { filterGallery('all'); });
-                }
-                filterGallery('all');
-            }
+            renderGallery(Array.isArray(list) ? list : []);
+            setupCategoryCards();
         })
         .catch(function() {
-            if (categoryNav && caseGallery) {
-                var cards = categoryNav.querySelectorAll('.case-item-card');
-                cards.forEach(function(card) {
-                    card.addEventListener('click', function() {
-                        filterGallery(card.getAttribute('data-category'));
-                    });
-                });
-                if (btnAllCases) btnAllCases.addEventListener('click', function() { filterGallery('all'); });
-                filterGallery('all');
-            }
+            renderGallery([]);
+            setupCategoryCards();
         });
 });
 </script>

@@ -135,7 +135,7 @@ nav {
 }
 
 .logo-img {
-    height: 75px; /* PC: 로고 대형화 */
+    height: 80px; /* PC: 로고 대형화 */
     width: auto;
     mix-blend-mode: lighten;
     object-fit: contain;
@@ -144,20 +144,20 @@ nav {
 
 @media (max-width: 768px) {
     .logo-img {
-        height: 50px; /* 모바일 */
+        height: 55px; /* 모바일 */
     }
 }
 
 @media (min-width: 769px) {
     .gnb {
-        padding: 0.85rem 2rem;
+        padding: 1rem 2rem; /* 헤더 높이 시원하게 */
     }
 }
 
 .gnb-nav {
     display: flex;
     align-items: center;
-    gap: 40px; /* 메뉴 간격 넓힘 */
+    gap: 45px; /* 메뉴 간격 */
     list-style: none !important;
     margin: 0;
     padding: 0;
@@ -166,8 +166,8 @@ nav {
 
 .gnb-nav a {
     color: var(--text-main);
-    font-size: 1.25rem; /* 20px */
-    font-weight: 700;
+    font-size: 1.3rem; /* 약 21px */
+    font-weight: 800; /* Extra Bold */
     padding: 0.5rem 0;
     position: relative;
     transition: color 0.3s;
