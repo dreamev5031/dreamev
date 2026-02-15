@@ -3539,8 +3539,9 @@ nav {
 @media (min-width: 769px) {
     .about-tech-section {
         background-color: #1a202c !important;
-        padding: 100px 0 !important;
+        padding: 120px 0 100px !important; /* 상단 여유로 호버 시 잘림 방지 */
         color: #ffffff !important;
+        overflow: visible !important;
     }
     .tech-header {
         text-align: center !important;
@@ -3562,6 +3563,7 @@ nav {
         max-width: 1200px !important;
         margin: 0 auto !important;
         padding: 0 40px !important;
+        overflow: visible !important;
     }
 
     .tech-item {
@@ -3573,6 +3575,8 @@ nav {
         align-items: flex-start !important;
         gap: 30px !important;
         transition: all 0.3s ease !important;
+        overflow: visible !important;
+        margin-top: 10px !important; /* 호버 시 위로 올라갈 여유 */
     }
     .tech-item:hover {
         transform: translateY(-5px) !important;
