@@ -3772,6 +3772,20 @@ nav {
     display: block;
 }
 
+/* 지도 영역 모바일에서 화면 너비 100% */
+@media (max-width: 768px) {
+    .map-frame,
+    .location-map-box {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+    .map-frame iframe,
+    .location-map-box iframe {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+}
+
 /* === about 페이지 PC 전용: 와이드 레이아웃 (769px 이상) === */
 @media (min-width: 769px) {
     .features-grid {
