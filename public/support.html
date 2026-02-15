@@ -110,10 +110,13 @@
                         map: map
                     });
 
-                    var infowindow = new naver.maps.InfoWindow({
-                        content: '<div style="padding:10px;min-width:150px;text-align:center;font-weight:bold;">드림전동차</div>'
-                    });
-                    infowindow.open(map, marker);
+                    setTimeout(function() {
+                        window.dispatchEvent(new Event('resize'));
+                        if (map) {
+                            map.updateSize();
+                            map.setCenter(position);
+                        }
+                    }, 200);
                 };
                 </script>
             </div>

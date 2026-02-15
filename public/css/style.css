@@ -3774,6 +3774,12 @@ nav {
     display: block;
 }
 
+/* 네이버 지도 타일 깨짐 방지 */
+#map img {
+    max-width: none !important;
+    height: auto !important;
+}
+
 /* 지도 영역 모바일에서 화면 너비 100% */
 @media (max-width: 768px) {
     .map-frame,
