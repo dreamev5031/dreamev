@@ -2041,14 +2041,14 @@ nav {
 @media (max-width: 768px) {
     .gnb-nav.active {
         display: flex !important;
-        position: fixed !important; /* 헤더 무시하고 화면 기준 배치 */
+        position: fixed !important; /* absolute가 아니라 fixed → 헤더 밖으로 */
         top: 0 !important;
         left: 0 !important;
-        width: 100vw !important; /* 부모 크기 무시하고 화면 전체 너비 */
-        height: 100vh !important; /* 부모 크기 무시하고 화면 전체 높이 */
+        width: 100vw !important;
+        height: 100vh !important;
 
-        background-color: rgba(0, 0, 0, 0.95) !important; /* 뒤가 살짝 비치는 진한 검정 */
-        z-index: 99999 !important; /* 모든 레이어 중 최상단 */
+        background-color: rgba(0, 0, 0, 0.95) !important;
+        z-index: 99999 !important;
 
         flex-direction: column !important;
         justify-content: center !important;
@@ -2059,12 +2059,19 @@ nav {
         box-sizing: border-box !important;
     }
 
+    /* 햄버거 버튼: 메뉴판보다 위에 있어야 닫을 수 있음 */
+    .mobile-menu-toggle {
+        position: relative !important;
+        z-index: 100000 !important; /* 메뉴판(99999)보다 위 */
+    }
+
     .gnb-nav.active ul,
     .gnb-nav.active .mobile-menu-list {
         display: flex !important;
         flex-direction: column !important;
         gap: 40px !important;
         text-align: center !important;
+        width: 100% !important;
         list-style: none !important;
         padding: 0 !important;
         margin: 0 !important;
