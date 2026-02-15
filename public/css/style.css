@@ -2129,24 +2129,34 @@ nav {
         padding: 12px 0 !important;
     }
 
-    /* ===== 2. Trust 섹션 (3대 핵심 경쟁력) ===== */
+    /* ===== 2. Trust 섹션 (왜 드림전동차인가? – 1열 배치로 글자 펴기) ===== */
     .trust-grid {
         display: grid !important;
         grid-template-columns: 1fr !important;
-        gap: 40px !important;
+        gap: 30px !important;
         padding: 0 20px !important;
     }
     .trust-card {
         width: 100% !important;
         margin: 0 !important;
         text-align: center !important;
+        padding: 20px !important;
+        border-radius: 15px !important;
+        background-color: rgba(255, 255, 255, 0.05) !important;
     }
     .trust-card .trust-icon,
     .trust-card h3,
     .trust-card p {
         text-align: center !important;
     }
+    .trust-title {
+        font-size: 1.5rem !important;
+        margin-bottom: 10px !important;
+        word-break: keep-all !important;
+    }
     .trust-desc {
+        font-size: 1rem !important;
+        line-height: 1.6 !important;
         word-break: keep-all !important;
     }
 
