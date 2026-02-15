@@ -119,11 +119,13 @@
                 </div>
             </div>
             <div class="map-frame">
-                <div id="map" style="width:100%; height:550px;"></div>
+                <div id="map" style="width:100%; height:550px; background-color:#f8f9fa;"></div>
                 <script>
                 window.onload = function() {
+                    var mapDiv = document.getElementById('map');
                     var position = new naver.maps.LatLng(37.83062, 127.02268);
-                    var map = new naver.maps.Map('map', {
+
+                    var map = new naver.maps.Map(mapDiv, {
                         center: position,
                         zoom: 16
                     });
@@ -134,12 +136,12 @@
                     });
 
                     setTimeout(function() {
-                        window.dispatchEvent(new Event('resize'));
                         if (map) {
                             map.updateSize();
                             map.setCenter(position);
+                            console.log("네이버 지도 크기 강제 갱신 완료");
                         }
-                    }, 200);
+                    }, 500);
                 };
                 </script>
             </div>
