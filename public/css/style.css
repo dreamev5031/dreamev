@@ -3947,6 +3947,33 @@ nav {
     color: #48bb78 !important;
     margin-bottom: 10px !important;
 }
+.case-page-section .icon-box .case-card-thumb {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 12px;
+    display: block;
+}
+.case-page-section .icon-box:has(.case-card-thumb) {
+    width: 64px;
+    height: 64px;
+    flex-shrink: 0;
+    overflow: hidden;
+}
+.case-page-section .icon-box img.case-card-thumb {
+    min-width: 56px;
+    min-height: 56px;
+}
+@media (min-width: 769px) {
+    .case-page-section .icon-box:has(.case-card-thumb) {
+        width: 88px;
+        height: 88px;
+    }
+    .case-page-section .icon-box img.case-card-thumb {
+        min-width: 80px;
+        min-height: 80px;
+    }
+}
 .case-page-section .text-box h3 {
     color: #fff !important;
     font-size: 1.1rem !important;
