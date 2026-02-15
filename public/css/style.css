@@ -25,14 +25,15 @@
     --glass-border: rgba(255, 255, 255, 0.1);
 }
 
-/* 지도 컨테이너 높이 강제 고정 (100% 상속 실패 방지) */
+/* 1. 지도 컨테이너 높이 물리적 고정 (100% 상속 실패 방지) */
 #map {
     width: 100% !important;
-    height: 600px !important; /* PC 기본 높이 */
-    min-height: 600px !important;
-    background-color: #f0f0f0; /* 로딩 중 회색 배경 */
+    height: 600px !important;    /* PC 높이 고정 */
+    min-height: 600px !important; /* 최소 높이 보장 */
     overflow: hidden !important;
+    background-color: #f0f0f0;    /* 로딩 중 회색 배경 */
 }
+
 @media (max-width: 768px) {
     #map {
         height: 400px !important;
@@ -40,19 +41,27 @@
     }
 }
 
-/* 지도 타일 강제 렌더링 및 경고 제거 */
+/* 2. 지도 타일/마커/컨트롤 강제 초기화 (글로벌 CSS 무시) */
 #map img,
-#map canvas {
+#map canvas,
+#map div {
     max-width: none !important;
     max-height: none !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
     width: auto !important;
     height: auto !important;
     margin: 0 !important;
     padding: 0 !important;
-    border: none !important;
-    content-visibility: visible !important;
-    overflow: clip !important;
-    box-sizing: content-box !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    box-sizing: content-box !important; /* 타일 깨짐 방지 핵심 */
+    background: none !important;
+    vertical-align: baseline !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    content-visibility: visible !important; /* 렌더링 최적화 옵션 해제 */
 }
 
 * {

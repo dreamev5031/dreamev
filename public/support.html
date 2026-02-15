@@ -100,30 +100,28 @@
                 <script>
                 window.onload = function() {
                     var position = new naver.maps.LatLng(37.80718, 126.98733);
-                    var map = new naver.maps.Map('map', {
+
+                    var mapOptions = {
                         center: position,
                         zoom: 17,
                         mapTypeId: naver.maps.MapTypeId.HYBRID
-                    });
+                    };
+                    var map = new naver.maps.Map('map', mapOptions);
 
                     var marker = new naver.maps.Marker({
                         position: position,
                         map: map
                     });
 
-                    function wakeUpMap() {
+                    function forceRender() {
                         if (map) {
-                            if (typeof map.refresh === 'function') {
-                                map.refresh();
-                            }
                             window.dispatchEvent(new Event('resize'));
                             map.setCenter(position);
-                            console.log("지도 강제 깨우기 실행됨");
                         }
                     }
-                    setTimeout(wakeUpMap, 200);
-                    setTimeout(wakeUpMap, 500);
-                    setTimeout(wakeUpMap, 1000);
+                    setTimeout(forceRender, 100);
+                    setTimeout(forceRender, 500);
+                    setTimeout(forceRender, 1000);
                 };
                 </script>
             </div>
