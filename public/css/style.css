@@ -915,6 +915,7 @@ nav {
 .process-section {
     padding: 4rem 1.5rem;
     background: var(--bg-main);
+    overflow: visible;
 }
 .process-header {
     text-align: center;
@@ -939,6 +940,7 @@ nav {
     flex-wrap: wrap;
     justify-content: center;
     gap: 2rem;
+    overflow: visible;
 }
 .process-step {
     flex: 1 1 200px;
@@ -982,28 +984,34 @@ nav {
 
 @media (min-width: 769px) {
     .process-section {
-        padding: 5rem 2rem;
+        padding: 6rem 2rem 5rem;
         background: #252b36;
+        overflow: visible;
+    }
+    .process-header {
+        margin-bottom: 3.5rem;
     }
     .process-header h2 {
         font-size: 2rem;
     }
     .process-container {
         flex-wrap: nowrap;
-        gap: 0;
+        gap: 2rem;
         align-items: stretch;
         justify-content: space-between;
+        overflow: visible;
     }
     .process-step {
         flex: 1 1 0;
         max-width: none;
         padding: 2.5rem 1.5rem;
-        padding-right: 2.5rem;
+        margin-top: 0.5rem;
+        overflow: visible;
     }
     .process-step::after {
         content: "→";
         position: absolute;
-        right: -12px;
+        right: -1.125rem;
         top: 50%;
         transform: translateY(-50%);
         font-size: 1.5rem;
