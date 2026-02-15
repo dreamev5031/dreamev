@@ -1978,7 +1978,7 @@ nav {
 
 @media (max-width: 768px) {
     .common-footer {
-        padding: 48px 20px 32px;
+        padding: 48px 0 32px;
     }
     .common-footer .footer-container {
         padding: 0 20px;
@@ -1991,8 +1991,33 @@ nav {
     .common-footer .footer-section h2 {
         font-size: 1.5rem;
     }
+    /* 단어 단위 줄바꿈: 주소·이름 등이 중간에 끊기지 않게 */
+    .common-footer .footer-section p,
+    .common-footer .footer-section span,
+    .common-footer .footer-section .desc,
+    .common-footer .footer-section .work-time,
+    .common-footer .addr,
+    .common-footer .biz-info,
+    .common-footer address p {
+        word-break: keep-all;
+        line-height: 1.6;
+    }
+    .common-footer .addr {
+        font-size: 0.85rem;
+        margin-top: 4px;
+    }
+    .common-footer .biz-info {
+        font-size: 0.9rem;
+    }
+    /* 전화번호: 잘 보이게 밝은 색 + 굵게 (tel: 링크 유지) */
     .common-footer .phone-number {
-        font-size: 1.75rem;
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: #4ade80 !important;
+        display: block;
+    }
+    .common-footer .phone-number:hover {
+        color: #86efac !important;
     }
 }
 
