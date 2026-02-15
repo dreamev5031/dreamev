@@ -79,28 +79,28 @@
         <div class="case-gallery-wrap">
             <p class="gallery-label">선택한 카테고리의 제작 사례</p>
             <div class="gallery" id="caseGallery">
-                <div class="gallery-item" data-category="industrial">
+                <div class="gallery-item" data-category="industrial" data-category-norm="산업용">
                     <img src="images/industrial.webp" alt="산업용 전동차 사례 1" loading="lazy">
                 </div>
-                <div class="gallery-item" data-category="industrial">
+                <div class="gallery-item" data-category="industrial" data-category-norm="산업용">
                     <img src="images/industrial.webp" alt="산업용 전동차 사례 2" loading="lazy">
                 </div>
-                <div class="gallery-item" data-category="agricultural">
+                <div class="gallery-item" data-category="agricultural" data-category-norm="농업용">
                     <img src="images/farm.webp" alt="농업용 전동차 사례 1" loading="lazy">
                 </div>
-                <div class="gallery-item" data-category="agricultural">
+                <div class="gallery-item" data-category="agricultural" data-category-norm="농업용">
                     <img src="images/farm.webp" alt="농업용 전동차 사례 2" loading="lazy">
                 </div>
-                <div class="gallery-item" data-category="multipurpose">
+                <div class="gallery-item" data-category="multipurpose" data-category-norm="다목적">
                     <img src="images/main2.webp" alt="다목적 전동차 사례 1" loading="lazy">
                 </div>
-                <div class="gallery-item" data-category="multipurpose">
+                <div class="gallery-item" data-category="multipurpose" data-category-norm="다목적">
                     <img src="images/main2.webp" alt="다목적 전동차 사례 2" loading="lazy">
                 </div>
-                <div class="gallery-item" data-category="custom">
+                <div class="gallery-item" data-category="custom" data-category-norm="맞춤제작">
                     <img src="images/custom.webp" alt="맞춤제작 사례 1" loading="lazy">
                 </div>
-                <div class="gallery-item" data-category="custom">
+                <div class="gallery-item" data-category="custom" data-category-norm="맞춤제작">
                     <img src="images/custom.webp" alt="맞춤제작 사례 2" loading="lazy">
                 </div>
             </div>
@@ -479,65 +479,79 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 제작 사례 갤러리: 카테고리 필터
+    // 제작 사례 갤러리: cases.json 로드 후 갤러리 렌더 + 카테고리 필터 (h3 텍스트와 JSON category 연동)
     var categoryNav = document.getElementById('caseCategoryNav');
     var caseGallery = document.getElementById('caseGallery');
     var btnAllCases = document.getElementById('btnAllCases');
-    if (categoryNav && caseGallery) {
-        var cards = categoryNav.querySelectorAll('.case-item-card');
-        var items = caseGallery.querySelectorAll('.gallery-item');
-        var currentFilter = 'all';
 
-        function filterGallery(category) {
-            currentFilter = category;
-            items.forEach(function(el) {
-                var itemCat = el.getAttribute('data-category');
-                if (category === 'all' || itemCat === category) {
-                    el.classList.remove('hidden');
-                } else {
-                    el.classList.add('hidden');
-                }
-            });
-            cards.forEach(function(c) {
-                var isActive = c.getAttribute('data-category') === category;
-                c.classList.toggle('active', isActive);
-                c.setAttribute('aria-pressed', isActive);
-            });
-        }
-
-        cards.forEach(function(card) {
-            card.addEventListener('click', function() {
-                filterGallery(card.getAttribute('data-category'));
-            });
-        });
-        if (btnAllCases) {
-            btnAllCases.addEventListener('click', function() { filterGallery('all'); });
-        }
-        filterGallery('all');
+    function norm(s) {
+        return (s || '').trim().replace(/\s+/g, '');
     }
-});
-</script>
-<!-- GitHub/Decap CMS 연동: cases.json으로 갤러리만 로드 (카드 아이콘은 항상 기본 아이콘 유지) -->
-<script>
-(function() {
-    var gallery = document.getElementById('caseGallery');
-    if (!gallery) return;
+
+    function filterGallery(categoryKey) {
+        var items = caseGallery.querySelectorAll('.gallery-item');
+        var cards = categoryNav ? categoryNav.querySelectorAll('.case-item-card') : [];
+
+        items.forEach(function(el) {
+        var itemNorm = el.getAttribute('data-category-norm') || '';
+            var show = categoryKey === 'all' ||
+                (itemNorm && (norm(categoryKey) === itemNorm || norm(categoryKey).indexOf(itemNorm) !== -1 || itemNorm.indexOf(norm(categoryKey)) !== -1));
+            el.classList.toggle('hidden', !show);
+        });
+        cards.forEach(function(c) {
+            var h3 = c.querySelector('.text-box h3');
+            var cardNorm = h3 ? norm(h3.textContent) : '';
+            var isActive = categoryKey === 'all' ? false : (cardNorm && norm(categoryKey) === cardNorm);
+            c.classList.toggle('active', isActive);
+            c.setAttribute('aria-pressed', isActive);
+        });
+    }
 
     fetch('/cases.json')
         .then(function(r) { return r.ok ? r.json() : []; })
         .then(function(list) {
-            if (!list || !list.length) return;
+            window.allCasesData = list || [];
+            if (!caseGallery) return;
+
             var html = '';
-            list.forEach(function(item) {
+            (list || []).forEach(function(item) {
                 if (!item.image) return;
-                html += '<div class="gallery-item" data-category="' + item.slug + '">';
+                var slug = item.slug || '';
+                var categoryNorm = norm(item.category || '');
+                html += '<div class="gallery-item" data-category="' + slug + '" data-category-norm="' + categoryNorm + '">';
                 html += '<img src="/' + item.image + '" alt="' + (item.title || '') + '" loading="lazy">';
                 html += '</div>';
             });
-            if (html) gallery.innerHTML = html;
+            if (html) caseGallery.innerHTML = html;
+
+            if (categoryNav && caseGallery) {
+                var cards = categoryNav.querySelectorAll('.case-item-card');
+                cards.forEach(function(card) {
+                    card.addEventListener('click', function() {
+                        var h3 = card.querySelector('.text-box h3');
+                        var categoryName = h3 ? h3.textContent.trim() : '';
+                        filterGallery(categoryName);
+                    });
+                });
+                if (btnAllCases) {
+                    btnAllCases.addEventListener('click', function() { filterGallery('all'); });
+                }
+                filterGallery('all');
+            }
         })
-        .catch(function() {});
-})();
+        .catch(function() {
+            if (categoryNav && caseGallery) {
+                var cards = categoryNav.querySelectorAll('.case-item-card');
+                cards.forEach(function(card) {
+                    card.addEventListener('click', function() {
+                        filterGallery(card.getAttribute('data-category'));
+                    });
+                });
+                if (btnAllCases) btnAllCases.addEventListener('click', function() { filterGallery('all'); });
+                filterGallery('all');
+            }
+        });
+});
 </script>
 </body>
 </html>
