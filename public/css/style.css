@@ -104,7 +104,7 @@ nav {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 1rem 2rem;
+    padding: 0.75rem 2rem;
     background: #1a202c;
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
@@ -135,9 +135,8 @@ nav {
 }
 
 .logo-img {
-    height: 50px; /* PC 기준 헤더 높이에 맞게 조절 */
-    width: auto;  /* 비율 유지 */
-    /* [핵심] 배경 제거: 어두운 배경은 투명, 밝은 부분(글자)만 남김 */
+    height: 70px; /* PC: 로고 대형화 */
+    width: auto;
     mix-blend-mode: lighten;
     object-fit: contain;
     display: block;
@@ -145,15 +144,21 @@ nav {
 
 @media (max-width: 768px) {
     .logo-img {
-        height: 35px; /* 모바일에서는 조금 작게 */
+        height: 45px; /* 모바일 */
+    }
+}
+
+@media (min-width: 769px) {
+    .gnb {
+        padding: 0.85rem 2rem;
     }
 }
 
 .gnb-nav {
     display: flex;
     align-items: center;
-    gap: 2rem;
-    list-style: none !important; /* 리스트 점(bullet) 완벽 제거 */
+    gap: 2.5rem; /* 메뉴 간격 넓힘 */
+    list-style: none !important;
     margin: 0;
     padding: 0;
     overflow: visible;
@@ -161,7 +166,8 @@ nav {
 
 .gnb-nav a {
     color: var(--text-main);
-    font-weight: 500;
+    font-size: 1.2rem;
+    font-weight: 700;
     padding: 0.5rem 0;
     position: relative;
     transition: color 0.3s;

@@ -517,91 +517,52 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 </script>
-<!-- Firestore에서 카테고리별 최신 이미지를 카드 썸네일로 로드.
-     Firestore 컬렉션 "cases"에 document 필드: category(한글 예: "산업용 전동차"), imageUrl(이미지 URL).
-     Firebase 콘솔 > 프로젝트 설정 > 일반 > 앱에서 firebaseConfig를 복사해 아래에 넣거나, 페이지 로드 전에 window.__FIREBASE_CONFIG__ 로 설정. -->
-<script type="module">
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-import { getFirestore, collection, query, where, getDocs, limit } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+<!-- GitHub/Decap CMS 연동: cases.json에서 제작사례 로드 (배포 전 node scripts/generate-cases-json.js 실행) -->
+<script>
+(function() {
+    var nav = document.getElementById('caseCategoryNav');
+    var gallery = document.getElementById('caseGallery');
+    if (!nav && !gallery) return;
 
-var firebaseConfig = window.__FIREBASE_CONFIG__ || {
-    apiKey: "",
-    authDomain: "dreamev-84990.firebaseapp.com",
-    projectId: "dreamev-84990",
-    storageBucket: "dreamev-84990.firebasestorage.app",
-    messagingSenderId: "",
-    appId: ""
-};
-
-if (!firebaseConfig.apiKey) {
-    console.warn('[cases] Firebase apiKey 없음. 카드에는 기본 아이콘이 표시됩니다.');
-} else {
-    try {
-        var app = initializeApp(firebaseConfig);
-        var db = getFirestore(app);
-
-        var categoryToLabel = {
-            industrial: "산업용 전동차",
-            agricultural: "농업용 전동차",
-            multipurpose: "다목적 전동차",
-            custom: "맞춤제작"
-        };
-
-        async function loadCaseImages() {
-            var nav = document.getElementById('caseCategoryNav');
-            if (!nav) return;
-
-            var cards = nav.querySelectorAll('.case-item-card');
-            var defaultIcons = {};
-            cards.forEach(function(card) {
-                var cat = card.getAttribute('data-category');
-                if (cat && card.querySelector('.icon-box')) {
-                    defaultIcons[cat] = card.querySelector('.icon-box').innerHTML;
-                }
-            });
-
-            for (var slug in categoryToLabel) {
-                var categoryLabel = categoryToLabel[slug];
-                var card = nav.querySelector('.case-item-card[data-category="' + slug + '"]');
-                if (!card) continue;
-
-                var iconBox = card.querySelector('.icon-box');
-                if (!iconBox) continue;
-
-                try {
-                    var q = query(
-                        collection(db, "cases"),
-                        where("category", "==", categoryLabel),
-                        limit(1)
-                    );
-                    var snapshot = await getDocs(q);
-                    if (snapshot.empty) {
-                        q = query(
-                            collection(db, "cases"),
-                            where("category", "==", slug),
-                            limit(1)
-                        );
-                        snapshot = await getDocs(q);
-                    }
-                    if (!snapshot.empty && snapshot.docs[0].data().imageUrl) {
-                        var url = snapshot.docs[0].data().imageUrl;
-                        iconBox.innerHTML = '<img src="' + url + '" alt="" class="case-card-thumb" loading="lazy">';
-                    }
-                } catch (e) {
-                    if (defaultIcons[slug]) iconBox.innerHTML = defaultIcons[slug];
-                }
-            }
-        }
-
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', loadCaseImages);
-        } else {
-            loadCaseImages();
-        }
-    } catch (e) {
-        console.warn('[cases] Firebase 초기화 실패:', e);
+    var defaultIcons = {};
+    if (nav) {
+        nav.querySelectorAll('.case-item-card').forEach(function(card) {
+            var cat = card.getAttribute('data-category');
+            if (cat && card.querySelector('.icon-box'))
+                defaultIcons[cat] = card.querySelector('.icon-box').innerHTML;
+        });
     }
-}
+
+    fetch('/cases.json')
+        .then(function(r) { return r.ok ? r.json() : []; })
+        .then(function(list) {
+            if (!list || !list.length) return;
+
+            if (nav) {
+                ['industrial', 'agricultural', 'multipurpose', 'custom'].forEach(function(slug) {
+                    var card = nav.querySelector('.case-item-card[data-category="' + slug + '"]');
+                    if (!card) return;
+                    var iconBox = card.querySelector('.icon-box');
+                    if (!iconBox) return;
+                    var first = list.find(function(item) { return item.slug === slug && item.image; });
+                    if (first)
+                        iconBox.innerHTML = '<img src="/' + first.image + '" alt="" class="case-card-thumb" loading="lazy">';
+                });
+            }
+
+            if (gallery && list.length) {
+                var html = '';
+                list.forEach(function(item) {
+                    if (!item.image) return;
+                    html += '<div class="gallery-item" data-category="' + item.slug + '">';
+                    html += '<img src="/' + item.image + '" alt="' + (item.title || '') + '" loading="lazy">';
+                    html += '</div>';
+                });
+                if (html) gallery.innerHTML = html;
+            }
+        })
+        .catch(function() {});
+})();
 </script>
 </body>
 </html>
