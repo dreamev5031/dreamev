@@ -2937,8 +2937,65 @@ nav {
     }
 }
 
-/* === [절대 주의] 오직 모바일만 수정 (768px 이하) - support 오시는 길 === */
+/* === [절대 주의] 오직 모바일만 수정 (768px 이하) - support FAQ↔오시는길 순서 + 꾸미기 === */
 @media (max-width: 768px) {
+    /* 1. 순서: 자주 묻는 질문 위, 오시는 길 아래 */
+    .support-main-content {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 0 !important;
+    }
+
+    .support-main-content .global-faq-section {
+        order: 1 !important;
+    }
+
+    .support-main-content .location-section {
+        order: 2 !important;
+    }
+
+    /* 2. FAQ 섹션 꾸미기 (네이비 톤 통일) */
+    .support-main-content .global-faq-section {
+        background-color: #0b1a2d !important;
+        padding: 48px 20px 40px !important;
+        text-align: center !important;
+    }
+
+    .support-main-content .global-faq-section .section-title {
+        font-size: 1.6rem !important;
+        color: #ffffff !important;
+        margin-bottom: 28px !important;
+    }
+
+    .support-main-content .global-faq-section .section-title span {
+        color: #48bb78 !important;
+    }
+
+    .support-main-content .global-faq-section .faq-item {
+        background: rgba(255, 255, 255, 0.06) !important;
+        border-radius: 14px !important;
+        margin-bottom: 12px !important;
+        overflow: hidden !important;
+        border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    }
+
+    .support-main-content .global-faq-section .faq-question {
+        color: #e2e8f0 !important;
+        padding: 18px 20px !important;
+        font-size: 1rem !important;
+    }
+
+    .support-main-content .global-faq-section .faq-answer {
+        padding: 0 20px 18px !important;
+    }
+
+    .support-main-content .global-faq-section .faq-answer p {
+        color: #cbd5e0 !important;
+        font-size: 0.95rem !important;
+        line-height: 1.6 !important;
+    }
+
+    /* 3. 오시는 길 섹션 */
     .location-section {
         background-color: #0b1a2d !important;
         padding: 50px 20px !important;
