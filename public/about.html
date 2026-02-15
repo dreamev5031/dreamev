@@ -6,7 +6,7 @@
     <title>브랜드 스토리 - 드림전동차</title>
     <link rel="stylesheet" href="css/style.css?v=20260214-999">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
-    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=a89f5559a4fad0d0cf12f6b92c46884c&libraries=services"></script>
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=9b9e04fba3fef284186cd531a730a60f&libraries=services"></script>
 </head>
 <body>
     <!-- GNB -->
@@ -119,7 +119,7 @@
                 </div>
             </div>
             <div class="map-frame">
-                <div id="map" style="width:100%; height:450px; display:block !important;"></div>
+                <div id="map" style="width:100%; height:450px; position:relative; display:block !important;"></div>
             </div>
         </div>
     </section>
@@ -323,12 +323,15 @@ window.onload = function() {
         var marker = new kakao.maps.Marker({ position: options.center });
         marker.setMap(map);
 
-        // [가장 중요] 지도가 생성된 직후와 0.2초 뒤에 두 번 레이아웃을 강제로 다시 잡습니다.
-        map.relayout();
+        var infowindow = new kakao.maps.InfoWindow({
+            content: '<div style="padding:5px; font-size:12px;">드림전동차</div>'
+        });
+        infowindow.open(map, marker);
 
+        // [가장 중요] 지도가 이미지를 다 받은 뒤(200 OK), 0.2초 뒤에 레이아웃을 강제로 다시 잡음
         setTimeout(function() {
             map.relayout();
-            map.setCenter(options.center); // 레이아웃 재계산 후 중심점을 다시 잡아야 합니다.
+            map.setCenter(options.center);
         }, 200);
     });
 };
