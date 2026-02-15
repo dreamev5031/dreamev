@@ -2250,7 +2250,13 @@ nav {
         font-size: 16px !important;
     }
 
-    /* 제작사례: 모바일 전용 대문 버튼 + 갤러리 초기 숨김 */
+    /* 제작사례: 모바일 전용 – 구형 상단 필터/2x2 그리드 숨김 */
+    .cases-hero > p,
+    .cases-hero .category-grid {
+        display: none !important;
+    }
+
+    /* 갤러리 초기 숨김, 버튼 클릭 시에만 표시 */
     .cases-hero .gallery {
         display: none !important;
     }
@@ -2282,10 +2288,12 @@ nav {
     .cases-hero.mobile-gallery-visible .mobile-case-back {
         display: block !important;
     }
+
+    /* 신상 대문 버튼: 배경 이미지 + 어두운 오버레이 */
     .m-case-btn {
         width: 100% !important;
         height: 120px !important;
-        border: none !important;
+        border: 1px solid rgba(255, 255, 255, 0.3) !important;
         border-radius: 20px !important;
         color: white !important;
         font-size: 1.8rem !important;
@@ -2293,22 +2301,25 @@ nav {
         box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2) !important;
         transition: transform 0.2s !important;
         cursor: pointer !important;
-        text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5) !important;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8) !important;
+        background-size: cover !important;
+        background-position: center !important;
+        background-repeat: no-repeat !important;
     }
     .m-case-btn:active {
         transform: scale(0.98) !important;
     }
     .m-case-btn.btn-ind {
-        background: linear-gradient(135deg, #2c3e50, #4ca1af) !important;
+        background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('../images/industrial.webp') !important;
     }
     .m-case-btn.btn-farm {
-        background: linear-gradient(135deg, #134e5e, #71b280) !important;
+        background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('../images/farm.webp') !important;
     }
     .m-case-btn.btn-multi {
-        background: linear-gradient(135deg, #42275a, #734b6d) !important;
+        background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('../images/main2.webp') !important;
     }
     .m-case-btn.btn-custom {
-        background: linear-gradient(135deg, #141e30, #243b55) !important;
+        background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('../images/custom.webp') !important;
     }
 }
 
