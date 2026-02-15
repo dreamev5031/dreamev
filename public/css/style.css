@@ -3065,10 +3065,12 @@ nav {
     }
 }
 
-/* === [절대 주의] 오직 모바일 화면만 수정 (768px 이하) - trust/features 1열 종대 === */
+/* === [절대 주의] 오직 모바일 화면만 수정 (768px 이하) - 카드 1열 + 글자 가로 배치 === */
 @media (max-width: 768px) {
+    /* 그리드 → 세로 1열 (trust, features, about 핵심경쟁력) */
     .trust-grid,
-    .features-grid {
+    .features-grid,
+    .core-values-grid {
         display: flex !important;
         flex-direction: column !important;
         gap: 20px !important;
@@ -3076,30 +3078,37 @@ nav {
     }
 
     .trust-card,
-    .feature-item {
+    .feature-item,
+    .core-card {
         width: 100% !important;
         max-width: none !important;
         min-width: unset !important;
         padding: 30px 20px !important;
         text-align: center !important;
         box-sizing: border-box !important;
+        writing-mode: horizontal-tb !important; /* 글자 가로 배치 강제 */
     }
 
     .trust-title,
-    .feature-item h4 {
+    .feature-item h4,
+    .core-card-title {
         font-size: 1.5rem !important;
         white-space: normal !important;
         word-break: keep-all !important;
         display: block !important;
         width: 100% !important;
         margin-bottom: 10px !important;
+        writing-mode: horizontal-tb !important;
     }
 
     .trust-desc,
-    .feature-item p {
+    .feature-item p,
+    .core-card-desc {
         font-size: 1rem !important;
         line-height: 1.6 !important;
         word-break: keep-all !important;
+        white-space: normal !important;
+        writing-mode: horizontal-tb !important;
     }
 }
 
