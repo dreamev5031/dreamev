@@ -121,40 +121,9 @@
             <div class="map-frame">
                 <div id="map"></div>
                 <script>
-                // [강제 스타일 주입] 지도 타일 깨짐 및 높이 문제 해결
-                var style = document.createElement('style');
-                style.innerHTML = `
-                    /* 1. 지도 컨테이너 강제 높이 설정 (고객지원 페이지 블랙스크린 해결) */
-                    #map {
-                        width: 100% !important;
-                        height: 100% !important;
-                        min-height: 500px !important;
-                        padding: 0 !important;
-                        margin: 0 !important;
-                    }
-
-                    /* 2. 지도 타일 격자무늬(틈) 제거 (회사소개 페이지 해결) */
-                    #map img {
-                        max-width: none !important;
-                        max-height: none !important;
-                        width: auto !important;
-                        height: auto !important;
-                        margin: 0 !important;
-                        padding: 0 !important;
-                        border: 0 !important;
-                        box-sizing: content-box !important;
-                        vertical-align: top !important;
-                    }
-
-                    /* 3. 지도 내부 div 초기화 */
-                    #map div {
-                        box-sizing: content-box !important;
-                    }
-                `;
-                document.head.appendChild(style);
-
                 window.onload = function() {
-                    var position = new naver.maps.LatLng(37.80718, 126.98733); // 드림전동차 실제 좌표
+                    var position = new naver.maps.LatLng(37.80718, 126.98733);
+
                     var map = new naver.maps.Map('map', {
                         center: position,
                         zoom: 17,
@@ -166,15 +135,15 @@
                         map: map
                     });
 
-                    function handleRefresh() {
+                    function fixMapLayout() {
                         if (map && typeof map.refresh === 'function') {
                             map.refresh();
                             map.setCenter(position);
-                            console.log("네이버 지도 refresh 완료");
+                            console.log("네이버 지도 레이아웃 보정 완료");
                         }
                     }
-                    setTimeout(handleRefresh, 100);
-                    setTimeout(handleRefresh, 500);
+                    setTimeout(fixMapLayout, 100);
+                    setTimeout(fixMapLayout, 500);
                 };
                 </script>
             </div>

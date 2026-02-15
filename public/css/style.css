@@ -25,11 +25,7 @@
     --glass-border: rgba(255, 255, 255, 0.1);
 }
 
-/* 지도 영역(#map) 전역 스타일 예외 처리 - 최우선 (66~70행 img, 88~95행 div 영향 제거) */
-#map,
-#map * {
-    overflow: visible !important;
-}
+/* 지도 타일 깨짐 방지 (표준 준수 버전) */
 #map img {
     max-width: none !important;
     max-height: none !important;
@@ -37,11 +33,15 @@
     height: auto !important;
     margin: 0 !important;
     padding: 0 !important;
-    border: none !important;
-    box-sizing: content-box !important; /* 타일 계산 오류 방지 */
+    border: 0 !important;
+    box-sizing: content-box !important; /* 이게 핵심 */
 }
+
+/* 지도 컨테이너 */
 #map {
-    overflow: hidden !important;
+    width: 100%;
+    height: 100%;
+    overflow: hidden !important; /* 지도는 넘치는 걸 잘라야 함 */
 }
 
 * {
