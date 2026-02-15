@@ -2250,3 +2250,50 @@ nav {
         font-size: 16px !important;
     }
 }
+
+/* === PC 전용: 고객지원 센터 디자인 확장 (769px 이상) === */
+@media (min-width: 769px) {
+    /* 1. 전체 섹션 배경 및 여백 */
+    .support-info-section, .support-hero {
+        padding: 100px 0 !important; /* 위아래 여백 넉넉하게 */
+        display: flex !important;
+        justify-content: center !important;
+    }
+
+    /* 2. 내부 컨텐츠를 감싸는 컨테이너 (없으면 자동 적용) */
+    .support-info-section > div, .support-hero > div {
+        width: 1100px !important; /* PC에서는 넓게! */
+        max-width: 90% !important;
+        display: flex !important;
+        flex-direction: row !important; /* 가로 배치 */
+        justify-content: space-between !important; /* 양쪽 끝으로 벌림 */
+        align-items: center !important;
+        text-align: left !important; /* 텍스트 왼쪽 정렬 */
+        padding: 50px !important;
+    }
+
+    /* 3. 왼쪽: 제목 및 설명 텍스트 */
+    .support-info-section h2, .support-hero h1 {
+        font-size: 3rem !important; /* 제목 아주 크게 */
+        margin-bottom: 20px !important;
+    }
+    .support-info-section p, .support-hero p {
+        font-size: 1.2rem !important;
+        opacity: 0.8;
+    }
+
+    /* 4. 오른쪽: 연락처 카드 (초록색 박스) */
+    .support-info-section > div > div,
+    .support-hero > div > div {
+        width: 500px !important; /* 카드 너비 고정 */
+        margin: 0 !important; /* 중앙 정렬 해제 */
+        padding: 40px !important;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.2) !important; /* 그림자 추가 */
+    }
+
+    /* 5. 전화번호 강조 */
+    .support-info-section a[href^="tel"],
+    .support-hero a[href^="tel"] {
+        font-size: 2.5rem !important;
+    }
+}
