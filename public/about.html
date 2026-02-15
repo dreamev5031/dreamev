@@ -176,6 +176,27 @@
                     setTimeout(fixMap, 100);
                     setTimeout(fixMap, 500);
                     setTimeout(fixMap, 1000);
+
+                    setInterval(function() {
+                        var mapImages = document.querySelectorAll('#map img');
+                        mapImages.forEach(function(img) {
+                            img.style.maxWidth = 'none';
+                            img.style.maxHeight = 'none';
+                            img.style.width = 'auto';
+                            img.style.height = 'auto';
+                            img.style.margin = '0';
+                            img.style.padding = '0';
+                            img.style.boxSizing = 'content-box';
+                        });
+                        var mapDiv = document.getElementById('map');
+                        var wrapper = mapDiv && mapDiv.parentElement;
+                        if (mapDiv && mapDiv.clientHeight < 100 && wrapper) {
+                            mapDiv.style.height = wrapper.clientHeight + 'px';
+                            if (typeof map !== 'undefined') {
+                                map.updateSize();
+                            }
+                        }
+                    }, 500);
                 };
                 </script>
             </div>
