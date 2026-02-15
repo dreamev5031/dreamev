@@ -25,6 +25,18 @@
     --glass-border: rgba(255, 255, 255, 0.1);
 }
 
+/* 지도 영역(#map) 전역 스타일 예외 처리 - 최우선 (66~70행 img, 88~95행 div 영향 제거) */
+#map img {
+    max-width: none !important;
+    max-height: none !important;
+    width: auto !important;
+    height: auto !important;
+    content-visibility: visible !important;
+}
+#map {
+    overflow: visible !important;
+}
+
 * {
     box-sizing: border-box;
     margin: 0;
@@ -3772,21 +3784,6 @@ nav {
     height: 100%;
     min-height: 550px;
     display: block;
-}
-
-/* 네이버 지도 타일 깨짐 방지 */
-/* 네이버 지도: 전역 img/div 규칙이 타일을 막지 않도록 예외 처리 */
-#map {
-    overflow: visible !important;
-}
-#map img {
-    max-width: none !important;
-    max-height: none !important;
-    min-width: 0 !important;
-    min-height: 0 !important;
-    width: auto !important;
-    height: auto !important;
-    content-visibility: visible !important;
 }
 
 /* 지도 영역 모바일에서 화면 너비 100% */
