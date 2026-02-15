@@ -982,56 +982,75 @@ nav {
     font-weight: 600;
 }
 
+/* === [수정됨] PC 전용 제작 프로세스 디자인 (769px 이상) === */
 @media (min-width: 769px) {
     .process-section {
-        padding: 6rem 2rem 5rem;
-        background: #252b36;
-        overflow: visible;
-    }
-    .process-header {
-        margin-bottom: 3.5rem;
+        background-color: #1a202c !important;
+        /* 상단 패딩을 150px로 대폭 늘려서 호버 공간 확보 */
+        padding: 150px 0 100px !important;
+        text-align: center !important;
+        overflow: visible !important; /* 잘림 방지 안전장치 */
     }
     .process-header h2 {
-        font-size: 2rem;
+        color: white !important; font-size: 2.5rem !important; margin-bottom: 10px !important;
     }
+    .process-header p {
+        color: #a0aec0 !important; margin-bottom: 80px !important; /* 헤더와 내용 간격도 넓힘 */
+    }
+
     .process-container {
-        flex-wrap: nowrap;
-        gap: 2rem;
-        align-items: stretch;
-        justify-content: space-between;
-        overflow: visible;
+        display: flex !important;
+        justify-content: center !important;
+        /* 박스 사이 간격을 40px에서 70px로 대폭 넓힘 */
+        gap: 70px !important;
+        max-width: 1400px !important;
+        margin: 0 auto !important;
+        /* 전체적인 양옆 여백 확보 */
+        padding: 0 50px !important;
     }
+
     .process-step {
-        flex: 1 1 0;
-        max-width: none;
-        padding: 2.5rem 1.5rem;
-        margin-top: 0.5rem;
-        overflow: visible;
-    }
-    .process-step::after {
-        content: "→";
-        position: absolute;
-        right: -1.125rem;
-        top: 50%;
-        transform: translateY(-50%);
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: var(--primary);
-        line-height: 1;
-        z-index: 1;
-    }
-    .process-step:last-child::after {
-        display: none;
+        flex: 1 !important;
+        background: rgba(255,255,255,0.05) !important;
+        padding: 40px 25px !important;
+        border-radius: 20px !important;
+        position: relative !important;
+        transition: transform 0.3s, background 0.3s !important;
+        /* 호버 시 움직일 공간 추가 확보 */
+        margin-top: 20px !important;
     }
     .process-step:hover {
-        border-color: rgba(16, 185, 129, 0.4);
-        box-shadow: 0 8px 24px rgba(16, 185, 129, 0.12);
+        /* 위로 떠오르는 높이 조절 */
+        transform: translateY(-15px) !important;
+        background: rgba(255,255,255,0.1) !important;
+        box-shadow: 0 15px 30px rgba(0,0,0,0.3) !important; /* 입체감 추가 */
     }
-    .process-step .step-icon {
-        font-size: 2.25rem;
+
+    /* 아이콘 스타일 */
+    .step-icon {
+        width: 90px !important; height: 90px !important; /* 아이콘 크기 약간 키움 */
+        background: #48bb78 !important;
+        border-radius: 50% !important;
+        display: flex !important; align-items: center !important; justify-content: center !important;
+        margin: 0 auto 25px !important;
+        font-size: 2.2rem !important; color: white !important;
+        box-shadow: 0 10px 20px rgba(72, 187, 120, 0.4) !important;
     }
-    .process-step h3 {
-        font-size: 1.35rem;
+
+    .step-num { font-size: 1rem !important; color: #48bb78 !important; font-weight: 800 !important; letter-spacing: 2px !important; margin-bottom: 15px !important; display: block !important; }
+    .process-step h3 { color: white !important; font-size: 1.5rem !important; margin-bottom: 20px !important; font-weight: bold !important; }
+    .process-step p { color: #cbd5e0 !important; font-size: 1.05rem !important; line-height: 1.7 !important; word-break: keep-all !important; }
+
+    /* 화살표 위치 조정 */
+    .process-step:not(:last-child)::after {
+        content: '→' !important;
+        position: absolute !important;
+        right: -45px !important; /* 간격이 넓어진 만큼 화살표 위치도 조정 */
+        top: 50% !important;
+        transform: translateY(-50%) !important;
+        font-size: 2.5rem !important;
+        color: #4a5568 !important;
+        opacity: 0.5 !important;
     }
 }
 
@@ -1266,6 +1285,111 @@ nav {
     padding-top: 2rem;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
     text-align: center;
+}
+
+/* === [PC 중심] common-footer 푸터 전체 스타일 === */
+.common-footer {
+    background-color: #1a202c;
+    color: #ffffff;
+    padding: 80px 0 40px;
+    margin-top: auto;
+}
+
+.common-footer .footer-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 40px;
+}
+
+.common-footer .footer-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 60px;
+    margin-bottom: 30px;
+    gap: 40px;
+}
+
+.common-footer .footer-section {
+    flex: 1;
+}
+
+.common-footer .footer-section h2 {
+    color: #48bb78;
+    font-size: 2rem;
+    font-weight: 800;
+    margin-bottom: 15px;
+}
+
+.common-footer .footer-section .slogan {
+    color: #a0aec0;
+    font-size: 1.1rem;
+    letter-spacing: -0.5px;
+}
+
+.common-footer .footer-section h3 {
+    font-size: 1.2rem;
+    color: #ffffff;
+    font-weight: bold;
+    margin-bottom: 25px;
+    position: relative;
+    display: inline-block;
+}
+
+.common-footer .phone-number {
+    display: block;
+    font-size: 2.2rem;
+    font-weight: 900;
+    color: #ffffff;
+    text-decoration: none;
+    margin: 15px 0;
+    letter-spacing: -1px;
+    transition: color 0.3s;
+}
+
+.common-footer .phone-number:hover {
+    color: #48bb78;
+}
+
+.common-footer .desc,
+.common-footer .work-time,
+.common-footer address p {
+    color: #cbd5e0;
+    font-size: 1rem;
+    line-height: 1.8;
+    margin-bottom: 5px;
+    font-style: normal;
+}
+
+.common-footer .footer-bottom {
+    text-align: center;
+    color: #718096;
+    font-size: 0.9rem;
+}
+
+.common-footer .footer-bottom p {
+    margin: 0;
+}
+
+@media (max-width: 768px) {
+    .common-footer {
+        padding: 48px 20px 32px;
+    }
+    .common-footer .footer-container {
+        padding: 0 20px;
+    }
+    .common-footer .footer-content {
+        flex-direction: column;
+        gap: 32px;
+        padding-bottom: 40px;
+    }
+    .common-footer .footer-section h2 {
+        font-size: 1.5rem;
+    }
+    .common-footer .phone-number {
+        font-size: 1.75rem;
+    }
 }
 
 /* ===== Contact Bar ===== */
@@ -3365,4 +3489,108 @@ nav {
         color: #4a5568 !important;
         font-size: 0.75rem !important;
     }
+}
+
+/* === 회사소개 4대 핵심 기술 섹션 (기본 + PC) === */
+.about-tech-section {
+    padding: 3rem 1.5rem;
+    background: var(--bg-main);
+    color: var(--text-main);
+}
+.tech-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+.tech-header h2 { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; }
+.tech-header p { color: var(--text-muted); font-size: 1rem; }
+.tech-grid {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+}
+.tech-item {
+    background: var(--bg-card);
+    border: 1px solid var(--glass-border);
+    padding: 1.5rem;
+    border-radius: 16px;
+    display: flex;
+    align-items: flex-start;
+    gap: 1.25rem;
+}
+.tech-icon {
+    font-size: 1.75rem;
+    color: var(--primary);
+    background: rgba(16, 185, 129, 0.15);
+    width: 56px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    flex-shrink: 0;
+}
+.tech-content h3 { font-size: 0.8rem; color: var(--primary); letter-spacing: 0.5px; margin-bottom: 0.25rem; text-transform: uppercase; }
+.tech-content h4 { font-size: 1.15rem; font-weight: 700; margin-bottom: 0.5rem; }
+.tech-content p { font-size: 0.95rem; color: var(--text-muted); line-height: 1.6; }
+
+/* === [PC] 회사소개 기술 상세 섹션 (769px 이상) === */
+@media (min-width: 769px) {
+    .about-tech-section {
+        background-color: #1a202c !important;
+        padding: 100px 0 !important;
+        color: #ffffff !important;
+    }
+    .tech-header {
+        text-align: center !important;
+        margin-bottom: 80px !important;
+    }
+    .tech-header h2 {
+        font-size: 2.5rem !important;
+        color: #48bb78 !important; /* 브랜드 컬러 */
+        margin-bottom: 15px !important;
+        font-weight: 800 !important;
+    }
+    .tech-header p { color: #a0aec0 !important; font-size: 1.1rem !important; }
+
+    /* 2x2 그리드 레이아웃 */
+    .tech-grid {
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 40px !important;
+        max-width: 1200px !important;
+        margin: 0 auto !important;
+        padding: 0 40px !important;
+    }
+
+    .tech-item {
+        background: rgba(255,255,255,0.05) !important;
+        border: 1px solid rgba(255,255,255,0.1) !important;
+        padding: 40px !important;
+        border-radius: 20px !important;
+        display: flex !important;
+        align-items: flex-start !important;
+        gap: 30px !important;
+        transition: all 0.3s ease !important;
+    }
+    .tech-item:hover {
+        transform: translateY(-5px) !important;
+        border-color: #48bb78 !important;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3) !important;
+    }
+
+    .tech-icon {
+        font-size: 2.5rem !important;
+        color: #48bb78 !important;
+        background: rgba(72, 187, 120, 0.1) !important;
+        width: 80px !important; height: 80px !important;
+        display: flex !important; align-items: center !important; justify-content: center !important;
+        border-radius: 15px !important;
+        flex-shrink: 0 !important;
+    }
+
+    .tech-content h3 { color: #48bb78 !important; font-size: 0.9rem !important; letter-spacing: 1px !important; margin-bottom: 5px !important; text-transform: uppercase !important; }
+    .tech-content h4 { color: #fff !important; font-size: 1.5rem !important; font-weight: bold !important; margin-bottom: 15px !important; }
+    .tech-content p { color: #cbd5e0 !important; line-height: 1.7 !important; word-break: keep-all !important; }
 }
