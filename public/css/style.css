@@ -25,36 +25,6 @@
     --glass-border: rgba(255, 255, 255, 0.1);
 }
 
-/* 1. 지도 상자: 높이를 픽셀로 강제 고정 (0px 실종 방지) */
-#map {
-    width: 100% !important;
-    height: 550px !important;    /* PC 높이 고정 */
-    min-height: 550px !important;
-    overflow: hidden !important;
-    background-color: #1a202c !important;
-}
-
-@media (max-width: 768px) {
-    #map {
-        height: 400px !important;
-        min-height: 400px !important;
-    }
-}
-
-/* 2. 지도 내부 모든 요소 강제 초기화 (타일 깨짐/실종 방지) */
-#map img, #map canvas, #map div {
-    max-width: none !important;
-    max-height: none !important;
-    width: auto !important;
-    height: auto !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    border: 0 !important;
-    box-sizing: content-box !important; /* 타일 정렬 핵심 */
-    content-visibility: visible !important; /* 렌더링 생략 방지 */
-    overflow: clip !important; /* 브라우저 경고 해결 */
-}
-
 * {
     box-sizing: border-box;
     margin: 0;
