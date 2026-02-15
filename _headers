@@ -1,2 +1,4 @@
 /*
   Cross-Origin-Embedder-Policy: unsafe-none
+  Cross-Origin-Opener-Policy: same-origin
+  X-Frame-Options: ALLOWALL
