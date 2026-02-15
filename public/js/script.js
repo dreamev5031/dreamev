@@ -58,6 +58,30 @@
         });
     }
 
-    // 초기: 전체 노출
+    // 초기: 전체 노출 (PC)
     window.filterGallery('all');
+
+    // 모바일 전용: 대문 버튼 클릭 시 갤러리 표시 + 해당 카테고리만 필터
+    var mobileCaseMenu = document.getElementById('mobileCaseMenu');
+    var mobileCaseBack = document.getElementById('mobileCaseBack');
+    var casesHero = gallery ? gallery.closest('.cases-hero') : null;
+
+    if (mobileCaseMenu && gallery && casesHero) {
+        mobileCaseMenu.querySelectorAll('.m-case-btn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var filter = btn.getAttribute('data-category');
+                casesHero.classList.add('mobile-gallery-visible');
+                window.currentFilter = filter;
+                window.filterGallery(filter);
+            });
+        });
+    }
+
+    if (mobileCaseBack && casesHero) {
+        mobileCaseBack.addEventListener('click', function() {
+            casesHero.classList.remove('mobile-gallery-visible');
+            window.currentFilter = 'all';
+            window.filterGallery('all');
+        });
+    }
 })();
