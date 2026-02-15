@@ -33,39 +33,75 @@
         <a href="contact.html" class="header-btn btn-primary">견적문의</a>
     </header>
 
-    <!-- 제작 사례 (다크 카드 2x2 그리드) -->
+    <!-- 제작 사례 갤러리 (카테고리 선택 + 갤러리) -->
     <section class="case-page-section">
-        <div class="header-area">
-            <h2>제작 사례</h2>
-            <p>드림전동차만의 기술력으로 완성된 맞춤형 라인업</p>
+        <div class="page-header gallery-header">
+            <div class="header-icon-box">
+                <i class="fas fa-images"></i>
+            </div>
+            <div class="header-text-box">
+                <h2>PORTFOLIO GALLERY</h2>
+                <h3>드림전동차 제작 사례</h3>
+                <p>현장의 요구에 완벽히 부응하는 맞춤형 라인업을 생생한 사진으로 확인하세요.</p>
+                <button type="button" class="btn-all-cases" id="btnAllCases">전체 보기</button>
+            </div>
         </div>
-        <div class="case-grid-container">
-            <div class="case-item-card">
+        <div class="case-grid-container" id="caseCategoryNav">
+            <button type="button" class="case-item-card" data-category="industrial" aria-pressed="false">
                 <div class="icon-box"><i class="fas fa-industry"></i></div>
                 <div class="text-box">
                     <h3>산업용 전동차</h3>
-                    <p>건설 및 물류 현장에 최적화된 강력한 출력과 내구성</p>
+                    <p>건설 및 물류 현장 최적화</p>
                 </div>
-            </div>
-            <div class="case-item-card">
+            </button>
+            <button type="button" class="case-item-card" data-category="agricultural" aria-pressed="false">
                 <div class="icon-box"><i class="fas fa-tractor"></i></div>
                 <div class="text-box">
                     <h3>농업용 전동차</h3>
-                    <p>험로와 경사지 주행이 잦은 농가 환경 맞춤형 설계</p>
+                    <p>농가 환경 맞춤형 설계</p>
                 </div>
-            </div>
-            <div class="case-item-card">
+            </button>
+            <button type="button" class="case-item-card" data-category="multipurpose" aria-pressed="false">
                 <div class="icon-box"><i class="fas fa-th-large"></i></div>
                 <div class="text-box">
                     <h3>다목적 전동차</h3>
-                    <p>시설 관리 및 순찰 등 다양한 용도의 전천후 기동성</p>
+                    <p>다양한 용도의 전천후 기동</p>
                 </div>
-            </div>
-            <div class="case-item-card">
+            </button>
+            <button type="button" class="case-item-card" data-category="custom" aria-pressed="false">
                 <div class="icon-box"><i class="fas fa-pencil-ruler"></i></div>
                 <div class="text-box">
-                    <h3>맞춤제작 솔루션</h3>
-                    <p>고객의 특수한 요구사항을 반영한 1:1 커스텀 제작</p>
+                    <h3>맞춤제작</h3>
+                    <p>1:1 커스텀 제작</p>
+                </div>
+            </button>
+        </div>
+        <div class="case-gallery-wrap">
+            <p class="gallery-label">선택한 카테고리의 제작 사례</p>
+            <div class="gallery" id="caseGallery">
+                <div class="gallery-item" data-category="industrial">
+                    <img src="images/industrial.webp" alt="산업용 전동차 사례 1" loading="lazy">
+                </div>
+                <div class="gallery-item" data-category="industrial">
+                    <img src="images/industrial.webp" alt="산업용 전동차 사례 2" loading="lazy">
+                </div>
+                <div class="gallery-item" data-category="agricultural">
+                    <img src="images/farm.webp" alt="농업용 전동차 사례 1" loading="lazy">
+                </div>
+                <div class="gallery-item" data-category="agricultural">
+                    <img src="images/farm.webp" alt="농업용 전동차 사례 2" loading="lazy">
+                </div>
+                <div class="gallery-item" data-category="multipurpose">
+                    <img src="images/main2.webp" alt="다목적 전동차 사례 1" loading="lazy">
+                </div>
+                <div class="gallery-item" data-category="multipurpose">
+                    <img src="images/main2.webp" alt="다목적 전동차 사례 2" loading="lazy">
+                </div>
+                <div class="gallery-item" data-category="custom">
+                    <img src="images/custom.webp" alt="맞춤제작 사례 1" loading="lazy">
+                </div>
+                <div class="gallery-item" data-category="custom">
+                    <img src="images/custom.webp" alt="맞춤제작 사례 2" loading="lazy">
                 </div>
             </div>
         </div>
@@ -441,6 +477,43 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.body.style.overflow = 'auto';
             });
         });
+    }
+
+    // 제작 사례 갤러리: 카테고리 필터
+    var categoryNav = document.getElementById('caseCategoryNav');
+    var caseGallery = document.getElementById('caseGallery');
+    var btnAllCases = document.getElementById('btnAllCases');
+    if (categoryNav && caseGallery) {
+        var cards = categoryNav.querySelectorAll('.case-item-card');
+        var items = caseGallery.querySelectorAll('.gallery-item');
+        var currentFilter = 'all';
+
+        function filterGallery(category) {
+            currentFilter = category;
+            items.forEach(function(el) {
+                var itemCat = el.getAttribute('data-category');
+                if (category === 'all' || itemCat === category) {
+                    el.classList.remove('hidden');
+                } else {
+                    el.classList.add('hidden');
+                }
+            });
+            cards.forEach(function(c) {
+                var isActive = c.getAttribute('data-category') === category;
+                c.classList.toggle('active', isActive);
+                c.setAttribute('aria-pressed', isActive);
+            });
+        }
+
+        cards.forEach(function(card) {
+            card.addEventListener('click', function() {
+                filterGallery(card.getAttribute('data-category'));
+            });
+        });
+        if (btnAllCases) {
+            btnAllCases.addEventListener('click', function() { filterGallery('all'); });
+        }
+        filterGallery('all');
     }
 });
 </script>

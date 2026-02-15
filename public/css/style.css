@@ -3817,72 +3817,183 @@ nav {
     .tech-content p { color: #cbd5e0 !important; line-height: 1.7 !important; word-break: keep-all !important; }
 }
 
-/* === 제작사례 페이지(cases.html) 다크 카드 2x2 그리드 === */
+/* === 제작사례 페이지(cases.html) 갤러리: 1x4 카드 + 갤러리 연결 === */
 .case-page-section {
     background-color: #1a202c !important;
-    padding: 80px 20px !important;
+    padding: 100px 20px 80px !important; /* 상단 여유로 호버 시 잘림 방지 */
     text-align: center !important;
+    overflow: visible !important;
 }
-.case-page-section .header-area h2 {
-    color: #fff !important;
-    font-size: 2.2rem !important;
-    margin-bottom: 40px !important;
-    font-weight: 800 !important;
-}
-.case-page-section .header-area p {
-    color: #a0aec0;
-    margin-bottom: 40px;
+/* === 제작사례 갤러리형 헤더 스타일 === */
+.gallery-header {
+    margin-bottom: 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    position: relative;
 }
 
+.gallery-header .header-icon-box {
+    font-size: 3.5rem;
+    color: #48bb78;
+    margin-bottom: 25px;
+    background: rgba(72, 187, 120, 0.1);
+    width: 100px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    box-shadow: 0 0 20px rgba(72, 187, 120, 0.2);
+}
+
+.gallery-header .header-text-box h2 {
+    font-size: 1rem;
+    color: #48bb78;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+    font-weight: bold;
+    text-transform: uppercase;
+    opacity: 0.9;
+}
+.gallery-header .header-text-box h3 {
+    font-size: 2.2rem;
+    color: #fff;
+    margin-bottom: 15px;
+    font-weight: 800;
+}
+.gallery-header .header-text-box p {
+    font-size: 1rem;
+    color: #a0aec0;
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+.gallery-header .btn-all-cases {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 0.5rem 1.25rem;
+    background: rgba(72, 187, 120, 0.2);
+    color: #48bb78;
+    border: 1px solid #48bb78;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+}
+.gallery-header .btn-all-cases:hover {
+    background: #48bb78;
+    color: #1a202c;
+}
+
+@media (min-width: 769px) {
+    .gallery-header {
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        gap: 40px;
+        text-align: left;
+    }
+    .gallery-header .header-icon-box {
+        margin-bottom: 0;
+        width: 120px;
+        height: 120px;
+        font-size: 4rem;
+    }
+    .gallery-header .header-text-box p {
+        margin: 0;
+    }
+}
+
+/* 1x4 가로 배치 (모바일은 2x2) */
 .case-grid-container {
     display: grid !important;
     grid-template-columns: repeat(2, 1fr) !important;
-    gap: 20px !important;
+    gap: 16px !important;
     max-width: 1200px !important;
-    margin: 0 auto !important;
+    margin: 0 auto 48px !important;
+    overflow: visible !important;
 }
 
 .case-item-card {
     background: rgba(255, 255, 255, 0.05) !important;
     border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    padding: 30px !important;
+    padding: 24px 16px !important;
     border-radius: 15px !important;
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
     transition: 0.3s !important;
+    cursor: pointer !important;
+    font: inherit !important;
+    color: inherit !important;
+    text-align: center !important;
 }
 .case-item-card:hover {
     background: rgba(255, 255, 255, 0.1) !important;
     border-color: #48bb78 !important;
-    transform: translateY(-5px);
+    transform: translateY(-6px) !important;
+}
+.case-item-card.active {
+    border-color: #48bb78 !important;
+    background: rgba(72, 187, 120, 0.1) !important;
 }
 
 .case-page-section .icon-box {
-    font-size: 2.5rem !important;
+    font-size: 2rem !important;
     color: #48bb78 !important;
-    margin-bottom: 15px !important;
+    margin-bottom: 10px !important;
 }
 .case-page-section .text-box h3 {
     color: #fff !important;
-    font-size: 1.2rem !important;
-    margin-bottom: 10px !important;
+    font-size: 1.1rem !important;
+    margin-bottom: 6px !important;
 }
 .case-page-section .text-box p {
     color: #cbd5e0 !important;
-    font-size: 0.9rem !important;
-    line-height: 1.6 !important;
+    font-size: 0.85rem !important;
+    line-height: 1.5 !important;
     word-break: keep-all !important;
 }
 
+/* 갤러리 영역 */
+.case-gallery-wrap {
+    max-width: 1200px;
+    margin: 0 auto;
+    overflow: visible;
+}
+.case-page-section .gallery-label {
+    color: #a0aec0;
+    font-size: 0.95rem;
+    margin-bottom: 20px;
+    text-align: center;
+}
+.case-page-section .gallery {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)) !important;
+    gap: 1.5rem !important;
+}
+
+/* PC: 1x4 가로 길게 + 호버 여유 */
 @media (min-width: 769px) {
+    .case-grid-container {
+        grid-template-columns: repeat(4, 1fr) !important;
+        gap: 20px !important;
+        margin-bottom: 56px !important;
+    }
     .case-item-card {
         flex-direction: row !important;
         text-align: left !important;
-        gap: 20px !important;
-        padding: 40px !important;
+        gap: 16px !important;
+        padding: 28px 20px !important;
     }
     .case-page-section .icon-box {
         margin-bottom: 0 !important;
+        font-size: 2.2rem !important;
     }
+    .case-page-section .text-box h3 { font-size: 1.15rem !important; }
+    .case-page-section .text-box p { font-size: 0.9rem !important; }
 }
