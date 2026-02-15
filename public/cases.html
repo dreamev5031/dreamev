@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>제작사례 - 드림전동차</title>
     <link rel="stylesheet" href="css/style.css?v=20260214-999">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 <body>
@@ -32,93 +33,43 @@
         <a href="contact.html" class="header-btn btn-primary">견적문의</a>
     </header>
 
-    <!-- 2x2 Category Nav -->
-    <section class="section cases-hero">
-        <h2 class="section-title">제작 <span>사례</span></h2>
-        <p style="text-align: center; margin-bottom: 1.5rem;">
-            <button type="button" class="btn-spec" id="filterAll">전체 보기</button>
-        </p>
-        <div class="category-grid" id="categoryNav">
-            <div class="category-box" data-filter="industrial">
-                <div class="category-box-bg" style="background-image: url('images/industrial.webp');"></div>
-                <div class="category-box-overlay"><span>산업용 전동차</span></div>
-            </div>
-            <div class="category-box" data-filter="agricultural">
-                <div class="category-box-bg" style="background-image: url('images/farm.webp');"></div>
-                <div class="category-box-overlay"><span>농업용 전동차</span></div>
-            </div>
-            <div class="category-box" data-filter="multipurpose">
-                <div class="category-box-bg" style="background-image: url('images/main2.webp');"></div>
-                <div class="category-box-overlay"><span>다목적 전동차</span></div>
-            </div>
-            <div class="category-box" data-filter="custom">
-                <div class="category-box-bg" style="background-image: url('images/custom.webp');"></div>
-                <div class="category-box-overlay"><span>맞춤제작 전동차</span></div>
-            </div>
+    <!-- 제작 사례 (다크 카드 2x2 그리드) -->
+    <section class="case-page-section">
+        <div class="header-area">
+            <h2>제작 사례</h2>
+            <p>드림전동차만의 기술력으로 완성된 맞춤형 라인업</p>
         </div>
-
-        <!-- 모바일 전용: 카테고리 대문 버튼 (PC에서는 숨김) -->
-        <div class="mobile-case-menu" id="mobileCaseMenu">
-            <button type="button" class="m-case-btn btn-ind" data-category="industrial">산업용 전동차</button>
-            <button type="button" class="m-case-btn btn-farm" data-category="agricultural">농업용 전동차</button>
-            <button type="button" class="m-case-btn btn-multi" data-category="multipurpose">다목적 전동차</button>
-            <button type="button" class="m-case-btn btn-custom" data-category="custom">맞춤제작 전동차</button>
-        </div>
-
-        <button type="button" class="mobile-case-back" id="mobileCaseBack">뒤로 가기(전체 메뉴 보기)</button>
-
-        <!-- Gallery -->
-        <div class="gallery" id="gallery">
-            <div class="gallery-item" data-category="industrial">
-                <img src="images/industrial.webp" alt="산업용 전동차 사례 1" loading="lazy" decoding="async">
+        <div class="case-grid-container">
+            <div class="case-item-card">
+                <div class="icon-box"><i class="fas fa-industry"></i></div>
+                <div class="text-box">
+                    <h3>산업용 전동차</h3>
+                    <p>건설 및 물류 현장에 최적화된 강력한 출력과 내구성</p>
+                </div>
             </div>
-            <div class="gallery-item" data-category="industrial">
-                <img src="images/industrial.webp" alt="산업용 전동차 사례 2" loading="lazy">
+            <div class="case-item-card">
+                <div class="icon-box"><i class="fas fa-tractor"></i></div>
+                <div class="text-box">
+                    <h3>농업용 전동차</h3>
+                    <p>험로와 경사지 주행이 잦은 농가 환경 맞춤형 설계</p>
+                </div>
             </div>
-            <div class="gallery-item" data-category="agricultural">
-                <img src="images/farm.webp" alt="농업용 사례 1" loading="lazy" decoding="async">
+            <div class="case-item-card">
+                <div class="icon-box"><i class="fas fa-th-large"></i></div>
+                <div class="text-box">
+                    <h3>다목적 전동차</h3>
+                    <p>시설 관리 및 순찰 등 다양한 용도의 전천후 기동성</p>
+                </div>
             </div>
-            <div class="gallery-item" data-category="agricultural">
-                <img src="images/farm.webp" alt="농업용 사례 2" loading="lazy">
-            </div>
-            <div class="gallery-item" data-category="multipurpose">
-                <img src="images/main2.webp" alt="다목적 사례 1" loading="lazy" decoding="async">
-            </div>
-            <div class="gallery-item" data-category="multipurpose">
-                <img src="images/main2.webp" alt="다목적 사례 2" loading="lazy">
-            </div>
-            <div class="gallery-item" data-category="custom">
-                <img src="images/custom.webp" alt="맞춤제작 사례 1" loading="lazy" decoding="async">
-            </div>
-            <div class="gallery-item" data-category="custom">
-                <img src="images/custom.webp" alt="맞춤제작 사례 2" loading="lazy">
-            </div>
-            <div class="gallery-item" data-category="industrial">
-                <img src="images/industrial.webp" alt="산업용 전동차 사례 3" loading="lazy">
-            </div>
-            <div class="gallery-item" data-category="agricultural">
-                <img src="images/farm.webp" alt="농업용 사례 3" loading="lazy">
+            <div class="case-item-card">
+                <div class="icon-box"><i class="fas fa-pencil-ruler"></i></div>
+                <div class="text-box">
+                    <h3>맞춤제작 솔루션</h3>
+                    <p>고객의 특수한 요구사항을 반영한 1:1 커스텀 제작</p>
+                </div>
             </div>
         </div>
     </section>
-
-    <!-- Modal Popup -->
-    <div id="caseModal" class="case-modal">
-        <div class="case-modal-overlay"></div>
-        <div class="case-modal-content">
-            <button class="case-modal-close" id="modalClose">&times;</button>
-            <div class="case-modal-image-wrap">
-                <img id="modalImage" src="" alt="" class="case-modal-image" loading="lazy" decoding="async">
-            </div>
-            <div class="case-modal-body">
-                <div class="case-modal-header">
-                    <span id="modalCategory" class="case-modal-category"></span>
-                    <h3 id="modalTitle" class="case-modal-title"></h3>
-                </div>
-                <div id="modalContent" class="case-modal-text"></div>
-            </div>
-        </div>
-    </div>
 
     <footer class="common-footer" id="contact">
         <div class="footer-container">

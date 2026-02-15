@@ -3816,3 +3816,73 @@ nav {
     .tech-content h4 { color: #fff !important; font-size: 1.5rem !important; font-weight: bold !important; margin-bottom: 15px !important; }
     .tech-content p { color: #cbd5e0 !important; line-height: 1.7 !important; word-break: keep-all !important; }
 }
+
+/* === 제작사례 페이지(cases.html) 다크 카드 2x2 그리드 === */
+.case-page-section {
+    background-color: #1a202c !important;
+    padding: 80px 20px !important;
+    text-align: center !important;
+}
+.case-page-section .header-area h2 {
+    color: #fff !important;
+    font-size: 2.2rem !important;
+    margin-bottom: 40px !important;
+    font-weight: 800 !important;
+}
+.case-page-section .header-area p {
+    color: #a0aec0;
+    margin-bottom: 40px;
+}
+
+.case-grid-container {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 20px !important;
+    max-width: 1200px !important;
+    margin: 0 auto !important;
+}
+
+.case-item-card {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    padding: 30px !important;
+    border-radius: 15px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    transition: 0.3s !important;
+}
+.case-item-card:hover {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border-color: #48bb78 !important;
+    transform: translateY(-5px);
+}
+
+.case-page-section .icon-box {
+    font-size: 2.5rem !important;
+    color: #48bb78 !important;
+    margin-bottom: 15px !important;
+}
+.case-page-section .text-box h3 {
+    color: #fff !important;
+    font-size: 1.2rem !important;
+    margin-bottom: 10px !important;
+}
+.case-page-section .text-box p {
+    color: #cbd5e0 !important;
+    font-size: 0.9rem !important;
+    line-height: 1.6 !important;
+    word-break: keep-all !important;
+}
+
+@media (min-width: 769px) {
+    .case-item-card {
+        flex-direction: row !important;
+        text-align: left !important;
+        gap: 20px !important;
+        padding: 40px !important;
+    }
+    .case-page-section .icon-box {
+        margin-bottom: 0 !important;
+    }
+}
