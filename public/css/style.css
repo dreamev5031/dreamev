@@ -1095,6 +1095,17 @@ nav {
     font-weight: 600;
 }
 
+.global-footer-tel {
+    font-size: 0.9rem;
+    color: #D1D5DB;
+    text-decoration: none;
+    line-height: 1.8;
+}
+
+.global-footer-tel:hover {
+    color: var(--primary);
+}
+
 .global-footer-row,
 .final-footer-row {
     display: flex;
@@ -3153,5 +3164,81 @@ nav {
     .location-section {
         padding-top: 10px !important;
         border-top: none !important;
+    }
+}
+
+/* === [모바일 전용] 공통 푸터 정보 재배치 및 정렬 (768px 이하) === */
+@media (max-width: 768px) {
+    .global-footer {
+        background-color: #1a202c !important;
+        padding: 40px 20px !important;
+        text-align: center !important;
+    }
+
+    .global-footer-content {
+        text-align: center !important;
+    }
+
+    .global-footer-grid {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 0 !important;
+    }
+
+    .global-footer-col {
+        width: 100% !important;
+        text-align: center !important;
+        margin-bottom: 0 !important;
+        padding-top: 20px !important;
+        border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+    }
+
+    .global-footer-col:first-child {
+        padding-top: 0 !important;
+        border-top: none !important;
+    }
+
+    .global-footer-logo {
+        color: #ffffff !important;
+        font-size: 1.6rem !important;
+        margin-bottom: 5px !important;
+    }
+
+    .global-footer-logo span {
+        color: #48bb78 !important;
+    }
+
+    .global-footer-tagline {
+        color: #a0aec0 !important;
+        font-size: 0.85rem !important;
+        margin-bottom: 30px !important;
+    }
+
+    .global-footer-col-title {
+        color: #ffffff !important;
+        font-size: 1.1rem !important;
+        margin-bottom: 10px !important;
+    }
+
+    .global-footer-tel {
+        display: block !important;
+        color: #ffffff !important;
+        font-size: 1.6rem !important;
+        font-weight: 800 !important;
+        text-decoration: none !important;
+    }
+
+    .global-footer-contact {
+        color: #718096 !important;
+        font-size: 0.85rem !important;
+        line-height: 1.6 !important;
+        margin-bottom: 5px !important;
+        text-align: center !important;
+    }
+
+    .global-footer-copyright {
+        margin-top: 30px !important;
+        color: #4a5568 !important;
+        font-size: 0.75rem !important;
     }
 }
