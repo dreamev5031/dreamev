@@ -2510,7 +2510,14 @@ nav {
         overflow: visible !important;
         z-index: 10000 !important;
         position: relative !important;
-        justify-content: space-between !important; /* 로고 왼쪽, 햄버거 오른쪽 끝 */
+        justify-content: center !important; /* 모바일: 로고 가운데 */
+    }
+
+    /* 모바일: 로고 가운데 정렬 */
+    .gnb-logo {
+        position: absolute !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
     }
 
     /* 모바일에서만 견적문의 버튼 숨김, 햄버거만 오른쪽 끝에 */
@@ -2518,14 +2525,15 @@ nav {
         display: none !important;
     }
 
-    /* 1. 햄버거 버튼 (무조건 맨 위) */
+    /* 1. 햄버거 버튼 (오른쪽 고정, 로고와 겹치지 않게) */
     .mobile-menu-toggle {
         display: flex !important;
         flex-direction: column;
         justify-content: space-between;
         width: 30px; height: 20px;
         background: transparent; border: none; cursor: pointer;
-        position: relative;
+        position: absolute !important;
+        right: 1rem !important;
         z-index: 100001 !important;
     }
     .mobile-menu-toggle span {
@@ -2583,8 +2591,11 @@ nav {
         display: block !important;
     }
 
-    /* 5. 로고와 견적문의 버튼도 클릭 가능하게 위로 */
-    .gnb-logo, .header-btn {
+    /* 5. 로고·햄버거 클릭 가능하게 위로 (로고는 가운데 유지) */
+    .gnb-logo {
+        z-index: 100001 !important;
+    }
+    .header-btn {
         position: relative;
         z-index: 100001 !important;
     }
