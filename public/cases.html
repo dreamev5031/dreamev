@@ -517,49 +517,24 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 </script>
-<!-- GitHub/Decap CMS 연동: cases.json에서 제작사례 로드 (배포 전 node scripts/generate-cases-json.js 실행) -->
+<!-- GitHub/Decap CMS 연동: cases.json으로 갤러리만 로드 (카드 아이콘은 항상 기본 아이콘 유지) -->
 <script>
 (function() {
-    var nav = document.getElementById('caseCategoryNav');
     var gallery = document.getElementById('caseGallery');
-    if (!nav && !gallery) return;
-
-    var defaultIcons = {};
-    if (nav) {
-        nav.querySelectorAll('.case-item-card').forEach(function(card) {
-            var cat = card.getAttribute('data-category');
-            if (cat && card.querySelector('.icon-box'))
-                defaultIcons[cat] = card.querySelector('.icon-box').innerHTML;
-        });
-    }
+    if (!gallery) return;
 
     fetch('/cases.json')
         .then(function(r) { return r.ok ? r.json() : []; })
         .then(function(list) {
             if (!list || !list.length) return;
-
-            if (nav) {
-                ['industrial', 'agricultural', 'multipurpose', 'custom'].forEach(function(slug) {
-                    var card = nav.querySelector('.case-item-card[data-category="' + slug + '"]');
-                    if (!card) return;
-                    var iconBox = card.querySelector('.icon-box');
-                    if (!iconBox) return;
-                    var first = list.find(function(item) { return item.slug === slug && item.image; });
-                    if (first)
-                        iconBox.innerHTML = '<img src="/' + first.image + '" alt="" class="case-card-thumb" loading="lazy">';
-                });
-            }
-
-            if (gallery && list.length) {
-                var html = '';
-                list.forEach(function(item) {
-                    if (!item.image) return;
-                    html += '<div class="gallery-item" data-category="' + item.slug + '">';
-                    html += '<img src="/' + item.image + '" alt="' + (item.title || '') + '" loading="lazy">';
-                    html += '</div>';
-                });
-                if (html) gallery.innerHTML = html;
-            }
+            var html = '';
+            list.forEach(function(item) {
+                if (!item.image) return;
+                html += '<div class="gallery-item" data-category="' + item.slug + '">';
+                html += '<img src="/' + item.image + '" alt="' + (item.title || '') + '" loading="lazy">';
+                html += '</div>';
+            });
+            if (html) gallery.innerHTML = html;
         })
         .catch(function() {});
 })();
