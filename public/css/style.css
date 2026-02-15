@@ -35,11 +35,10 @@
     max-height: none !important;
     width: auto !important;
     height: auto !important;
-    content-visibility: visible !important;
     margin: 0 !important;
     padding: 0 !important;
-    border: 0 !important;
-    vertical-align: top !important;
+    border: none !important;
+    box-sizing: content-box !important; /* 타일 계산 오류 방지 */
 }
 #map {
     overflow: hidden !important;
