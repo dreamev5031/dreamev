@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>고객지원 - 드림전동차</title>
     <link rel="stylesheet" href="css/style.css?v=20260214-999">
+    <script type="text/javascript" src="https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=ev9ulljphi" referrerpolicy="no-referrer-when-downgrade"></script>
 </head>
 <body class="support-page">
     <!-- GNB -->
@@ -95,16 +96,22 @@
             </div>
 
             <div class="location-map-box">
-                <iframe
-                    src="https://www.google.com/maps?q=%EA%B2%BD%EA%B8%B0%EB%8F%84+%EC%96%91%EC%A3%BC%EC%8B%9C+%EA%B4%91%EC%A0%81%EB%A9%B4+%EB%B6%80%ED%9D%A5%EB%A1%9C956%EB%B2%88%EA%B8%B8+174&output=embed"
-                    width="100%"
-                    style="border:0; height:100%;"
-                    allowfullscreen=""
-                    loading="lazy"
-                    referrerpolicy="no-referrer-when-downgrade"
-                    sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox"
-                    title="드림전동차 오시는 길">
-                </iframe>
+                <div id="naver-map-support" style="width:100%;height:100%;" title="드림전동차 오시는 길"></div>
+                <script>
+                (function() {
+                    function initNaverMap() {
+                        var el = document.getElementById('naver-map-support');
+                        if (!el || typeof naver === 'undefined') return;
+                        var center = new naver.maps.LatLng(37.8568, 127.0385);
+                        var map = new naver.maps.Map(el, { center: center, zoom: 16 });
+                        var marker = new naver.maps.Marker({ position: center, map: map, title: '드림전동차' });
+                        var infoWindow = new naver.maps.InfoWindow({ content: '<div style="padding:8px 10px;font-weight:bold;">드림전동차</div>' });
+                        naver.maps.Event.addListener(marker, 'click', function() { infoWindow.open(map, marker); });
+                    }
+                    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initNaverMap);
+                    else initNaverMap();
+                })();
+                </script>
             </div>
         </div>
     </section>
