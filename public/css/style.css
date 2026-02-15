@@ -530,6 +530,68 @@ nav {
     box-shadow: 0 0 24px rgba(16, 185, 129, 0.2);
 }
 
+/* ===== Cases: 카테고리 버튼 (클릭 시 갤러리 표시) ===== */
+.category-btn-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+    max-width: 700px;
+    margin: 0 auto 2.5rem;
+    padding: 0 1rem;
+}
+
+.cat-btn {
+    width: 100%;
+    min-height: 100px;
+    border: none;
+    border-radius: 16px;
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: white;
+    cursor: pointer;
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.8);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.cat-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
+}
+
+.cat-btn:active {
+    transform: translateY(1px) scale(0.98);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+}
+
+.cat-btn.active {
+    box-shadow: 0 0 0 3px var(--primary), 0 6px 20px rgba(16, 185, 129, 0.3);
+    transform: translateY(0);
+}
+
+/* 카테고리별 배경 (이미지 대신 그라데이션 + 컬러) */
+.cat-btn.industry {
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.5) 100%), #2d3748;
+}
+.cat-btn.farm {
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.35) 0%, rgba(0, 0, 0, 0.5) 100%), #2f855a;
+}
+.cat-btn.multipurpose {
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.35) 0%, rgba(0, 0, 0, 0.5) 100%), #2b6cb0;
+}
+.cat-btn.custom {
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.35) 0%, rgba(0, 0, 0, 0.5) 100%), #553c9a;
+}
+
+.gallery-wrap {
+    margin-top: 0.5rem;
+}
+
 /* ===== Masonry Gallery (Cases) ===== */
 .gallery {
     display: grid;
@@ -2203,6 +2265,41 @@ nav {
         margin: 20px auto 0 auto !important;
         padding: 15px 0 !important;
         text-align: center !important;
+    }
+
+    /* 제작사례: 카테고리 버튼 세로 1열 (1x4) */
+    .category-btn-container {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 15px !important;
+        padding: 20px !important;
+    }
+    .cat-btn {
+        width: 100% !important;
+        height: 100px !important;
+        min-height: 100px !important;
+        border-radius: 12px !important;
+        font-size: 1.5rem !important;
+        font-weight: bold !important;
+        color: white !important;
+        background-size: cover !important;
+        background-position: center !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7) !important;
+    }
+    .cat-btn.industry {
+        background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), #2d3748 !important;
+    }
+    .cat-btn.farm {
+        background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), #2f855a !important;
+    }
+    .cat-btn.multipurpose {
+        background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), #2b6cb0 !important;
+    }
+    .cat-btn.custom {
+        background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), #553c9a !important;
     }
 
     /* (3) 오시는 길(지도): 글자 찌그러짐 해결 */

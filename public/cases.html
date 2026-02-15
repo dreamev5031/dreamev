@@ -30,32 +30,19 @@
         <a href="contact.html" class="header-btn btn-primary">견적문의</a>
     </header>
 
-    <!-- 2x2 Category Nav -->
+    <!-- 버튼 클릭형 갤러리: 처음엔 사진 숨김, 카테고리 선택 시 표시 -->
     <section class="section cases-hero">
         <h2 class="section-title">제작 <span>사례</span></h2>
-        <p style="text-align: center; margin-bottom: 1.5rem;">
-            <button type="button" class="btn-spec" id="filterAll">전체 보기</button>
-        </p>
-        <div class="category-grid" id="categoryNav">
-            <div class="category-box" data-filter="industrial">
-                <div class="category-box-bg" style="background-image: url('images/industrial.webp');"></div>
-                <div class="category-box-overlay"><span>산업용 전동차</span></div>
-            </div>
-            <div class="category-box" data-filter="agricultural">
-                <div class="category-box-bg" style="background-image: url('images/farm.webp');"></div>
-                <div class="category-box-overlay"><span>농업용 전동차</span></div>
-            </div>
-            <div class="category-box" data-filter="multipurpose">
-                <div class="category-box-bg" style="background-image: url('images/main2.webp');"></div>
-                <div class="category-box-overlay"><span>다목적 전동차</span></div>
-            </div>
-            <div class="category-box" data-filter="custom">
-                <div class="category-box-bg" style="background-image: url('images/custom.webp');"></div>
-                <div class="category-box-overlay"><span>맞춤제작 전동차</span></div>
-            </div>
+
+        <div class="category-btn-container" id="categoryNav">
+            <button type="button" class="cat-btn industry" data-filter="industrial">산업용 전동차</button>
+            <button type="button" class="cat-btn farm" data-filter="agricultural">농업용 전동차</button>
+            <button type="button" class="cat-btn multipurpose" data-filter="multipurpose">다목적 전동차</button>
+            <button type="button" class="cat-btn custom" data-filter="custom">맞춤제작 전동차</button>
         </div>
 
-        <!-- Gallery -->
+        <!-- Gallery: 버튼 클릭 전까지 숨김 (모바일 데이터 절약) -->
+        <div class="gallery-wrap" id="galleryWrap" style="display: none;">
         <div class="gallery" id="gallery">
             <div class="gallery-item" data-category="industrial">
                 <img src="images/industrial.webp" alt="산업용 전동차 사례 1" loading="lazy" decoding="async">
@@ -87,6 +74,7 @@
             <div class="gallery-item" data-category="agricultural">
                 <img src="images/farm.webp" alt="농업용 사례 3" loading="lazy">
             </div>
+        </div>
         </div>
     </section>
 
