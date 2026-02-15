@@ -2872,7 +2872,8 @@ nav {
         max-width: 1200px;
         margin: 80px auto;
         gap: 30px;
-        padding: 0 20px;
+        padding: 30px 20px 0 !important; /* 상단 여유로 호버 시 잘림 방지 */
+        overflow: visible !important;
     }
 
     .feature-item {
