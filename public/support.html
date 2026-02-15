@@ -131,7 +131,7 @@
                 document.head.appendChild(style);
 
                 window.onload = function() {
-                    var position = new naver.maps.LatLng(37.80718, 126.98733);
+                    var position = new naver.maps.LatLng(37.80718, 126.98733); // 드림전동차 실제 좌표
                     var map = new naver.maps.Map('map', {
                         center: position,
                         zoom: 17,
@@ -143,15 +143,15 @@
                         map: map
                     });
 
-                    function forceRefresh() {
-                        if (typeof map.refresh === 'function') {
+                    function handleRefresh() {
+                        if (map && typeof map.refresh === 'function') {
                             map.refresh();
                             map.setCenter(position);
                             console.log("네이버 지도 refresh 완료");
                         }
                     }
-                    setTimeout(forceRefresh, 200);
-                    setTimeout(forceRefresh, 800);
+                    setTimeout(handleRefresh, 100);
+                    setTimeout(handleRefresh, 500);
                 };
                 </script>
             </div>
