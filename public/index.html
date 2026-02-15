@@ -151,26 +151,29 @@
         </div>
     </section>
 
-    <!-- 대표 모델 상세 스펙 팝업 (데이터는 하단 스크립트 featuredModels에서 로드) -->
+    <!-- 대표 모델 상세 스펙 팝업: 좌측 슬라이더 / 우측 제원표 -->
     <div class="featured-modal" id="featuredModelModal" aria-hidden="true">
         <div class="featured-modal-overlay"></div>
         <div class="featured-modal-content">
-            <button type="button" class="featured-modal-close" id="featuredModalClose" aria-label="닫기">&times;</button>
-            <h2 class="featured-modal-title" id="featuredModalTitle"></h2>
-            <div class="featured-modal-slider-wrap">
-                <button type="button" class="featured-modal-slider-prev" aria-label="이전 이미지">&lsaquo;</button>
-                <div class="featured-modal-slider">
-                    <img id="featuredModalImage" src="" alt="">
+            <div class="featured-modal-left">
+                <div class="featured-modal-slider-wrap">
+                    <button type="button" class="featured-modal-slider-prev" aria-label="이전 이미지">&lsaquo;</button>
+                    <div class="featured-modal-slider">
+                        <img id="featuredModalImage" src="" alt="">
+                    </div>
+                    <button type="button" class="featured-modal-slider-next" aria-label="다음 이미지">&rsaquo;</button>
                 </div>
-                <button type="button" class="featured-modal-slider-next" aria-label="다음 이미지">&rsaquo;</button>
+                <p class="featured-modal-slider-dots" id="featuredModalDots"></p>
             </div>
-            <p class="featured-modal-slider-dots" id="featuredModalDots"></p>
-            <div class="featured-modal-specs-wrap">
-                <table class="featured-modal-specs-table" id="featuredModalSpecsTable">
-                    <tbody></tbody>
-                </table>
+            <div class="featured-modal-right">
+                <button type="button" class="featured-modal-close" id="featuredModalClose" aria-label="닫기">&times;</button>
+                <h2 class="featured-modal-title" id="featuredModalTitle"></h2>
+                <div class="featured-modal-specs-wrap">
+                    <table class="featured-modal-specs-table" id="featuredModalSpecsTable">
+                        <tbody></tbody>
+                    </table>
+                </div>
             </div>
-            <a href="#" class="featured-modal-page-link" id="featuredModalPageLink">상세 페이지 보기</a>
         </div>
     </div>
 
@@ -389,27 +392,49 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ========== [사용자 설정 구역] 대표 모델 데이터 — 나중에 이 부분만 수정하세요! ==========
+    // ========== [사용자 설정 구역] 대표 모델 데이터 — 사진/제원 수정은 여기만 하세요 ==========
     const featuredModels = {
         "model-a1": {
             title: "전동 지게차 A-1",
-            detailPageUrl: "product-a1.html",
-            // 여기를 수정해서 사진을 바꾸세요. 배열에 이미지 경로만 추가/변경하면 슬라이더에 반영됩니다.
-            images: ["images/farm.webp", "images/custom.webp"],
-            // 여기를 수정해서 제원을 바꾸세요. 키-값만 넣으면 팝업 제원표에 자동 반영됩니다.
-            specs: { "적재중량": "2.5 Ton", "주행거리": "150km", "배터리": "48V 500Ah", "최고 속도": "20 km/h" }
+            images: ["images/farm.webp", "images/custom.webp", "images/industrial.webp"],
+            specs: {
+                "적재중량": "2.5 Ton",
+                "주행거리": "150km (1회 충전)",
+                "배터리": "리튬이온 48V 500Ah",
+                "최고속도": "25 km/h",
+                "등판능력": "30%",
+                "모터출력": "5kW AC",
+                "충전시간": "6~8시간",
+                "타이어": "공기압 / 솔리드 선택"
+            }
         },
         "model-b3": {
             title: "다목적 전동 카트 B-3",
-            detailPageUrl: "product-b3.html",
-            images: ["images/industrial.webp", "images/farm.webp"],
-            specs: { "탑승": "4인", "주행거리": "100km", "배터리": "48V 300Ah", "최고 속도": "25 km/h" }
+            images: ["images/industrial.webp", "images/farm.webp", "images/custom.webp"],
+            specs: {
+                "탑승인원": "4인",
+                "주행거리": "100km (1회 충전)",
+                "배터리": "리튬이온 48V 300Ah",
+                "최고속도": "25 km/h",
+                "등판능력": "25%",
+                "모터출력": "3kW AC",
+                "충전시간": "5~6시간",
+                "타이어": "공기압 / 솔리드 선택"
+            }
         },
         "model-cmax": {
             title: "대형 전동 운반차 C-MAX",
-            detailPageUrl: "product-cmax.html",
-            images: ["images/custom.webp", "images/industrial.webp"],
-            specs: { "적재중량": "5 Ton", "주행거리": "120km", "배터리": "72V 800Ah", "등판 능력": "25%" }
+            images: ["images/custom.webp", "images/industrial.webp", "images/farm.webp"],
+            specs: {
+                "적재중량": "5 Ton",
+                "주행거리": "120km (1회 충전)",
+                "배터리": "리튬이온 72V 800Ah",
+                "최고속도": "20 km/h",
+                "등판능력": "25%",
+                "모터출력": "8kW AC",
+                "충전시간": "8~10시간",
+                "타이어": "공기압 / 솔리드 선택"
+            }
         }
     };
 
@@ -418,7 +443,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalTitle = document.getElementById("featuredModalTitle");
     const modalImage = document.getElementById("featuredModalImage");
     const modalSpecsTbody = document.getElementById("featuredModalSpecsTable").querySelector("tbody");
-    const modalPageLink = document.getElementById("featuredModalPageLink");
     const modalDots = document.getElementById("featuredModalDots");
     let currentSliderIndex = 0;
     let currentModelData = null;
@@ -430,7 +454,6 @@ document.addEventListener('DOMContentLoaded', () => {
         currentSliderIndex = 0;
 
         modalTitle.textContent = data.title;
-        modalPageLink.href = data.detailPageUrl || "#";
 
         // 이미지 슬라이더: images 배열 사용
         if (data.images && data.images.length > 0) {

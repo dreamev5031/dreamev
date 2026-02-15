@@ -1209,7 +1209,7 @@ nav {
     color: #1a202c;
 }
 
-/* ===== 대표 모델 상세 스펙 팝업 (다크 테마 #1a202c) ===== */
+/* ===== 대표 모델 상세 스펙 팝업: 좌측 슬라이더 / 우측 제원표 (다크 #1a202c) ===== */
 .featured-modal {
     display: none;
     position: fixed;
@@ -1235,24 +1235,43 @@ nav {
 }
 .featured-modal-content {
     position: relative;
+    display: flex;
+    flex-direction: row;
     background: #1a202c;
     border-radius: 20px;
-    max-width: 560px;
+    max-width: 1000px;
     width: 100%;
+    min-height: 480px;
     max-height: 90vh;
-    overflow-y: auto;
+    overflow: hidden;
     box-shadow: 0 24px 80px rgba(0, 0, 0, 0.5);
     z-index: 10001;
     animation: featuredModalFadeIn 0.3s ease-out;
 }
 @keyframes featuredModalFadeIn {
-    from { opacity: 0; transform: scale(0.95) translateY(20px); }
+    from { opacity: 0; transform: scale(0.96) translateY(20px); }
     to { opacity: 1; transform: scale(1) translateY(0); }
+}
+.featured-modal-left {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem;
+    border-radius: 20px 0 0 20px;
+}
+.featured-modal-right {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem 1.5rem 1.5rem 0;
+    position: relative;
 }
 .featured-modal-close {
     position: absolute;
-    top: 1rem;
-    right: 1rem;
+    top: 0;
+    right: 0;
     width: 44px;
     height: 44px;
     border: none;
@@ -1264,33 +1283,42 @@ nav {
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 10002;
     transition: background 0.2s;
 }
 .featured-modal-close:hover {
     background: rgba(255, 255, 255, 0.2);
 }
 .featured-modal-title {
-    margin: 0;
-    padding: 1.5rem 1.5rem 0.5rem;
+    margin: 0 0 1.25rem 0;
+    padding-right: 48px;
     color: #f7fafc;
     font-size: 1.5rem;
     font-weight: 800;
+    line-height: 1.3;
 }
 .featured-modal-slider-wrap {
     position: relative;
-    padding: 0 1.5rem;
-}
-.featured-modal-slider {
-    width: 100%;
-    aspect-ratio: 16/10;
+    flex: 1;
+    min-height: 280px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     background: #2d3748;
     border-radius: 12px;
     overflow: hidden;
 }
+.featured-modal-slider {
+    width: 100%;
+    height: 100%;
+    min-height: 280px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 .featured-modal-slider img {
     width: 100%;
     height: 100%;
+    min-height: 260px;
     object-fit: contain;
     display: block;
 }
@@ -1299,8 +1327,8 @@ nav {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
     border: none;
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.15);
@@ -1308,16 +1336,17 @@ nav {
     font-size: 1.25rem;
     cursor: pointer;
     transition: background 0.2s;
+    z-index: 2;
 }
-.featured-modal-slider-prev { left: 1rem; }
-.featured-modal-slider-next { right: 1rem; }
+.featured-modal-slider-prev { left: 0.5rem; }
+.featured-modal-slider-next { right: 0.5rem; }
 .featured-modal-slider-prev:hover,
 .featured-modal-slider-next:hover {
     background: rgba(255, 255, 255, 0.25);
 }
 .featured-modal-slider-dots {
     text-align: center;
-    margin: 0.5rem 0 0;
+    margin: 0.75rem 0 0;
     padding: 0;
 }
 .featured-modal-dot {
@@ -1334,7 +1363,9 @@ nav {
     background: var(--primary);
 }
 .featured-modal-specs-wrap {
-    padding: 1.25rem 1.5rem;
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 0.25rem;
 }
 .featured-modal-specs-table {
     width: 100%;
@@ -1344,33 +1375,40 @@ nav {
 }
 .featured-modal-specs-table th,
 .featured-modal-specs-table td {
-    padding: 0.6rem 0.75rem;
+    padding: 0.65rem 0.5rem 0.65rem 0;
     text-align: left;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 .featured-modal-specs-table th {
     color: #a0aec0;
     font-weight: 600;
-    width: 38%;
+    width: 40%;
 }
 .featured-modal-specs-table td {
     color: #f7fafc;
     font-weight: 500;
 }
-.featured-modal-page-link {
-    display: inline-block;
-    margin: 0 1.5rem 1.5rem;
-    padding: 0.6rem 1.25rem;
-    background: var(--primary);
-    color: #1a202c;
-    font-size: 0.9rem;
-    font-weight: 600;
-    border-radius: 8px;
-    text-decoration: none;
-    transition: background 0.2s;
-}
-.featured-modal-page-link:hover {
-    background: var(--primary-hover);
+
+@media (max-width: 768px) {
+    .featured-modal-content {
+        flex-direction: column;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+    .featured-modal-left {
+        padding: 1rem;
+        min-height: 240px;
+    }
+    .featured-modal-right {
+        padding: 1rem 1rem 1rem 1.5rem;
+    }
+    .featured-modal-slider-wrap,
+    .featured-modal-slider {
+        min-height: 220px;
+    }
+    .featured-modal-slider img {
+        min-height: 200px;
+    }
 }
 
 @media (max-width: 768px) {
