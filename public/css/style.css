@@ -3598,26 +3598,35 @@ nav {
         opacity: 0.9 !important;
     }
 
-    /* [PC 전용] 고객지원 페이지(support.html) 지도 높이 + 주소:지도 = 1:2 너비 비율 */
+    /* [PC 전용] 고객지원 페이지 = 회사소개 지도 영역과 동일 (450px + 지도 flex:1, 버튼 스타일 통일) */
     .support-page .location-container {
         display: flex !important;
+        flex-direction: row !important;
         align-items: stretch !important;
-        gap: 3rem;
+        min-height: 600px !important;
+        height: 600px !important;
+        max-width: 1400px !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+        gap: 0 !important;
+        border-radius: 30px !important;
+        overflow: hidden !important;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2) !important;
     }
     .support-page .location-info-box {
-        flex: 1 !important;
-        min-width: 300px;
-        width: auto !important;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
+        width: 450px !important;
+        flex-shrink: 0 !important;
+        padding: 60px !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
     }
     .support-page .location-map-box {
-        flex: 2 !important;
+        flex: 1 !important;
         width: 100% !important;
         display: flex !important;
         flex-direction: column !important;
-        height: auto !important;
+        height: 100% !important;
         min-height: 100% !important;
     }
     .support-page .location-map-box #map {
@@ -3629,6 +3638,34 @@ nav {
         width: 100% !important;
         height: 100% !important;
         display: block !important;
+    }
+    /* 네이버/카카오 버튼 = 회사소개 .map-links / .btn-naver, .btn-kakao 와 동일 */
+    .support-page .map-buttons {
+        display: flex !important;
+        gap: 12px !important;
+        margin-top: 24px !important;
+    }
+    .support-page .map-btn {
+        flex: 1 !important;
+        padding: 14px !important;
+        text-align: center !important;
+        border-radius: 12px !important;
+        font-weight: bold !important;
+        text-decoration: none !important;
+        font-size: 0.95rem !important;
+        transition: 0.3s !important;
+    }
+    .support-page .map-btn.naver {
+        background-color: #03C75A !important;
+        color: white !important;
+    }
+    .support-page .map-btn.kakao {
+        background-color: #FEE500 !important;
+        color: #191919 !important;
+    }
+    .support-page .map-btn:hover {
+        transform: translateY(-2px) !important;
+        opacity: 0.95 !important;
     }
 }
 
