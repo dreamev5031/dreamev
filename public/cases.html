@@ -136,6 +136,25 @@
         </div>
     </footer>
 
+    <!-- 제작사례 상세 모달 (이미지·제목·날짜·설명) -->
+    <div class="case-modal" id="caseModal" aria-hidden="true">
+        <div class="case-modal-overlay" aria-label="모달 닫기"></div>
+        <div class="case-modal-content">
+            <button type="button" class="case-modal-close" id="modalClose" aria-label="닫기">&times;</button>
+            <div class="case-modal-image-wrap">
+                <img id="modalImage" class="case-modal-image" src="" alt="">
+            </div>
+            <div class="case-modal-body">
+                <div class="case-modal-header">
+                    <span class="case-modal-category" id="modalCategory"></span>
+                    <h2 class="case-modal-title" id="modalTitle"></h2>
+                    <p class="case-modal-date" id="modalDate"></p>
+                </div>
+                <div class="case-modal-text" id="modalContent"></div>
+            </div>
+        </div>
+    </div>
+
     <script src="js/script.js"></script>
     <script>
         // Mobile Menu Toggle - 기존 코드 주석 처리
@@ -341,25 +360,32 @@
             var modalContent = document.getElementById('modalContent');
             var modalOverlay = modal ? modal.querySelector('.case-modal-overlay') : null;
 
-            // Open modal with case data
+            // 날짜 포맷 (YYYY-MM-DD 또는 ISO 문자열 → 읽기 쉬운 형식)
+            function formatDate(str) {
+                if (!str) return '';
+                var d = new Date(str);
+                if (isNaN(d.getTime())) return str;
+                return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+            }
+
+            // Open modal with case data (이미지 확대, 제목·날짜·상세 설명)
             window.openCaseModal = function(caseData) {
                 if (!modal) return;
-                
-                modalImage.src = caseData.image || '';
+                var imgSrc = (caseData.image || '').indexOf('/') === 0 ? caseData.image : ('/' + (caseData.image || ''));
+                modalImage.src = imgSrc;
                 modalImage.alt = caseData.title || '제작사례';
                 modalTitle.textContent = caseData.title || '제작사례';
-                modalCategory.textContent = caseData.categoryLabel || '';
-                
-                // Convert markdown to HTML
-                var bodyContent = caseData.body || '';
+                modalCategory.textContent = caseData.categoryLabel || caseData.category || '';
+                var modalDateEl = document.getElementById('modalDate');
+                if (modalDateEl) modalDateEl.textContent = formatDate(caseData.date || '');
+                var bodyContent = caseData.description || caseData.body || '';
                 if (bodyContent && typeof marked !== 'undefined') {
                     modalContent.innerHTML = marked.parse(bodyContent);
                 } else {
-                    // Fallback: simple markdown-like conversion
-                    modalContent.innerHTML = '<p>' + bodyContent.replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>') + '</p>';
+                    modalContent.innerHTML = bodyContent ? ('<p>' + bodyContent.replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>') + '</p>') : '';
                 }
-                
                 modal.classList.add('active');
+                modal.setAttribute('aria-hidden', 'false');
                 document.body.style.overflow = 'hidden';
             };
 
@@ -367,6 +393,7 @@
             function closeModal() {
                 if (!modal) return;
                 modal.classList.remove('active');
+                modal.setAttribute('aria-hidden', 'true');
                 document.body.style.overflow = '';
             }
 
@@ -531,10 +558,10 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderGallery(list) {
         if (!caseGallery) return;
         var jsonHtml = '';
-        (list || []).forEach(function(item) {
+        (list || []).forEach(function(item, i) {
             if (!item.image) return;
             var categoryNorm = norm(item.category || '');
-            jsonHtml += '<div class="gallery-item" data-category="' + (item.slug || '') + '" data-category-norm="' + categoryNorm + '">';
+            jsonHtml += '<div class="gallery-item" data-category="' + (item.slug || '') + '" data-category-norm="' + categoryNorm + '" data-case-index="' + i + '">';
             jsonHtml += '<img src="/' + item.image + '" alt="' + (item.title || '').replace(/"/g, '&quot;') + '" loading="lazy">';
             jsonHtml += '</div>';
         });
@@ -556,16 +583,37 @@ document.addEventListener('DOMContentLoaded', () => {
         filterGallery('all');
     }
 
+    // 갤러리 이미지 클릭 → 상세 모달 열기 (cases.json 데이터 또는 플레이스홀더)
+    function setupGalleryClicks() {
+        if (!caseGallery) return;
+        caseGallery.addEventListener('click', function(e) {
+            var item = e.target.closest('.gallery-item');
+            if (!item) return;
+            var idx = item.getAttribute('data-case-index');
+            var data;
+            if (idx !== null && idx !== '' && window.allCasesData && window.allCasesData[parseInt(idx, 10)]) {
+                data = window.allCasesData[parseInt(idx, 10)];
+                data = { title: data.title, image: '/' + (data.image || ''), date: data.date, description: data.description, categoryLabel: data.category, category: data.category };
+            } else {
+                var img = item.querySelector('img');
+                data = { title: img ? img.alt : '', image: img ? img.src : '', date: '', description: '', categoryLabel: '' };
+            }
+            if (window.openCaseModal) window.openCaseModal(data);
+        });
+    }
+
     fetch('/cases.json')
         .then(function(r) { return r.ok ? r.json() : []; })
         .then(function(list) {
             window.allCasesData = list || [];
             renderGallery(Array.isArray(list) ? list : []);
             setupCategoryCards();
+            setupGalleryClicks();
         })
         .catch(function() {
             renderGallery([]);
             setupCategoryCards();
+            setupGalleryClicks();
         });
 });
 </script>

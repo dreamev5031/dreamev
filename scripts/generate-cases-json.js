@@ -21,7 +21,7 @@ const CATEGORY_SLUG = {
 };
 
 function parseFrontmatter(content) {
-  const match = content.match(/^---\s*\r?\n([\s\S]*?)\r?\n---/);
+  const match = content.match(/^---\s*\r?\n([\s\S]*?)\r?\n---\s*\r?\n([\s\S]*)$/);
   if (!match) return null;
   const front = {};
   match[1].split(/\r?\n/).forEach(line => {
@@ -33,6 +33,7 @@ function parseFrontmatter(content) {
       val = val.slice(1, -1);
     front[key] = val;
   });
+  front.body = (match[2] || '').trim();
   return front;
 }
 
@@ -49,7 +50,8 @@ try {
       category: front.category,
       title: front.title || '',
       image: front.image ? (front.image.startsWith('/') ? front.image.slice(1) : front.image) : '',
-      date: front.date || ''
+      date: front.date || '',
+      description: front.body || ''
     });
   }
   list.sort((a, b) => (b.date || '').localeCompare(a.date || ''));

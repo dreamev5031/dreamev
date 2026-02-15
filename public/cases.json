@@ -4,27 +4,31 @@
     "category": "다목적",
     "title": "ㄱㄷㅅㄷㄳㅎ",
     "image": "images/custom.webp",
-    "date": "2026-02-15T13:21:00.000+09:00"
+    "date": "2026-02-15T13:21:00.000+09:00",
+    "description": "ㅇㅎㅇㅀ"
   },
   {
     "slug": "custom",
     "category": "맞춤제작",
     "title": "ㅁㄴㅇ43",
     "image": "images/main1.webp",
-    "date": "2026-02-15T13:20:00.000+09:00"
+    "date": "2026-02-15T13:20:00.000+09:00",
+    "description": "ㅈㄷㄴㄹㅇ"
   },
   {
     "slug": "agricultural",
     "category": "농업용",
     "title": "werfds",
     "image": "images/industrial.webp",
-    "date": "2026-02-15T13:17:00.000+09:00"
+    "date": "2026-02-15T13:17:00.000+09:00",
+    "description": "sdfs"
   },
   {
     "slug": "industrial",
     "category": "산업용",
     "title": "erwer",
     "image": "images/dscf1393.jpg",
-    "date": "2026-02-13T17:13:00.000+09:00"
+    "date": "2026-02-13T17:13:00.000+09:00",
+    "description": "개똥"
   }
 ]
