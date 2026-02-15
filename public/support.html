@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="css/style.css?v=20260214-999">
     <script type="text/javascript" src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=ev9ulljphi"></script>
     <style>
-    /* 지도 안의 모든 이미지는 원래 크기대로만 나와야 함 */
+    /* 지도 타일 깨짐 방지: margin/padding/border 제거 */
     #map img {
         max-width: none !important;
         max-height: none !important;
@@ -15,11 +15,17 @@
         height: auto !important;
         min-width: 0 !important;
         min-height: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: 0 !important;
+        vertical-align: top !important;
     }
 
-    /* 지도 컨테이너 자체의 오버플로우 문제 해결 */
+    /* 지도 컨테이너 */
     #map {
-        overflow: hidden !important; /* 네이버 지도는 hidden이 권장됨 */
+        overflow: hidden !important;
+        height: 100% !important;
+        min-height: 100% !important;
     }
     </style>
 </head>
@@ -112,7 +118,7 @@
             </div>
 
             <div class="location-map-box">
-                <div id="map" style="width:100%; height:550px; background-color:#eee;"></div>
+                <div id="map" style="width:100%; height:100%; min-height:100%; background-color:#eee;"></div>
                 <script>
                 window.onload = function() {
                     var mapDiv = document.getElementById('map');
