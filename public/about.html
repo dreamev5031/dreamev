@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>브랜드 스토리 - 드림전동차</title>
     <link rel="stylesheet" href="css/style.css?v=20260214-999">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
 </head>
 <body>
     <!-- GNB -->
@@ -61,21 +62,49 @@
         </div>
     </section>
 
-    <!-- 3. 오시는 길 (Location) -->
-    <section class="section about-location scroll-fade" id="location">
-        <h2 class="section-title">오시는 <span>길</span></h2>
-        <p class="about-address">경기도 양주시 광적면 부흥로956번길 174</p>
-        <div class="about-map-wrap">
-            <iframe
-                src="https://www.google.com/maps?q=%EA%B2%BD%EA%B8%B0%EB%8F%84+%EC%96%91%EC%A3%BC%EC%8B%9C+%EA%B4%91%EC%A0%81%EB%A9%B4+%EB%B6%80%ED%9D%A5%EB%A1%9C956%EB%B2%88%EA%B8%B8+174&output=embed"
-                width="100%"
-                height="400"
-                style="border:0; border-radius: 12px;"
-                allowfullscreen=""
-                loading="lazy"
-                referrerpolicy="no-referrer-when-downgrade"
-                title="드림전동차 오시는 길">
-            </iframe>
+    <!-- 드림전동차의 약속 (신뢰감 강화) -->
+    <section class="features-grid scroll-fade">
+        <div class="feature-item">
+            <i class="fas fa-tools"></i>
+            <h4>100% 맞춤제작</h4>
+            <p>현장 특성에 최적화된 설계와<br>커스텀 제작을 보장합니다.</p>
+        </div>
+        <div class="feature-item">
+            <i class="fas fa-truck-fast"></i>
+            <h4>전국 출장 A/S</h4>
+            <p>전동차 전문가가 현장으로<br>직접 방문하여 해결합니다.</p>
+        </div>
+        <div class="feature-item">
+            <i class="fas fa-leaf"></i>
+            <h4>친환경 에너지</h4>
+            <p>고성능 리튬 배터리로<br>압도적인 주행거리를 제공합니다.</p>
+        </div>
+    </section>
+
+    <!-- 오시는 길 (와이드 대형 지도) -->
+    <section class="about-map-section" id="location">
+        <div class="about-map-container">
+            <div class="map-info">
+                <h2>본사 오시는 길</h2>
+                <div class="info-content">
+                    <p><strong>주소</strong><br>경기도 양주시 광적면 부흥로 956번길 174</p>
+                    <p><strong>전화</strong><br>010-3789-7653</p>
+                    <p><strong>이메일</strong><br>dreamcar@example.com</p>
+                </div>
+                <div class="map-links">
+                    <a href="https://map.naver.com/v5/search/경기도 양주시 광적면 부흥로956번길 174" target="_blank" rel="noopener noreferrer" class="btn-naver">네이버 지도</a>
+                    <a href="https://map.kakao.com/link/search/경기도 양주시 광적면 부흥로956번길 174" target="_blank" rel="noopener noreferrer" class="btn-kakao">카카오맵</a>
+                </div>
+            </div>
+            <div class="map-frame">
+                <iframe
+                    src="https://www.google.com/maps?q=%EA%B2%BD%EA%B8%B0%EB%8F%84+%EC%96%91%EC%A3%BC%EC%8B%9C+%EA%B4%91%EC%A0%81%EB%A9%B4+%EB%B6%80%ED%9D%A5%EB%A1%9C956%EB%B2%88%EA%B8%B8+174&output=embed"
+                    style="border:0;"
+                    allowfullscreen=""
+                    loading="lazy"
+                    title="드림전동차 오시는 길">
+                </iframe>
+            </div>
         </div>
     </section>
 

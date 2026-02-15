@@ -2264,10 +2264,10 @@ nav {
         display: grid !important;
     }
     .mobile-case-menu {
+        padding: 20px !important;
         display: flex !important;
         flex-direction: column !important;
         gap: 20px !important;
-        padding: 30px 20px !important;
     }
     .cases-hero.mobile-gallery-visible .mobile-case-menu {
         display: none !important;
@@ -2289,38 +2289,37 @@ nav {
         display: block !important;
     }
 
-    /* === 모바일 대문 버튼 고급화: 이미지 + 오버레이 + 입체감 === */
+    /* === 버튼 공통 스타일 === */
     .m-case-btn {
         width: 100% !important;
-        height: 110px !important;
-        border-radius: 16px !important;
-        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        height: 120px !important;
+        border-radius: 20px !important;
+        border: 1px solid rgba(255, 255, 255, 0.3) !important;
         color: white !important;
-        font-size: 1.6rem !important;
+        font-size: 1.8rem !important;
         font-weight: 800 !important;
-        text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.8) !important;
+        text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.9) !important;
         background-size: cover !important;
         background-position: center !important;
         background-repeat: no-repeat !important;
-        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3) !important;
-        transition: all 0.2s ease !important;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3) !important;
         cursor: pointer !important;
+        position: relative !important;
+        overflow: hidden !important;
     }
-    .m-case-btn:active {
-        transform: scale(0.97) !important;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2) !important;
-    }
+
+    /* === 버튼별 이미지 연결 (public/images) === */
     .m-case-btn.btn-ind {
-        background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('../images/industrial.webp') !important;
+        background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('../images/industrial.webp') !important;
     }
     .m-case-btn.btn-farm {
-        background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('../images/farm.webp') !important;
+        background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('../images/farm.webp') !important;
     }
     .m-case-btn.btn-multi {
-        background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('../images/main2.webp') !important;
+        background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('../images/main2.webp') !important;
     }
     .m-case-btn.btn-custom {
-        background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('../images/custom.webp') !important;
+        background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('../images/custom.webp') !important;
     }
 }
 
@@ -2488,5 +2487,315 @@ nav {
     .support-contact-card {
         width: 100% !important;
         padding: 30px !important;
+    }
+}
+
+/* === PC 전용: 오시는 길 와이드 확장 (769px 이상) === */
+@media (min-width: 769px) {
+    .location-section {
+        background-color: #1a202c !important;
+        padding: 100px 0 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+    }
+
+    .location-header h2 {
+        font-size: 3rem !important;
+        color: white !important;
+        margin-bottom: 50px !important;
+        text-align: center !important;
+    }
+
+    .location-header h2 span {
+        color: #48bb78 !important;
+    }
+
+    .location-container {
+        width: 1400px !important;
+        max-width: 95% !important;
+        display: grid !important;
+        grid-template-columns: 400px 1fr !important;
+        gap: 0 !important;
+        border-radius: 24px !important;
+        overflow: hidden !important;
+        box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5) !important;
+    }
+
+    .location-info-box {
+        background-color: #2d3748 !important;
+        padding: 60px 40px !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+    }
+
+    .info-group {
+        margin-bottom: 40px !important;
+    }
+
+    .info-group h3 {
+        font-size: 1.2rem !important;
+        color: #a0aec0 !important;
+        margin-bottom: 15px !important;
+        font-weight: bold !important;
+    }
+
+    .address-text {
+        font-size: 1.5rem !important;
+        color: white !important;
+        line-height: 1.5 !important;
+        font-weight: bold !important;
+    }
+
+    .time-text {
+        font-size: 1.2rem !important;
+        color: white !important;
+    }
+
+    .sub-text {
+        font-size: 1rem !important;
+        color: #718096 !important;
+    }
+
+    .location-map-box {
+        width: 100% !important;
+        height: 600px !important;
+    }
+
+    .location-map-box iframe {
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: cover !important;
+    }
+
+    .map-buttons {
+        display: flex !important;
+        gap: 15px !important;
+        margin-top: auto !important;
+    }
+
+    .map-btn {
+        flex: 1 !important;
+        padding: 15px 0 !important;
+        text-align: center !important;
+        border-radius: 12px !important;
+        font-weight: bold !important;
+        text-decoration: none !important;
+        transition: 0.3s !important;
+        font-size: 1rem !important;
+    }
+
+    .map-btn.naver {
+        background-color: #03C75A !important;
+        color: white !important;
+    }
+
+    .map-btn.kakao {
+        background-color: #FEE500 !important;
+        color: #191919 !important;
+    }
+
+    .map-btn:hover {
+        transform: translateY(-3px) !important;
+        opacity: 0.9 !important;
+    }
+}
+
+/* [모바일 보호] 오시는 길 모바일 세로 배치 유지 */
+@media (max-width: 768px) {
+    .location-container {
+        display: flex !important;
+        flex-direction: column !important;
+        box-shadow: none !important;
+    }
+
+    .location-info-box {
+        padding: 0 !important;
+        background: transparent !important;
+    }
+
+    .location-map-box {
+        height: 300px !important;
+        border-radius: 15px !important;
+        overflow: hidden !important;
+    }
+}
+
+/* === about 페이지: 드림전동차의 약속 + 오시는 길 (공통/모바일) === */
+.features-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding: 40px 20px;
+    max-width: 100%;
+}
+
+.feature-item {
+    background: #f8fafc;
+    padding: 32px 24px;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+}
+
+.feature-item i {
+    font-size: 2.5rem;
+    color: #48bb78;
+    margin-bottom: 16px;
+}
+
+.feature-item h4 {
+    font-size: 1.25rem;
+    margin-bottom: 12px;
+    color: #2d3748;
+}
+
+.feature-item p {
+    font-size: 0.95rem;
+    color: #4a5568;
+    line-height: 1.6;
+}
+
+.about-map-section {
+    padding: 40px 20px 60px;
+}
+
+.about-map-container {
+    display: flex;
+    flex-direction: column;
+    max-width: 100%;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+}
+
+.map-info {
+    background: #2d3748;
+    color: white;
+    padding: 32px 24px;
+}
+
+.map-info h2 {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    color: white;
+}
+
+.info-content p {
+    margin-bottom: 16px;
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+.map-links {
+    display: flex;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.btn-naver,
+.btn-kakao {
+    flex: 1;
+    padding: 14px;
+    text-align: center;
+    border-radius: 12px;
+    font-weight: bold;
+    text-decoration: none;
+    font-size: 0.95rem;
+    transition: 0.3s;
+}
+
+.btn-naver {
+    background: #03C75A;
+    color: white;
+}
+
+.btn-kakao {
+    background: #FEE500;
+    color: #191919;
+}
+
+.map-frame {
+    width: 100%;
+    height: 350px;
+}
+
+.map-frame iframe {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+/* === about 페이지 PC 전용: 와이드 레이아웃 (769px 이상) === */
+@media (min-width: 769px) {
+    .features-grid {
+        display: grid !important;
+        grid-template-columns: repeat(3, 1fr);
+        max-width: 1200px;
+        margin: 80px auto;
+        gap: 30px;
+        padding: 0 20px;
+    }
+
+    .feature-item {
+        padding: 40px !important;
+        transition: 0.3s !important;
+    }
+
+    .feature-item:hover {
+        transform: translateY(-10px);
+        background: #ffffff !important;
+    }
+
+    .feature-item i {
+        font-size: 3rem !important;
+        margin-bottom: 20px !important;
+    }
+
+    .feature-item h4 {
+        font-size: 1.5rem !important;
+        margin-bottom: 15px !important;
+    }
+
+    .about-map-section {
+        padding: 50px 20px 100px !important;
+    }
+
+    .about-map-container {
+        display: grid !important;
+        grid-template-columns: 450px 1fr;
+        max-width: 1400px !important;
+        height: 600px !important;
+        margin: 50px auto 100px !important;
+        border-radius: 30px !important;
+        overflow: hidden !important;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2) !important;
+    }
+
+    .map-info {
+        padding: 60px !important;
+        display: flex !important;
+        flex-direction: column !important;
+    }
+
+    .map-info h2 {
+        font-size: 1.75rem !important;
+    }
+
+    .map-frame {
+        width: 100% !important;
+        height: 100% !important;
+    }
+
+    .map-frame iframe {
+        width: 100% !important;
+        height: 100% !important;
+    }
+
+    .btn-naver:hover,
+    .btn-kakao:hover {
+        transform: translateY(-2px);
+        opacity: 0.95;
     }
 }
