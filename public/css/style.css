@@ -3065,7 +3065,7 @@ nav {
     }
 }
 
-/* === [절대 주의] 오직 모바일 화면만 수정 (768px 이하) - trust/features 1열 === */
+/* === [절대 주의] 오직 모바일 화면만 수정 (768px 이하) - trust/features 1열 종대 === */
 @media (max-width: 768px) {
     .trust-grid,
     .features-grid {
@@ -3088,8 +3088,10 @@ nav {
     .trust-title,
     .feature-item h4 {
         font-size: 1.5rem !important;
-        word-break: keep-all !important;
         white-space: normal !important;
+        word-break: keep-all !important;
+        display: block !important;
+        width: 100% !important;
         margin-bottom: 10px !important;
     }
 
@@ -3098,5 +3100,48 @@ nav {
         font-size: 1rem !important;
         line-height: 1.6 !important;
         word-break: keep-all !important;
+    }
+}
+
+/* === [모바일 전용] FAQ 버그 수정 및 섹션 통합 (768px 이하) === */
+@media (max-width: 768px) {
+    .faq-answer {
+        display: none !important;
+        padding: 0 20px 20px 20px !important;
+        margin-top: 10px !important;
+        color: #cbd5e0 !important;
+        font-size: 0.95rem !important;
+        line-height: 1.5 !important;
+    }
+
+    .faq-item.active .faq-answer {
+        display: block !important;
+        border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+        padding-top: 15px !important;
+    }
+
+    .faq-item {
+        background-color: rgba(255, 255, 255, 0.05) !important;
+        border-radius: 15px !important;
+        overflow: hidden !important;
+        margin-bottom: 15px !important;
+    }
+
+    .global-faq-section,
+    .location-section,
+    section.faq,
+    section.location {
+        background-color: #0b1a2d !important;
+        margin-bottom: 0 !important;
+        margin-top: 0 !important;
+    }
+
+    .global-faq-section {
+        padding-bottom: 10px !important;
+    }
+
+    .location-section {
+        padding-top: 10px !important;
+        border-top: none !important;
     }
 }
