@@ -44,7 +44,7 @@
     <section class="section global-inquiry-section">
         <h2 class="section-title">더 궁금하신 점이 있나요? <span>상담 신청하기</span></h2>
         <div class="global-inquiry-container">
-            <form id="globalInquiryForm" class="global-inquiry-form">
+            <form id="globalInquiryForm" class="global-inquiry-form" action="https://formspree.io/f/mdalglra" method="POST">
                 <div class="form-row">
                     <div class="form-group">
                         <label for="globalInquiryNameContact">성함 <span class="required">*</span></label>
@@ -98,14 +98,8 @@
         (function() {
             var form = document.getElementById('globalInquiryForm');
             if (form) {
-                form.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    var formData = new FormData(form);
-                    var data = {};
-                    formData.forEach(function(value, key) { data[key] = value; });
-                    console.log('Inquiry submitted:', data);
-                    alert('상담 신청이 접수되었습니다.\n빠른 시일 내에 연락드리겠습니다.');
-                    form.reset();
+                form.addEventListener('submit', function() {
+                    /* Formspree로 전송 (action="https://formspree.io/f/mdalglra", method="POST") */
                 });
             }
         })();
