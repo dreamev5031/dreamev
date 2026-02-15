@@ -96,28 +96,7 @@
             </div>
 
             <div class="location-map-box">
-                <div id="kakao-map-support" style="width:100%;height:100%;min-height:300px;" title="드림전동차 오시는 길"></div>
-                <script>
-                (function() {
-                    function initKakaoMap() {
-                        var el = document.getElementById('kakao-map-support');
-                        if (!el || typeof kakao === 'undefined') return;
-                        kakao.maps.load(function() {
-                            var coords = new kakao.maps.LatLng(37.8306, 127.0227);
-                            var map = new kakao.maps.Map(el, { center: coords, level: 3 });
-                            var marker = new kakao.maps.Marker({ position: coords, map: map });
-                            var overlay = new kakao.maps.CustomOverlay({
-                                position: coords,
-                                content: '<div style="padding:6px 10px;background:#fff;border:1px solid #ddd;border-radius:4px;font-weight:bold;white-space:nowrap;box-shadow:0 1px 3px rgba(0,0,0,0.2);">드림전동차</div>',
-                                yAnchor: 1.5
-                            });
-                            overlay.setMap(map);
-                        });
-                    }
-                    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initKakaoMap);
-                    else initKakaoMap();
-                })();
-                </script>
+                <div id="map" style="width:100%; height:400px;" title="드림전동차 오시는 길"></div>
             </div>
         </div>
     </section>
@@ -339,6 +318,22 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+window.onload = function() {
+    var container = document.getElementById('map');
+    if (!container || typeof kakao === 'undefined') return;
+    kakao.maps.load(function() {
+        var coords = new kakao.maps.LatLng(37.8306, 127.0227);
+        var map = new kakao.maps.Map(container, { center: coords, level: 3 });
+        new kakao.maps.Marker({ position: coords, map: map });
+        var infoWindow = new kakao.maps.CustomOverlay({
+            position: coords,
+            content: '<div style="padding:8px 12px;background:#fff;border:1px solid #ddd;border-radius:6px;font-weight:bold;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,0.15);">드림전동차</div>',
+            yAnchor: 1.5
+        });
+        infoWindow.setMap(map);
+    });
+};
 </script>
 </body>
 </html>
