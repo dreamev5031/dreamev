@@ -26,6 +26,10 @@
 }
 
 /* 지도 영역(#map) 전역 스타일 예외 처리 - 최우선 (66~70행 img, 88~95행 div 영향 제거) */
+#map,
+#map * {
+    overflow: visible !important;
+}
 #map img {
     max-width: none !important;
     max-height: none !important;
