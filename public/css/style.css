@@ -2936,3 +2936,74 @@ nav {
         opacity: 0.95;
     }
 }
+
+/* === [절대 주의] 오직 모바일만 수정 (768px 이하) - support 오시는 길 === */
+@media (max-width: 768px) {
+    .location-section {
+        background-color: #0b1a2d !important;
+        padding: 50px 20px !important;
+        text-align: center !important;
+    }
+
+    .location-header h2 {
+        font-size: 1.8rem !important;
+        color: white !important;
+        margin-bottom: 30px !important;
+    }
+
+    .info-group h3 {
+        font-size: 1.1rem !important;
+        color: #48bb78 !important;
+        margin-bottom: 10px !important;
+    }
+
+    .address-text,
+    .time-text {
+        font-size: 1rem !important;
+        color: #cbd5e0 !important;
+        line-height: 1.6 !important;
+        margin-bottom: 25px !important;
+    }
+
+    .location-map-box {
+        width: 100% !important;
+        height: 250px !important;
+        border-radius: 20px !important;
+        overflow: hidden !important;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4) !important;
+        margin: 20px 0 40px 0 !important;
+    }
+
+    .location-map-box iframe {
+        width: 100% !important;
+        height: 100% !important;
+        border: 0 !important;
+    }
+
+    .map-buttons {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 15px !important;
+        max-width: 100% !important;
+    }
+
+    .map-btn {
+        display: block !important;
+        width: 100% !important;
+        padding: 18px 0 !important;
+        border-radius: 15px !important;
+        font-weight: 800 !important;
+        font-size: 1.1rem !important;
+        text-decoration: none !important;
+    }
+
+    .map-btn.naver {
+        background-color: #03C75A !important;
+        color: white !important;
+    }
+
+    .map-btn.kakao {
+        background-color: #FEE500 !important;
+        color: #191919 !important;
+    }
+}
