@@ -544,16 +544,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 정적 플레이스홀더 (카테고리별 기본 이미지) — JSON에 없어도 카테고리 클릭 시 표시
-    var staticPlaceholders = ''
-        + '<div class="gallery-item" data-category="industrial" data-category-norm="산업용"><img src="images/industrial.webp" alt="산업용 전동차 사례 1" loading="lazy"></div>'
-        + '<div class="gallery-item" data-category="industrial" data-category-norm="산업용"><img src="images/industrial.webp" alt="산업용 전동차 사례 2" loading="lazy"></div>'
-        + '<div class="gallery-item" data-category="agricultural" data-category-norm="농업용"><img src="images/farm.webp" alt="농업용 전동차 사례 1" loading="lazy"></div>'
-        + '<div class="gallery-item" data-category="agricultural" data-category-norm="농업용"><img src="images/farm.webp" alt="농업용 전동차 사례 2" loading="lazy"></div>'
-        + '<div class="gallery-item" data-category="multipurpose" data-category-norm="다목적"><img src="images/main2.webp" alt="다목적 전동차 사례 1" loading="lazy"></div>'
-        + '<div class="gallery-item" data-category="multipurpose" data-category-norm="다목적"><img src="images/main2.webp" alt="다목적 전동차 사례 2" loading="lazy"></div>'
-        + '<div class="gallery-item" data-category="custom" data-category-norm="맞춤제작"><img src="images/custom.webp" alt="맞춤제작 사례 1" loading="lazy"></div>'
-        + '<div class="gallery-item" data-category="custom" data-category-norm="맞춤제작"><img src="images/custom.webp" alt="맞춤제작 사례 2" loading="lazy"></div>';
+    // 정적 플레이스홀더 제거 — 갤러리는 cases.json( content/cases/*.md ) 데이터만 표시
+    var staticPlaceholders = '';
 
     function renderGallery(list) {
         if (!caseGallery) return;
