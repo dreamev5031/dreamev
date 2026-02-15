@@ -6,7 +6,7 @@
     <title>브랜드 스토리 - 드림전동차</title>
     <link rel="stylesheet" href="css/style.css?v=20260214-999">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
-    <script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=a89f5559a4fad0d0cf12f6b92c46884c&libraries=services" referrerpolicy="no-referrer-when-downgrade"></script>
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=a89f5559a4fad0d0cf12f6b92c46884c&libraries=services"></script>
 </head>
 <body>
     <!-- GNB -->
@@ -119,27 +119,22 @@
                 </div>
             </div>
             <div class="map-frame">
-                <div id="kakao-map-about" style="width:100%;height:100%;" title="드림전동차 오시는 길"></div>
+                <div id="kakao-map-about" style="width:100%;height:100%;min-height:300px;" title="드림전동차 오시는 길"></div>
                 <script>
                 (function() {
-                    var address = '경기도 양주시 광적면 부흥로956번길 174';
                     function initKakaoMap() {
                         var el = document.getElementById('kakao-map-about');
                         if (!el || typeof kakao === 'undefined') return;
                         kakao.maps.load(function() {
-                            var geocoder = new kakao.maps.services.Geocoder();
-                            geocoder.addressSearch(address, function(result, status) {
-                                if (status !== kakao.maps.services.Status.OK) return;
-                                var coords = new kakao.maps.LatLng(result[0].y, result[0].x);
-                                var map = new kakao.maps.Map(el, { center: coords, level: 3 });
-                                var marker = new kakao.maps.Marker({ position: coords, map: map });
-                                var overlay = new kakao.maps.CustomOverlay({
-                                    position: coords,
-                                    content: '<div style="padding:6px 10px;background:#fff;border:1px solid #ddd;border-radius:4px;font-weight:bold;white-space:nowrap;box-shadow:0 1px 3px rgba(0,0,0,0.2);">드림전동차</div>',
-                                    yAnchor: 1.5
-                                });
-                                overlay.setMap(map);
+                            var coords = new kakao.maps.LatLng(37.8306, 127.0227);
+                            var map = new kakao.maps.Map(el, { center: coords, level: 3 });
+                            var marker = new kakao.maps.Marker({ position: coords, map: map });
+                            var overlay = new kakao.maps.CustomOverlay({
+                                position: coords,
+                                content: '<div style="padding:6px 10px;background:#fff;border:1px solid #ddd;border-radius:4px;font-weight:bold;white-space:nowrap;box-shadow:0 1px 3px rgba(0,0,0,0.2);">드림전동차</div>',
+                                yAnchor: 1.5
                             });
+                            overlay.setMap(map);
                         });
                     }
                     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initKakaoMap);
