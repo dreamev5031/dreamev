@@ -3775,11 +3775,18 @@ nav {
 }
 
 /* 네이버 지도 타일 깨짐 방지 */
+/* 네이버 지도: 전역 img/div 규칙이 타일을 막지 않도록 예외 처리 */
+#map {
+    overflow: visible !important;
+}
 #map img {
     max-width: none !important;
     max-height: none !important;
     min-width: 0 !important;
     min-height: 0 !important;
+    width: auto !important;
+    height: auto !important;
+    content-visibility: visible !important;
 }
 
 /* 지도 영역 모바일에서 화면 너비 100% */
