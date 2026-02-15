@@ -1,20 +1,21 @@
 /**
  * Dream EV - 제작사례 페이지 갤러리 필터
- * 카테고리 버튼 클릭 시 갤러리 표시 + 해당 카테고리만 노출 (모바일 데이터 절약)
+ * 2x2 카테고리 박스 클릭 시 해당 data-category만 노출, 나머지는 display: none
  */
 (function() {
     'use strict';
 
     var categoryNav = document.getElementById('categoryNav');
     var gallery = document.getElementById('gallery');
-    var galleryWrap = document.getElementById('galleryWrap');
+    var filterAllBtn = document.getElementById('filterAll');
 
     if (!categoryNav || !gallery) return;
 
-    var boxes = categoryNav.querySelectorAll('.cat-btn, .category-box');
+    var boxes = categoryNav.querySelectorAll('.category-box');
 
     // Make filterGallery globally accessible
     window.filterGallery = function(activeFilter) {
+        // Refresh items list to include dynamically added CMS items
         var allItems = gallery.querySelectorAll('.gallery-item');
         allItems.forEach(function(item) {
             var category = item.getAttribute('data-category');
@@ -28,6 +29,7 @@
         });
     };
 
+    // Store current filter for later use
     window.currentFilter = 'all';
 
     function setActiveBox(clickedBox) {
@@ -41,7 +43,6 @@
 
     boxes.forEach(function(box) {
         box.addEventListener('click', function() {
-            if (galleryWrap) galleryWrap.style.display = 'block';
             var filter = box.getAttribute('data-filter');
             setActiveBox(box);
             window.currentFilter = filter;
@@ -49,5 +50,14 @@
         });
     });
 
-    // 초기: 갤러리는 숨김 상태 유지 (버튼 클릭 시에만 표시)
+    if (filterAllBtn) {
+        filterAllBtn.addEventListener('click', function() {
+            setActiveBox(null);
+            window.currentFilter = 'all';
+            window.filterGallery('all');
+        });
+    }
+
+    // 초기: 전체 노출
+    window.filterGallery('all');
 })();
