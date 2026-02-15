@@ -2036,3 +2036,39 @@ nav {
         font-size: 1.8rem; color: white; font-weight: 800; text-decoration: none;
     }
 }
+
+/* 메뉴판 강제 시각화 (형광 노랑 + 검정 배경) */
+@media (max-width: 768px) {
+    .gnb-nav.active {
+        display: flex !important;
+        position: fixed !important;
+        top: 0 !important; left: 0 !important;
+        width: 100vw !important; height: 100vh !important;
+        background-color: #000000 !important; /* 완전 검정 */
+        z-index: 9999 !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        align-items: center !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+    }
+
+    .gnb-nav.active ul,
+    .gnb-nav.active .mobile-menu-list {
+        list-style: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        text-align: center !important;
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 40px !important;
+    }
+
+    .gnb-nav.active a {
+        display: block !important;
+        color: #FFFF00 !important; /* 형광 노란색 */
+        font-size: 2.5rem !important;
+        font-weight: 900 !important;
+        text-decoration: none !important;
+    }
+}
