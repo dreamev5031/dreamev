@@ -100,7 +100,6 @@
                 <script>
                 window.onload = function() {
                     var position = new naver.maps.LatLng(37.80718, 126.98733);
-
                     var map = new naver.maps.Map('map', {
                         center: position,
                         zoom: 17,
@@ -112,15 +111,19 @@
                         map: map
                     });
 
-                    function fixMapLayout() {
-                        if (map && typeof map.refresh === 'function') {
-                            map.refresh();
+                    function wakeUpMap() {
+                        if (map) {
+                            if (typeof map.refresh === 'function') {
+                                map.refresh();
+                            }
+                            window.dispatchEvent(new Event('resize'));
                             map.setCenter(position);
-                            console.log("네이버 지도 레이아웃 보정 완료");
+                            console.log("지도 강제 깨우기 실행됨");
                         }
                     }
-                    setTimeout(fixMapLayout, 100);
-                    setTimeout(fixMapLayout, 500);
+                    setTimeout(wakeUpMap, 200);
+                    setTimeout(wakeUpMap, 500);
+                    setTimeout(wakeUpMap, 1000);
                 };
                 </script>
             </div>
