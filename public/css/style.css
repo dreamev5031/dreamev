@@ -3007,3 +3007,39 @@ nav {
         color: #191919 !important;
     }
 }
+
+/* === [절대 주의] 오직 모바일 화면만 수정 (768px 이하) - trust/features 1열 === */
+@media (max-width: 768px) {
+    .trust-grid,
+    .features-grid {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 20px !important;
+        padding: 0 20px !important;
+    }
+
+    .trust-card,
+    .feature-item {
+        width: 100% !important;
+        max-width: none !important;
+        min-width: unset !important;
+        padding: 30px 20px !important;
+        text-align: center !important;
+        box-sizing: border-box !important;
+    }
+
+    .trust-title,
+    .feature-item h4 {
+        font-size: 1.5rem !important;
+        word-break: keep-all !important;
+        white-space: normal !important;
+        margin-bottom: 10px !important;
+    }
+
+    .trust-desc,
+    .feature-item p {
+        font-size: 1rem !important;
+        line-height: 1.6 !important;
+        word-break: keep-all !important;
+    }
+}
