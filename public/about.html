@@ -123,27 +123,22 @@
                 <script>
                 window.onload = function() {
                     var position = new naver.maps.LatLng(37.80718, 126.98733);
-
                     var map = new naver.maps.Map('map', {
                         center: position,
                         zoom: 17,
                         mapTypeId: naver.maps.MapTypeId.HYBRID
                     });
+                    new naver.maps.Marker({ position: position, map: map });
 
-                    var marker = new naver.maps.Marker({
-                        position: position,
-                        map: map
-                    });
-
-                    function fixMap() {
-                        if (map && typeof map.refresh === 'function') {
-                            map.refresh();
+                    function forceMap() {
+                        if (map) {
+                            naver.maps.Event.trigger(map, 'resize');
                             map.setCenter(position);
-                            window.dispatchEvent(new Event('resize'));
+                            console.log("드림전동차 지도 강제 리플래시 완료");
                         }
                     }
-                    setTimeout(fixMap, 100);
-                    setTimeout(fixMap, 500);
+                    setTimeout(forceMap, 200);
+                    setTimeout(forceMap, 1000);
                 };
                 </script>
             </div>
