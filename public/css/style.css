@@ -2320,49 +2320,163 @@ nav {
     }
 }
 
-/* === PC 전용: 고객지원 센터 디자인 확장 (769px 이상) === */
+/* === PC 전용: 고객지원 고품격 리디자인 (769px 이상) === */
 @media (min-width: 769px) {
-    /* 1. 전체 섹션 배경 및 여백 */
-    .support-info-section, .support-hero {
-        padding: 100px 0 !important; /* 위아래 여백 넉넉하게 */
+    /* 1. 배경 및 레이아웃 */
+    .support-hero {
+        background-color: #1a202c !important;
+        padding: 120px 0 !important;
         display: flex !important;
         justify-content: center !important;
-    }
-
-    /* 2. 내부 컨텐츠를 감싸는 컨테이너 (없으면 자동 적용) */
-    .support-info-section > div, .support-hero > div {
-        width: 1100px !important; /* PC에서는 넓게! */
-        max-width: 90% !important;
-        display: flex !important;
-        flex-direction: row !important; /* 가로 배치 */
-        justify-content: space-between !important; /* 양쪽 끝으로 벌림 */
         align-items: center !important;
-        text-align: left !important; /* 텍스트 왼쪽 정렬 */
-        padding: 50px !important;
     }
 
-    /* 3. 왼쪽: 제목 및 설명 텍스트 */
-    .support-info-section h2, .support-hero h1 {
-        font-size: 3rem !important; /* 제목 아주 크게 */
+    .support-container {
+        width: 1200px !important;
+        max-width: 95% !important;
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+    }
+
+    /* 2. 왼쪽 텍스트 디자인 */
+    .support-text-group {
+        width: 50% !important;
+        text-align: left !important;
+    }
+
+    .sub-badge {
+        display: inline-block !important;
+        background: rgba(72, 187, 120, 0.2) !important;
+        color: #48bb78 !important;
+        padding: 8px 16px !important;
+        border-radius: 30px !important;
+        font-weight: bold !important;
         margin-bottom: 20px !important;
     }
-    .support-info-section p, .support-hero p {
+
+    .support-text-group h1 {
+        font-size: 3.5rem !important;
+        color: white !important;
+        margin-bottom: 20px !important;
+        font-weight: 800 !important;
+        line-height: 1.2 !important;
+    }
+
+    .support-text-group p {
         font-size: 1.2rem !important;
-        opacity: 0.8;
+        color: #a0aec0 !important;
+        line-height: 1.6 !important;
     }
 
-    /* 4. 오른쪽: 연락처 카드 (초록색 박스) */
-    .support-info-section > div > div,
-    .support-hero > div > div {
-        width: 500px !important; /* 카드 너비 고정 */
-        margin: 0 !important; /* 중앙 정렬 해제 */
-        padding: 40px !important;
-        box-shadow: 0 20px 40px rgba(0,0,0,0.2) !important; /* 그림자 추가 */
+    /* 3. 오른쪽 카드 디자인 (핵심) */
+    .support-contact-card {
+        width: 450px !important;
+        background: white !important;
+        border-radius: 20px !important;
+        padding: 50px !important;
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3) !important;
+        text-align: center !important;
+        position: relative !important;
+        top: 20px !important;
     }
 
-    /* 5. 전화번호 강조 */
-    .support-info-section a[href^="tel"],
-    .support-hero a[href^="tel"] {
-        font-size: 2.5rem !important;
+    .card-header h3 {
+        font-size: 1.5rem !important;
+        color: #2d3748 !important;
+        margin-bottom: 5px !important;
+    }
+
+    .card-header p {
+        color: #718096 !important;
+        font-size: 0.95rem !important;
+        margin-bottom: 30px !important;
+    }
+
+    .phone-number {
+        display: block !important;
+        font-size: 2.8rem !important;
+        font-weight: 900 !important;
+        color: #2d3748 !important;
+        text-decoration: none !important;
+        margin-bottom: 30px !important;
+        letter-spacing: -1px !important;
+    }
+
+    .phone-number:hover {
+        color: #48bb78 !important;
+        transition: 0.3s !important;
+    }
+
+    .divider {
+        height: 1px !important;
+        background: #e2e8f0 !important;
+        margin: 30px 0 !important;
+    }
+
+    .info-list {
+        list-style: none !important;
+        padding: 0 !important;
+        margin-bottom: 30px !important;
+        text-align: left !important;
+    }
+
+    .info-list li {
+        display: flex !important;
+        margin-bottom: 12px !important;
+        font-size: 1rem !important;
+        color: #4a5568 !important;
+    }
+
+    .info-list .icon {
+        margin-right: 10px !important;
+    }
+
+    .info-list .label {
+        font-weight: bold !important;
+        margin-right: 10px !important;
+        width: 80px !important;
+    }
+
+    /* 버튼 디자인 */
+    .btn-inquiry {
+        display: block !important;
+        width: 100% !important;
+        padding: 18px 0 !important;
+        background-color: #48bb78 !important;
+        color: white !important;
+        font-weight: bold !important;
+        font-size: 1.1rem !important;
+        border-radius: 12px !important;
+        text-decoration: none !important;
+        transition: 0.3s !important;
+    }
+
+    .btn-inquiry:hover {
+        background-color: #38a169 !important;
+        transform: translateY(-2px) !important;
+    }
+}
+
+/* [모바일 방어] support-hero 모바일에서도 정상 표시 */
+@media (max-width: 768px) {
+    .support-hero {
+        padding: 60px 20px !important;
+        background: #1a202c !important;
+    }
+
+    .support-container {
+        flex-direction: column !important;
+    }
+
+    .support-text-group {
+        width: 100% !important;
+        text-align: center !important;
+        margin-bottom: 40px !important;
+    }
+
+    .support-contact-card {
+        width: 100% !important;
+        padding: 30px !important;
     }
 }
