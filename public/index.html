@@ -72,7 +72,7 @@
             <p>검증된 성능과 내구성, 현장에 최적화된 라인업을 만나보세요.</p>
         </div>
         <div class="featured-model-grid">
-            <a href="product-a1.html" class="model-card">
+            <div class="model-card">
                 <div class="model-card-image-wrap">
                     <img src="images/main1.webp" alt="전동 지게차 A-1" loading="lazy">
                 </div>
@@ -83,10 +83,10 @@
                         <li>주행거리 <strong>150km</strong></li>
                         <li>48V / 500Ah</li>
                     </ul>
-                    <span class="model-card-cta">상세 스펙 보기</span>
+                    <button type="button" class="model-card-cta-btn" data-model="model-a1">상세 스펙 보기</button>
                 </div>
-            </a>
-            <a href="product-b3.html" class="model-card">
+            </div>
+            <div class="model-card">
                 <div class="model-card-image-wrap">
                     <img src="images/main2.webp" alt="다목적 전동 카트 B-3" loading="lazy">
                 </div>
@@ -97,10 +97,10 @@
                         <li>주행거리 <strong>100km</strong></li>
                         <li>48V / 300Ah</li>
                     </ul>
-                    <span class="model-card-cta">상세 스펙 보기</span>
+                    <button type="button" class="model-card-cta-btn" data-model="model-b3">상세 스펙 보기</button>
                 </div>
-            </a>
-            <a href="product-cmax.html" class="model-card">
+            </div>
+            <div class="model-card">
                 <div class="model-card-image-wrap">
                     <img src="images/main3.webp" alt="대형 전동 운반차 C-MAX" loading="lazy">
                 </div>
@@ -111,9 +111,9 @@
                         <li>주행거리 <strong>120km</strong></li>
                         <li>72V / 800Ah</li>
                     </ul>
-                    <span class="model-card-cta">상세 스펙 보기</span>
+                    <button type="button" class="model-card-cta-btn" data-model="model-cmax">상세 스펙 보기</button>
                 </div>
-            </a>
+            </div>
         </div>
     </section>
 
@@ -150,6 +150,29 @@
             </div>
         </div>
     </section>
+
+    <!-- 대표 모델 상세 스펙 팝업 (데이터는 하단 스크립트 featuredModels에서 로드) -->
+    <div class="featured-modal" id="featuredModelModal" aria-hidden="true">
+        <div class="featured-modal-overlay"></div>
+        <div class="featured-modal-content">
+            <button type="button" class="featured-modal-close" id="featuredModalClose" aria-label="닫기">&times;</button>
+            <h2 class="featured-modal-title" id="featuredModalTitle"></h2>
+            <div class="featured-modal-slider-wrap">
+                <button type="button" class="featured-modal-slider-prev" aria-label="이전 이미지">&lsaquo;</button>
+                <div class="featured-modal-slider">
+                    <img id="featuredModalImage" src="" alt="">
+                </div>
+                <button type="button" class="featured-modal-slider-next" aria-label="다음 이미지">&rsaquo;</button>
+            </div>
+            <p class="featured-modal-slider-dots" id="featuredModalDots"></p>
+            <div class="featured-modal-specs-wrap">
+                <table class="featured-modal-specs-table" id="featuredModalSpecsTable">
+                    <tbody></tbody>
+                </table>
+            </div>
+            <a href="#" class="featured-modal-page-link" id="featuredModalPageLink">상세 페이지 보기</a>
+        </div>
+    </div>
 
     <footer class="common-footer" id="contact">
         <div class="footer-container">
@@ -365,6 +388,122 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     }
+
+    // ========== [사용자 설정 구역] 대표 모델 데이터 — 나중에 이 부분만 수정하세요! ==========
+    const featuredModels = {
+        "model-a1": {
+            title: "전동 지게차 A-1",
+            detailPageUrl: "product-a1.html",
+            // 여기를 수정해서 사진을 바꾸세요. 배열에 이미지 경로만 추가/변경하면 슬라이더에 반영됩니다.
+            images: ["images/farm.webp", "images/custom.webp"],
+            // 여기를 수정해서 제원을 바꾸세요. 키-값만 넣으면 팝업 제원표에 자동 반영됩니다.
+            specs: { "적재중량": "2.5 Ton", "주행거리": "150km", "배터리": "48V 500Ah", "최고 속도": "20 km/h" }
+        },
+        "model-b3": {
+            title: "다목적 전동 카트 B-3",
+            detailPageUrl: "product-b3.html",
+            images: ["images/industrial.webp", "images/farm.webp"],
+            specs: { "탑승": "4인", "주행거리": "100km", "배터리": "48V 300Ah", "최고 속도": "25 km/h" }
+        },
+        "model-cmax": {
+            title: "대형 전동 운반차 C-MAX",
+            detailPageUrl: "product-cmax.html",
+            images: ["images/custom.webp", "images/industrial.webp"],
+            specs: { "적재중량": "5 Ton", "주행거리": "120km", "배터리": "72V 800Ah", "등판 능력": "25%" }
+        }
+    };
+
+    // ========== 로직: 팝업 열기/닫기, 슬라이더, 제원표 렌더 ==========
+    const modal = document.getElementById("featuredModelModal");
+    const modalTitle = document.getElementById("featuredModalTitle");
+    const modalImage = document.getElementById("featuredModalImage");
+    const modalSpecsTbody = document.getElementById("featuredModalSpecsTable").querySelector("tbody");
+    const modalPageLink = document.getElementById("featuredModalPageLink");
+    const modalDots = document.getElementById("featuredModalDots");
+    let currentSliderIndex = 0;
+    let currentModelData = null;
+
+    function openFeaturedModal(modelId) {
+        const data = featuredModels[modelId];
+        if (!data) return;
+        currentModelData = data;
+        currentSliderIndex = 0;
+
+        modalTitle.textContent = data.title;
+        modalPageLink.href = data.detailPageUrl || "#";
+
+        // 이미지 슬라이더: images 배열 사용
+        if (data.images && data.images.length > 0) {
+            modalImage.src = data.images[0];
+            modalImage.alt = data.title;
+            updateSliderDots(data.images.length);
+        }
+
+        // 제원표: specs 객체를 반복해서 테이블로 출력
+        modalSpecsTbody.innerHTML = "";
+        if (data.specs && typeof data.specs === "object") {
+            Object.entries(data.specs).forEach(function(entry) {
+                const tr = document.createElement("tr");
+                tr.innerHTML = "<th>" + entry[0] + "</th><td>" + entry[1] + "</td>";
+                modalSpecsTbody.appendChild(tr);
+            });
+        }
+
+        modal.classList.add("active");
+        modal.setAttribute("aria-hidden", "false");
+        document.body.style.overflow = "hidden";
+    }
+
+    function updateSliderDots(total) {
+        if (!modalDots) return;
+        modalDots.textContent = "";
+        for (let i = 0; i < total; i++) {
+            const span = document.createElement("span");
+            span.className = "featured-modal-dot" + (i === currentSliderIndex ? " active" : "");
+            span.setAttribute("data-index", i);
+            modalDots.appendChild(span);
+        }
+    }
+
+    function setSliderIndex(index) {
+        if (!currentModelData || !currentModelData.images || currentModelData.images.length === 0) return;
+        const len = currentModelData.images.length;
+        currentSliderIndex = (index + len) % len;
+        modalImage.src = currentModelData.images[currentSliderIndex];
+        modalImage.alt = currentModelData.title;
+        const dots = modalDots.querySelectorAll(".featured-modal-dot");
+        dots.forEach(function(d, i) { d.classList.toggle("active", i === currentSliderIndex); });
+    }
+
+    function closeFeaturedModal() {
+        modal.classList.remove("active");
+        modal.setAttribute("aria-hidden", "true");
+        document.body.style.overflow = "";
+    }
+
+    document.querySelectorAll(".model-card-cta-btn").forEach(function(btn) {
+        btn.addEventListener("click", function() {
+            const modelId = btn.getAttribute("data-model");
+            if (modelId) openFeaturedModal(modelId);
+        });
+    });
+
+    document.getElementById("featuredModalClose").addEventListener("click", closeFeaturedModal);
+    modal.querySelector(".featured-modal-overlay").addEventListener("click", closeFeaturedModal);
+
+    const prevBtn = modal.querySelector(".featured-modal-slider-prev");
+    const nextBtn = modal.querySelector(".featured-modal-slider-next");
+    if (prevBtn) prevBtn.addEventListener("click", function() { setSliderIndex(currentSliderIndex - 1); });
+    if (nextBtn) nextBtn.addEventListener("click", function() { setSliderIndex(currentSliderIndex + 1); });
+
+    if (modalDots) modalDots.addEventListener("click", function(e) {
+        const dot = e.target.closest(".featured-modal-dot");
+        if (dot) setSliderIndex(parseInt(dot.getAttribute("data-index"), 10));
+    });
+
+    document.addEventListener("keydown", function(e) {
+        if (e.key === "Escape" && modal.classList.contains("active")) closeFeaturedModal();
+    });
 });
 </script>
 </body>
