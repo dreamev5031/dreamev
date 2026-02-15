@@ -3,3 +3,4 @@
   Cross-Origin-Opener-Policy: unsafe-none
   Cross-Origin-Resource-Policy: cross-origin
   Access-Control-Allow-Origin: *
+  Content-Security-Policy: frame-src 'self' https://*.google.com https://*.googleapis.com;
