@@ -96,7 +96,7 @@
             </div>
 
             <div class="location-map-box">
-                <div id="map" style="width:100%; height:450px; position:relative; display:block !important;"></div>
+                <div id="map" style="width:100%; height:450px; position:relative; overflow:visible !important; z-index:1;"></div>
             </div>
         </div>
     </section>
@@ -322,25 +322,26 @@ document.addEventListener('DOMContentLoaded', () => {
 window.onload = function() {
     kakao.maps.load(function() {
         var container = document.getElementById('map');
+        var loc = new kakao.maps.LatLng(37.83062, 127.02268); // 드림전동차 위치
+
         var options = {
-            center: new kakao.maps.LatLng(37.83062, 127.02268), // 드림전동차 좌표 직접 입력
+            center: loc,
             level: 3
         };
 
         var map = new kakao.maps.Map(container, options);
-        var marker = new kakao.maps.Marker({ position: options.center });
+        var marker = new kakao.maps.Marker({ position: loc });
         marker.setMap(map);
 
-        var infowindow = new kakao.maps.InfoWindow({
-            content: '<div style="padding:5px; font-size:12px;">드림전동차</div>'
+        // [핵심] 0.1초 뒤, 0.5초 뒤, 1초 뒤에 세 번 강제로 레이아웃을 다시 잡음
+        var counts = [100, 500, 1000];
+        counts.forEach(function(delay) {
+            setTimeout(function() {
+                map.relayout();
+                map.setCenter(loc);
+                console.log("Map Relayout Executed at " + delay + "ms");
+            }, delay);
         });
-        infowindow.open(map, marker);
-
-        // [가장 중요] 지도가 이미지를 다 받은 뒤(200 OK), 0.2초 뒤에 레이아웃을 강제로 다시 잡음
-        setTimeout(function() {
-            map.relayout();
-            map.setCenter(options.center);
-        }, 200);
     });
 };
 </script>
