@@ -132,7 +132,6 @@
 
                 window.onload = function() {
                     var position = new naver.maps.LatLng(37.80718, 126.98733);
-
                     var map = new naver.maps.Map('map', {
                         center: position,
                         zoom: 17,
@@ -144,13 +143,15 @@
                         map: map
                     });
 
-                    function forceUpdate() {
-                        map.updateSize();
-                        map.setCenter(new naver.maps.LatLng(37.80718, 126.98733));
+                    function forceRefresh() {
+                        if (typeof map.refresh === 'function') {
+                            map.refresh();
+                            map.setCenter(position);
+                            console.log("네이버 지도 refresh 완료");
+                        }
                     }
-                    forceUpdate();
-                    setTimeout(forceUpdate, 100);
-                    setTimeout(forceUpdate, 500);
+                    setTimeout(forceRefresh, 200);
+                    setTimeout(forceRefresh, 800);
                 };
                 </script>
             </div>
