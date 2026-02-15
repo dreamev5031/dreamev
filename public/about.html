@@ -119,7 +119,7 @@
                 </div>
             </div>
             <div class="map-frame">
-                <div id="map" style="width:100%; height:400px;" title="드림전동차 오시는 길"></div>
+                <div id="map" style="width:100%; height:450px; display:block;" title="드림전동차 오시는 길"></div>
             </div>
         </div>
     </section>
@@ -317,6 +317,8 @@ window.onload = function() {
     kakao.maps.load(function() {
         var coords = new kakao.maps.LatLng(37.83062, 127.02268);
         var map = new kakao.maps.Map(container, { center: coords, level: 3 });
+        map.relayout();
+        map.setCenter(new kakao.maps.LatLng(37.83062, 127.02268));
         var marker = new kakao.maps.Marker({ position: coords, map: map });
         var infowindow = new kakao.maps.InfoWindow({ content: '<div style="padding:8px 12px;font-weight:bold;">드림전동차</div>' });
         infowindow.open(map, marker);
