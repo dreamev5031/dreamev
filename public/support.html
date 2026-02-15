@@ -323,15 +323,11 @@ window.onload = function() {
     var container = document.getElementById('map');
     if (!container || typeof kakao === 'undefined') return;
     kakao.maps.load(function() {
-        var coords = new kakao.maps.LatLng(37.8306, 127.0227);
+        var coords = new kakao.maps.LatLng(37.83062, 127.02268);
         var map = new kakao.maps.Map(container, { center: coords, level: 3 });
-        new kakao.maps.Marker({ position: coords, map: map });
-        var infoWindow = new kakao.maps.CustomOverlay({
-            position: coords,
-            content: '<div style="padding:8px 12px;background:#fff;border:1px solid #ddd;border-radius:6px;font-weight:bold;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,0.15);">드림전동차</div>',
-            yAnchor: 1.5
-        });
-        infoWindow.setMap(map);
+        var marker = new kakao.maps.Marker({ position: coords, map: map });
+        var infowindow = new kakao.maps.InfoWindow({ content: '<div style="padding:8px 12px;font-weight:bold;">드림전동차</div>' });
+        infowindow.open(map, marker);
     });
 };
 </script>
