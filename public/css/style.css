@@ -2005,6 +2005,12 @@ nav {
         overflow: visible !important;
         z-index: 10000 !important;
         position: relative !important;
+        justify-content: space-between !important; /* 로고 왼쪽, 햄버거 오른쪽 끝 */
+    }
+
+    /* 모바일에서만 견적문의 버튼 숨김, 햄버거만 오른쪽 끝에 */
+    .header-btn {
+        display: none !important;
     }
 
     /* 1. 햄버거 버튼 (무조건 맨 위) */
@@ -2095,22 +2101,53 @@ nav {
         word-break: keep-all !important;
     }
 
+    /* ===== 대표 라인업 (Best Sellers) ===== */
+    .model-item {
+        flex-direction: column-reverse !important;
+        align-items: center !important;
+        text-align: center !important;
+        margin-bottom: 50px !important;
+    }
+    .model-image-wrap {
+        width: 100% !important;
+        max-width: 300px !important;
+        margin: 20px 0 !important;
+    }
+    .model-content {
+        padding: 0 !important;
+        width: 100% !important;
+    }
+    .model-title {
+        font-size: 1.8rem !important;
+        margin-bottom: 10px !important;
+        display: block !important;
+    }
+    .model-item .btn-spec {
+        display: inline-block !important;
+        margin-top: 15px !important;
+        width: 80% !important;
+        padding: 12px 0 !important;
+    }
+
     /* ===== 2. Trust 섹션 (3대 핵심 경쟁력) ===== */
     .trust-grid {
         display: grid !important;
         grid-template-columns: 1fr !important;
         gap: 40px !important;
-        padding: 20px !important;
+        padding: 0 20px !important;
     }
     .trust-card {
         width: 100% !important;
-        margin: 0 auto !important;
+        margin: 0 !important;
         text-align: center !important;
     }
     .trust-card .trust-icon,
     .trust-card h3,
     .trust-card p {
         text-align: center !important;
+    }
+    .trust-desc {
+        word-break: keep-all !important;
     }
 
     /* ===== 3. Footer (하단 정보) ===== */

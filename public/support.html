@@ -26,7 +26,7 @@
             <span></span>
         </button>
 
-        <a href="support.html" class="header-btn btn-primary">견적문의</a>
+        <a href="contact.html" class="header-btn btn-primary">견적문의</a>
     </header>
 
     <!-- Support Hero Banner -->
@@ -137,30 +137,6 @@
                     <p>안정적인 <strong>국산 컨트롤러</strong>를 탑재하여 부드러운 가감속이 가능합니다. 초보자나 어르신도 금방 적응하실 수 있을 만큼 조작이 직관적이고 안전합니다.</p>
                 </div>
             </div>
-        </div>
-    </section>
-
-    <!-- Global Footer: Inquiry Section -->
-    <section class="section global-inquiry-section">
-        <h2 class="section-title">더 궁금하신 점이 있나요? <span>상담 신청하기</span></h2>
-        <div class="global-inquiry-container">
-            <form id="globalInquiryForm" class="global-inquiry-form">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="globalInquiryNameSupport">성함 <span class="required">*</span></label>
-                        <input type="text" id="globalInquiryNameSupport" name="name" required placeholder="홍길동">
-                    </div>
-                    <div class="form-group">
-                        <label for="globalInquiryPhoneSupport">연락처 <span class="required">*</span></label>
-                        <input type="tel" id="globalInquiryPhoneSupport" name="phone" required placeholder="010-1234-5678">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="globalInquiryMessageSupport">문의 내용 <span class="required">*</span></label>
-                    <textarea id="globalInquiryMessageSupport" name="message" rows="6" required placeholder="문의하실 내용을 자세히 적어주시면 더 정확한 답변을 드릴 수 있습니다."></textarea>
-                </div>
-                <button type="submit" class="btn-submit">상담 신청하기</button>
-            </form>
         </div>
     </section>
 
@@ -311,19 +287,6 @@
                 });
             });
 
-            // Global Inquiry Form submission
-            var form = document.getElementById('globalInquiryForm');
-            if (form) {
-                form.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    var formData = new FormData(form);
-                    var data = {};
-                    formData.forEach(function(value, key) { data[key] = value; });
-                    console.log('Global inquiry submitted:', data);
-                    alert('상담 신청이 접수되었습니다.\n빠른 시일 내에 연락드리겠습니다.');
-                    form.reset();
-                });
-            }
         })();
 
     </script>
