@@ -124,27 +124,26 @@
                 window.onload = function() {
                     var position = new naver.maps.LatLng(37.80718, 126.98733);
 
-                    var mapOptions = {
+                    var map = new naver.maps.Map('map', {
                         center: position,
                         zoom: 17,
                         mapTypeId: naver.maps.MapTypeId.HYBRID
-                    };
-                    var map = new naver.maps.Map('map', mapOptions);
+                    });
 
                     var marker = new naver.maps.Marker({
                         position: position,
                         map: map
                     });
 
-                    function forceRender() {
-                        if (map) {
-                            window.dispatchEvent(new Event('resize'));
+                    function fixMap() {
+                        if (map && typeof map.refresh === 'function') {
+                            map.refresh();
                             map.setCenter(position);
+                            window.dispatchEvent(new Event('resize'));
                         }
                     }
-                    setTimeout(forceRender, 100);
-                    setTimeout(forceRender, 500);
-                    setTimeout(forceRender, 1000);
+                    setTimeout(fixMap, 100);
+                    setTimeout(fixMap, 500);
                 };
                 </script>
             </div>
