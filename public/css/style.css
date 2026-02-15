@@ -1053,6 +1053,82 @@ nav {
     }
 }
 
+/* === 제작사례 페이지(cases.html) 스타일 === */
+.case-page-container {
+    background-color: #1a202c;
+    padding: 80px 20px;
+    min-height: 100vh;
+    text-align: center;
+}
+
+.case-page-container .page-header h2 {
+    color: #fff;
+    font-size: 2rem;
+    margin-bottom: 10px;
+    font-weight: 800;
+}
+.case-page-container .page-header p {
+    color: #a0aec0;
+    margin-bottom: 50px;
+}
+
+.case-page-container .case-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.case-page-container .case-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: 0.3s;
+    text-align: center;
+}
+.case-page-container .case-card:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: #48bb78;
+    transform: translateY(-5px);
+}
+
+.case-page-container .case-icon {
+    font-size: 2.5rem;
+    color: #48bb78;
+    margin-bottom: 15px;
+}
+.case-page-container .case-info h3 {
+    color: #fff;
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+.case-page-container .case-info p {
+    color: #cbd5e0;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    word-break: keep-all;
+}
+
+@media (min-width: 769px) {
+    .case-page-container .case-card {
+        flex-direction: row;
+        text-align: left;
+        gap: 20px;
+        padding: 40px;
+    }
+    .case-page-container .case-icon {
+        margin-bottom: 0;
+        width: 60px;
+        text-align: center;
+    }
+}
+
 /* ===== Process Section (제작 프로세스) ===== */
 .process-section {
     padding: 4rem 1.5rem;
