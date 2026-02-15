@@ -2267,7 +2267,7 @@ nav {
         display: flex !important;
         flex-direction: column !important;
         gap: 20px !important;
-        padding: 20px !important;
+        padding: 30px 20px !important;
     }
     .cases-hero.mobile-gallery-visible .mobile-case-menu {
         display: none !important;
@@ -2289,37 +2289,38 @@ nav {
         display: block !important;
     }
 
-    /* 신상 대문 버튼: 배경 이미지 + 어두운 오버레이 */
+    /* === 모바일 대문 버튼 고급화: 이미지 + 오버레이 + 입체감 === */
     .m-case-btn {
         width: 100% !important;
-        height: 120px !important;
-        border: 1px solid rgba(255, 255, 255, 0.3) !important;
-        border-radius: 20px !important;
+        height: 110px !important;
+        border-radius: 16px !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
         color: white !important;
-        font-size: 1.8rem !important;
+        font-size: 1.6rem !important;
         font-weight: 800 !important;
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2) !important;
-        transition: transform 0.2s !important;
-        cursor: pointer !important;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8) !important;
+        text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.8) !important;
         background-size: cover !important;
         background-position: center !important;
         background-repeat: no-repeat !important;
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3) !important;
+        transition: all 0.2s ease !important;
+        cursor: pointer !important;
     }
     .m-case-btn:active {
-        transform: scale(0.98) !important;
+        transform: scale(0.97) !important;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2) !important;
     }
     .m-case-btn.btn-ind {
-        background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('../images/industrial.webp') !important;
+        background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('../images/industrial.webp') !important;
     }
     .m-case-btn.btn-farm {
-        background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('../images/farm.webp') !important;
+        background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('../images/farm.webp') !important;
     }
     .m-case-btn.btn-multi {
-        background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('../images/main2.webp') !important;
+        background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('../images/main2.webp') !important;
     }
     .m-case-btn.btn-custom {
-        background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('../images/custom.webp') !important;
+        background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('../images/custom.webp') !important;
     }
 }
 
@@ -2331,15 +2332,17 @@ nav {
     }
 }
 
-/* === PC 전용: 고객지원 고품격 리디자인 (769px 이상) === */
+/* === PC 전용: 고객지원 다크 네이비 리디자인 (769px 이상, 스크롤 트랩 방지) === */
 @media (min-width: 769px) {
-    /* 1. 배경 및 레이아웃 */
+    /* 1. 배경 및 레이아웃 – overflow 제거로 스크롤 트랩 방지 */
     .support-hero {
         background-color: #1a202c !important;
         padding: 120px 0 !important;
         display: flex !important;
         justify-content: center !important;
         align-items: center !important;
+        overflow: visible !important;
+        min-height: 0 !important;
     }
 
     .support-container {
@@ -2348,6 +2351,7 @@ nav {
         display: flex !important;
         justify-content: space-between !important;
         align-items: center !important;
+        overflow: visible !important;
     }
 
     /* 2. 왼쪽 텍스트 디자인 */
@@ -2380,16 +2384,16 @@ nav {
         line-height: 1.6 !important;
     }
 
-    /* 3. 오른쪽 카드 디자인 (핵심) */
+    /* 3. 오른쪽 카드 – 스크롤 트랩 없이 시각만 살짝 강조 */
     .support-contact-card {
         width: 450px !important;
+        flex-shrink: 0 !important;
         background: white !important;
         border-radius: 20px !important;
         padding: 50px !important;
         box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3) !important;
         text-align: center !important;
-        position: relative !important;
-        top: 20px !important;
+        overflow: visible !important;
     }
 
     .card-header h3 {
@@ -2434,6 +2438,7 @@ nav {
 
     .info-list li {
         display: flex !important;
+        align-items: center !important;
         margin-bottom: 12px !important;
         font-size: 1rem !important;
         color: #4a5568 !important;
@@ -2441,12 +2446,6 @@ nav {
 
     .info-list .icon {
         margin-right: 10px !important;
-    }
-
-    .info-list .label {
-        font-weight: bold !important;
-        margin-right: 10px !important;
-        width: 80px !important;
     }
 
     /* 버튼 디자인 */
