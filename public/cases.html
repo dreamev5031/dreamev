@@ -142,10 +142,7 @@
         <div class="case-modal-content">
             <button type="button" class="case-modal-close" id="modalClose" aria-label="닫기">&times;</button>
             <div class="case-modal-image-wrap">
-                <img id="modalImage" class="case-modal-image" src="" alt="">
-                <button type="button" class="case-modal-nav case-modal-prev" id="modalPrev" aria-label="이전 사진" style="display:none;">&#10094;</button>
-                <button type="button" class="case-modal-nav case-modal-next" id="modalNext" aria-label="다음 사진" style="display:none;">&#10095;</button>
-                <div class="case-modal-dots" id="modalDots"></div>
+                <div id="modalImageContainer" class="case-modal-detail-images"></div>
             </div>
             <div class="case-modal-body">
                 <div class="case-modal-header">
@@ -263,7 +260,9 @@
                 item.setAttribute('data-case-gallery', JSON.stringify(data.gallery || (data.image ? [{ image: data.image }] : [])));
                 
                 var img = document.createElement('img');
-                img.src = data.image;
+                var rawImg = (data.image || '').trim();
+                var imgSrc = (rawImg.indexOf('/') === 0 || rawImg.indexOf('http') === 0) ? rawImg : ('/' + rawImg.replace(/^\//, ''));
+                img.src = imgSrc;
                 img.alt = data.title || '제작사례';
                 img.loading = 'lazy';
                 img.decoding = 'async';
@@ -382,31 +381,38 @@
                 });
             }
 
-            var modalGallery = [];
-            var modalGalleryIndex = 0;
-            var modalPrevBtn = document.getElementById('modalPrev');
-            var modalNextBtn = document.getElementById('modalNext');
-            var modalDotsEl = document.getElementById('modalDots');
+            var modalImageContainer = document.getElementById('modalImageContainer');
 
-            function updateModalImageByIndex() {
-                if (!modalGallery.length) return;
-                modalGalleryIndex = Math.max(0, Math.min(modalGalleryIndex, modalGallery.length - 1));
-                modalImage.src = modalGallery[modalGalleryIndex];
-                if (modalDotsEl) {
-                    var dots = modalDotsEl.querySelectorAll('.case-modal-dot');
-                    dots.forEach(function(d, i) { d.classList.toggle('active', i === modalGalleryIndex); });
+            // 하이브리드 출력: gallery 있으면 여러 장, 없으면 image 한 장
+            function renderModalImages(container, caseData) {
+                if (!container) return;
+                container.innerHTML = '';
+                var title = caseData.title || '제작사례';
+
+                if (caseData.gallery && Array.isArray(caseData.gallery) && caseData.gallery.length > 0) {
+                    var paths = normalizeGalleryPaths(caseData.gallery);
+                    paths.forEach(function(imgUrl) {
+                        var img = document.createElement('img');
+                        img.src = imgUrl;
+                        img.alt = title;
+                        img.className = 'case-modal-image detail-image';
+                        img.loading = 'lazy';
+                        container.appendChild(img);
+                    });
+                } else if (caseData.image) {
+                    var raw = (caseData.image + '').trim();
+                    var singleSrc = (raw.indexOf('/') === 0 || raw.indexOf('http') === 0) ? raw : ('/' + raw.replace(/^\//, ''));
+                    var img = document.createElement('img');
+                    img.src = singleSrc;
+                    img.alt = title;
+                    img.className = 'case-modal-image detail-image';
+                    container.appendChild(img);
                 }
             }
 
-            // Open modal with case data (이미지 확대, 제목·날짜·상세 설명). gallery 배열이 있으면 여러 장 슬라이드.
+            // Open modal with case data (이미지 확대, 제목·날짜·상세 설명). gallery면 여러 장, image면 한 장 출력.
             window.openCaseModal = function(caseData) {
                 if (!modal) return;
-                var gallery = caseData.gallery && Array.isArray(caseData.gallery) ? caseData.gallery : (caseData.image ? [{ image: caseData.image }] : []);
-                modalGallery = normalizeGalleryPaths(gallery);
-                modalGalleryIndex = 0;
-                var imgSrc = modalGallery.length ? modalGallery[0] : ((caseData.image || '').indexOf('/') === 0 ? caseData.image : ('/' + (caseData.image || '')));
-                modalImage.src = imgSrc;
-                modalImage.alt = caseData.title || '제작사례';
                 modalTitle.textContent = caseData.title || '제작사례';
                 modalCategory.textContent = caseData.categoryLabel || caseData.category || '';
                 var modalDateEl = document.getElementById('modalDate');
@@ -417,21 +423,7 @@
                 } else {
                     modalContent.innerHTML = bodyContent ? ('<p>' + bodyContent.replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>') + '</p>') : '';
                 }
-                if (modalPrevBtn) { modalPrevBtn.style.display = modalGallery.length > 1 ? '' : 'none'; modalPrevBtn.onclick = function() { modalGalleryIndex--; updateModalImageByIndex(); }; }
-                if (modalNextBtn) { modalNextBtn.style.display = modalGallery.length > 1 ? '' : 'none'; modalNextBtn.onclick = function() { modalGalleryIndex++; updateModalImageByIndex(); }; }
-                if (modalDotsEl) {
-                    modalDotsEl.innerHTML = '';
-                    if (modalGallery.length > 1) {
-                        for (var i = 0; i < modalGallery.length; i++) {
-                            var dot = document.createElement('button');
-                            dot.type = 'button';
-                            dot.className = 'case-modal-dot' + (i === 0 ? ' active' : '');
-                            dot.setAttribute('aria-label', '사진 ' + (i + 1));
-                            (function(idx) { dot.addEventListener('click', function() { modalGalleryIndex = idx; updateModalImageByIndex(); }); })(i);
-                            modalDotsEl.appendChild(dot);
-                        }
-                    }
-                }
+                renderModalImages(modalImageContainer, caseData);
                 modal.classList.add('active');
                 modal.setAttribute('aria-hidden', 'false');
                 document.body.style.overflow = 'hidden';
