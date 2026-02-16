@@ -8,9 +8,9 @@ backend:
 site_url: https://dreamev.kr
 display_url: https://dreamev.kr
 
-# 미디어 라이브러리: public/images (work 하위 폴더 포함 탐색)
-media_folder: "public/images"
-public_folder: "images"
+# 미디어 라이브러리 (가장 안정적인 기본 설정)
+media_folder: "public/images"   # 깃허브 상의 실제 물리적 경로
+public_folder: "/images"        # 웹사이트 주소창에 들어갈 경로 (슬래시 포함)
 
 collections:
   - name: "cases"
@@ -26,7 +26,7 @@ collections:
         name: "image"
         widget: "image"
         media_folder: "public/images/work"
-        public_folder: "images/work"
+        public_folder: "/images/work"
         choose_url: true
         hint: "미디어가 안 보이면 'URL로 삽입'에 https://dreamev.kr/images/work/파일명.webp 입력. 목록은 /admin/images.html 참고."
       - {label: "작업 날짜", name: "date", widget: "datetime"}
