@@ -21,6 +21,10 @@ collections:
     fields:
       - {label: "제목", name: "title", widget: "string"}
       - {label: "카테고리", name: "category", widget: "select", options: ["산업용", "농업용", "다목적", "맞춤제작"]}
-      - {label: "대표 이미지", name: "image", widget: "image"}
+      - label: "제작사례 이미지"
+        name: "images"
+        widget: "image"
+        allow_multiple: true
+        choose_url: false
       - {label: "작업 날짜", name: "date", widget: "datetime"}
       - {label: "상세 내용", name: "body", widget: "markdown"}
