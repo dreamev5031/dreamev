@@ -250,7 +250,8 @@
                                 .then(function(r) { return r.text(); })
                                 .then(function(content) {
                                     var frontmatter = parseFrontmatter(content);
-                                    var category = categoryMap[frontmatter.category] || (frontmatter.category || '').toLowerCase();
+                                    var rawCat = (frontmatter.category != null ? String(frontmatter.category) : '').trim();
+                                    var category = categoryMap[rawCat] || rawCat.toLowerCase().replace(/\s+/g, '');
                                     var galleryList = frontmatter.gallery && Array.isArray(frontmatter.gallery) ? frontmatter.gallery : (frontmatter.image ? [{ image: frontmatter.image }] : []);
                                     var firstImage = (galleryList[0] && galleryList[0].image) || frontmatter.image || '';
                                     return {
@@ -480,15 +481,17 @@ document.addEventListener('DOMContentLoaded', () => {
     var galleryWrap = document.querySelector('.case-gallery-wrap');
 
     function norm(s) {
-        return (s || '').trim().replace(/\s+/g, '');
+        return (String(s || '').trim().replace(/\s+/g, '')).toLowerCase();
     }
 
-    // 띄어쓰기 제거 후 서로 포함 관계면 매칭 (버튼 "산업용 전동차" ↔ DB "산업용")
-    function matchCategory(buttonTitle, jsonCategory) {
-        var cleanTarget = norm(buttonTitle);
-        var cleanItem = norm(jsonCategory || '');
-        if (!cleanTarget || !cleanItem) return false;
-        return cleanTarget.indexOf(cleanItem) !== -1 || cleanItem.indexOf(cleanTarget) !== -1;
+    // 버튼 값(또는 data-category)과 포스트 카테고리(문자열 또는 배열) 유연 비교. trim·소문자·배열 포함 여부 지원.
+    function matchCategory(buttonValue, itemCategoryNorm) {
+        var cleanTarget = norm(buttonValue);
+        if (!cleanTarget) return false;
+        var itemNorm = (itemCategoryNorm || '').trim();
+        if (!itemNorm) return false;
+        var parts = itemNorm.split(',').map(function(p) { return norm(p); });
+        return parts.indexOf(cleanTarget) !== -1 || parts.some(function(p) { return p.indexOf(cleanTarget) !== -1 || cleanTarget.indexOf(p) !== -1; });
     }
 
     function filterGallery(categoryKey) {
@@ -503,9 +506,8 @@ document.addEventListener('DOMContentLoaded', () => {
             el.classList.toggle('hidden', !show);
         });
         cards.forEach(function(c) {
-            var h3 = c.querySelector('.text-box h3');
-            var cardNorm = h3 ? norm(h3.textContent) : '';
-            var isActive = categoryKey === 'all' ? false : (cardNorm && matchCategory(categoryKey, cardNorm));
+            var cardKey = c.getAttribute('data-category') || '';
+            var isActive = categoryKey !== 'all' && cardKey && norm(cardKey) === norm(categoryKey);
             c.classList.toggle('active', isActive);
             c.setAttribute('aria-pressed', isActive);
         });
@@ -519,7 +521,7 @@ document.addEventListener('DOMContentLoaded', () => {
             var gallery = item.gallery && Array.isArray(item.gallery) ? item.gallery : (item.image ? [{ image: item.image }] : []);
             var thumbSrc = (gallery[0] && gallery[0].image) ? gallery[0].image : item.image;
             if (!thumbSrc) return;
-            var categoryNorm = norm(item.category || '');
+            var categoryNorm = Array.isArray(item.category) ? item.category.map(function(c) { return norm(String(c)); }).join(',') : norm(String(item.category || ''));
             var thumbPath = thumbSrc.indexOf('/') === 0 ? thumbSrc : '/' + thumbSrc;
             jsonHtml += '<div class="gallery-item" data-category="' + (item.slug || '') + '" data-category-norm="' + categoryNorm + '" data-case-index="' + i + '" data-case-gallery="' + (JSON.stringify(gallery).replace(/"/g, '&quot;')) + '">';
             jsonHtml += '<img src="' + thumbPath + '" alt="' + (item.title || '').replace(/"/g, '&quot;') + '" loading="lazy">';
@@ -534,10 +536,9 @@ document.addEventListener('DOMContentLoaded', () => {
         var cards = categoryNav.querySelectorAll('.case-item-card');
         cards.forEach(function(card) {
             card.addEventListener('click', function() {
-                var h3 = card.querySelector('.text-box h3');
-                var categoryName = h3 ? h3.textContent.trim() : '';
+                var categoryKey = card.getAttribute('data-category') || '';
                 if (galleryWrap) galleryWrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                filterGallery(categoryName);
+                filterGallery(categoryKey);
             });
         });
         if (btnAllCases) btnAllCases.addEventListener('click', function() { filterGallery('all'); });
