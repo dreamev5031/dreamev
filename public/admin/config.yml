@@ -26,6 +26,6 @@ collections:
         widget: "list"
         summary: "{{fields.image}}"
         fields:
-          - { label: "사진 추가", name: "image", widget: "image", media_folder: "public/images/work", public_folder: "images/work" }
+          - { label: "사진 추가", name: "image", widget: "image", media_folder: "public/images", public_folder: "images" }
       - {label: "작업 날짜", name: "date", widget: "datetime"}
       - {label: "상세 내용", name: "body", widget: "markdown"}
