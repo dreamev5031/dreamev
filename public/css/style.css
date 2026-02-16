@@ -4605,6 +4605,18 @@ nav {
     margin-bottom: 20px;
     text-align: center;
 }
+.gallery-empty-msg {
+    grid-column: 1 / -1;
+    text-align: center;
+    color: #718096;
+    padding: 2rem 1rem;
+}
+.gallery-empty-msg code {
+    background: #e2e8f0;
+    padding: 0.2em 0.4em;
+    border-radius: 4px;
+    font-size: 0.9em;
+}
 .case-page-section .gallery {
     display: grid !important;
     grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)) !important;

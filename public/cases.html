@@ -78,31 +78,8 @@
         </div>
         <div class="case-gallery-wrap">
             <p class="gallery-label">선택한 카테고리의 제작 사례</p>
-            <div class="gallery" id="caseGallery">
-                <div class="gallery-item" data-category="industrial" data-category-norm="산업용">
-                    <img src="images/industrial.webp" alt="산업용 전동차 사례 1" loading="lazy">
-                </div>
-                <div class="gallery-item" data-category="industrial" data-category-norm="산업용">
-                    <img src="images/industrial.webp" alt="산업용 전동차 사례 2" loading="lazy">
-                </div>
-                <div class="gallery-item" data-category="agricultural" data-category-norm="농업용">
-                    <img src="images/farm.webp" alt="농업용 전동차 사례 1" loading="lazy">
-                </div>
-                <div class="gallery-item" data-category="agricultural" data-category-norm="농업용">
-                    <img src="images/farm.webp" alt="농업용 전동차 사례 2" loading="lazy">
-                </div>
-                <div class="gallery-item" data-category="multipurpose" data-category-norm="다목적">
-                    <img src="images/main2.webp" alt="다목적 전동차 사례 1" loading="lazy">
-                </div>
-                <div class="gallery-item" data-category="multipurpose" data-category-norm="다목적">
-                    <img src="images/main2.webp" alt="다목적 전동차 사례 2" loading="lazy">
-                </div>
-                <div class="gallery-item" data-category="custom" data-category-norm="맞춤제작">
-                    <img src="images/custom.webp" alt="맞춤제작 사례 1" loading="lazy">
-                </div>
-                <div class="gallery-item" data-category="custom" data-category-norm="맞춤제작">
-                    <img src="images/custom.webp" alt="맞춤제작 사례 2" loading="lazy">
-                </div>
+            <div class="gallery" id="caseGallery" data-dynamic="true">
+                <!-- 갤러리 항목은 content/cases 데이터·cases.json·이미지 폴더 스캔으로만 동적 생성됩니다. 파일명 하드코딩 없음. -->
             </div>
         </div>
     </section>
@@ -213,12 +190,8 @@
         })();
         */
 
-        // Load CMS cases data
+        // CMS/콘텐츠 데이터 로드 (DOM 조작 없이 데이터만 반환)
         (function() {
-            var gallery = document.getElementById('caseGallery');
-            if (!gallery) return;
-
-            // Category mapping: 한글 -> 영문
             var categoryMap = {
                 '산업용': 'industrial',
                 '농업용': 'agricultural',
@@ -226,7 +199,6 @@
                 '맞춤제작': 'custom'
             };
 
-            // Parse frontmatter from markdown content
             function parseFrontmatter(content) {
                 var frontmatter = {};
                 var body = '';
@@ -248,65 +220,23 @@
                 return frontmatter;
             }
 
-            // Create gallery item from CMS data
-            function createGalleryItem(data) {
-                var item = document.createElement('div');
-                item.className = 'gallery-item';
-                item.setAttribute('data-category', data.category);
-                item.setAttribute('data-case-title', data.title || '');
-                item.setAttribute('data-case-category', data.categoryLabel || '');
-                item.setAttribute('data-case-image', data.image || '');
-                item.setAttribute('data-case-body', data.body || '');
-                item.setAttribute('data-case-gallery', JSON.stringify(data.gallery || (data.image ? [{ image: data.image }] : [])));
-                
-                var img = document.createElement('img');
-                var rawImg = (data.image || '').trim();
-                var imgSrc = (rawImg.indexOf('/') === 0 || rawImg.indexOf('http') === 0) ? rawImg : ('/' + rawImg.replace(/^\//, ''));
-                img.src = imgSrc;
-                img.alt = data.title || '제작사례';
-                img.loading = 'lazy';
-                img.decoding = 'async';
-                
-                item.appendChild(img);
-                
-                // Add click event
-                item.addEventListener('click', function() {
-                    openCaseModal(data);
-                });
-                
-                return item;
-            }
-
-            // Load cases from GitHub
-            function loadCases() {
-                // GitHub API: Get folder contents
+            // content/cases 폴더에서 마크다운 기반 제작사례 목록 반환 (Promise). 파일명은 전부 콘텐츠에서 로드.
+            window.loadCasesFromContent = function() {
                 var apiUrl = 'https://api.github.com/repos/dreamev5031/dreamev/contents/public/content/cases';
-                
-                fetch(apiUrl)
+                return fetch(apiUrl)
                     .then(function(response) {
-                        if (!response.ok) {
-                            throw new Error('Failed to load cases');
-                        }
+                        if (!response.ok) return [];
                         return response.json();
                     })
                     .then(function(files) {
-                        // Filter markdown files
-                        var mdFiles = files.filter(function(file) {
-                            return file.type === 'file' && file.name.endsWith('.md');
-                        });
-
-                        if (mdFiles.length === 0) {
-                            console.log('No CMS cases found');
-                            return;
-                        }
-
-                        // Load each markdown file
-                        var promises = mdFiles.map(function(file) {
+                        var mdFiles = (files || []).filter(function(f) { return f.type === 'file' && f.name && f.name.endsWith('.md'); });
+                        if (mdFiles.length === 0) return [];
+                        return Promise.all(mdFiles.map(function(file) {
                             return fetch(file.download_url)
-                                .then(function(response) { return response.text(); })
+                                .then(function(r) { return r.text(); })
                                 .then(function(content) {
                                     var frontmatter = parseFrontmatter(content);
-                                    var category = categoryMap[frontmatter.category] || frontmatter.category.toLowerCase();
+                                    var category = categoryMap[frontmatter.category] || (frontmatter.category || '').toLowerCase();
                                     var galleryList = frontmatter.gallery && Array.isArray(frontmatter.gallery) ? frontmatter.gallery : (frontmatter.image ? [{ image: frontmatter.image }] : []);
                                     var firstImage = (galleryList[0] && galleryList[0].image) || frontmatter.image || '';
                                     return {
@@ -319,46 +249,42 @@
                                         body: frontmatter.body || ''
                                     };
                                 })
-                                .catch(function(err) {
-                                    console.error('Error loading file:', file.name, err);
-                                    return null;
-                                });
+                                .catch(function() { return null; });
+                        })).then(function(cases) {
+                            return (cases || []).filter(function(c) { return c && ((c.gallery && c.gallery.length) || c.image); });
                         });
-
-                        Promise.all(promises)
-                            .then(function(cases) {
-                                // Filter out null values
-                                cases = cases.filter(function(c) { return c && ((c.gallery && c.gallery.length) || c.image); });
-                                
-                                // Create gallery items and prepend to gallery (CMS items appear first)
-                                cases.forEach(function(caseData) {
-                                    var item = createGalleryItem(caseData);
-                                    gallery.insertBefore(item, gallery.firstChild);
-                                });
-
-                                // Update filter to include new CMS items
-                                if (window.filterGallery) {
-                                    window.filterGallery(window.currentFilter || 'all');
-                                }
-                            })
-                            .catch(function(err) {
-                                console.error('Error processing cases:', err);
-                            });
                     })
-                    .catch(function(err) {
-                        console.error('Error loading cases from GitHub:', err);
-                    });
-            }
+                    .catch(function() { return []; });
+            };
 
-            // Load cases on page load
-            loadCases();
+            // public/images, public/images/work 폴더 스캔 → 이미지 파일만 리스트로 반환 (파일명 하드코딩 없음)
+            window.loadImagesFromFolders = function() {
+                var api = 'https://api.github.com/repos/dreamev5031/dreamev/contents';
+                var ext = /\.(webp|jpg|jpeg|png|gif)$/i;
+                function toItem(entry, prefix) {
+                    var path = prefix ? prefix + '/' + entry.name : entry.name;
+                    return { title: '제작사례', category: 'custom', categoryLabel: '맞춤제작', image: path, gallery: [{ image: path }], date: '', body: '' };
+                }
+                return Promise.all([
+                    fetch(api + '/public/images').then(function(r) { return r.ok ? r.json() : []; }).catch(function() { return []; }),
+                    fetch(api + '/public/images/work').then(function(r) { return r.ok ? r.json() : []; }).catch(function() { return []; })
+                ]).then(function(results) {
+                    var list = [];
+                    (results[0] || []).forEach(function(f) {
+                        if (f.type === 'file' && ext.test(f.name)) list.push(toItem(f, 'images'));
+                    });
+                    (results[1] || []).forEach(function(f) {
+                        if (f.type === 'file' && ext.test(f.name)) list.push(toItem(f, 'images/work'));
+                    });
+                    return list;
+                });
+            };
         })();
 
         // Modal functionality
         (function() {
             var modal = document.getElementById('caseModal');
             var modalClose = document.getElementById('modalClose');
-            var modalImage = document.getElementById('modalImage');
             var modalCategory = document.getElementById('modalCategory');
             var modalTitle = document.getElementById('modalTitle');
             var modalContent = document.getElementById('modalContent');
@@ -584,13 +510,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 정적 플레이스홀더 제거 — 갤러리는 cases.json( content/cases/*.md ) 데이터만 표시
-    var staticPlaceholders = '';
-
     function renderGallery(list) {
         if (!caseGallery) return;
+        var items = list || [];
         var jsonHtml = '';
-        (list || []).forEach(function(item, i) {
+        items.forEach(function(item, i) {
             var gallery = item.gallery && Array.isArray(item.gallery) ? item.gallery : (item.image ? [{ image: item.image }] : []);
             var thumbSrc = (gallery[0] && gallery[0].image) ? gallery[0].image : item.image;
             if (!thumbSrc) return;
@@ -600,7 +524,8 @@ document.addEventListener('DOMContentLoaded', () => {
             jsonHtml += '<img src="' + thumbPath + '" alt="' + (item.title || '').replace(/"/g, '&quot;') + '" loading="lazy">';
             jsonHtml += '</div>';
         });
-        caseGallery.innerHTML = staticPlaceholders + jsonHtml;
+        if (!jsonHtml) jsonHtml = '<p class="gallery-empty-msg">등록된 제작사례가 없습니다. Admin에서 추가하거나 <code>public/images</code>에 이미지를 넣어보세요.</p>';
+        caseGallery.innerHTML = jsonHtml;
     }
 
     function setupCategoryCards() {
@@ -656,18 +581,44 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    fetch('/cases.json')
-        .then(function(r) { return r.ok ? r.json() : []; })
-        .then(function(list) {
-            window.allCasesData = list || [];
-            renderGallery(Array.isArray(list) ? list : []);
+    // 데이터 소스: (1) content/cases 마크다운 (2) cases.json. 없으면 (3) public/images 폴더 스캔. 파일명은 모두 데이터/API에서만 로드.
+    var jsonPromise = fetch('/cases.json').then(function(r) { return r.ok ? r.json() : []; }).catch(function() { return []; });
+    var contentPromise = window.loadCasesFromContent ? window.loadCasesFromContent() : Promise.resolve([]);
+    Promise.all([jsonPromise, contentPromise])
+        .then(function(results) {
+            var jsonList = Array.isArray(results[0]) ? results[0] : [];
+            var contentList = Array.isArray(results[1]) ? results[1] : [];
+            var merged = contentList.concat(jsonList);
+            if (merged.length === 0 && window.loadImagesFromFolders) {
+                return window.loadImagesFromFolders().then(function(folderList) {
+                    window.allCasesData = folderList || [];
+                    renderGallery(window.allCasesData);
+                    setupCategoryCards();
+                    setupGalleryClicks();
+                });
+            }
+            window.allCasesData = merged;
+            renderGallery(merged);
             setupCategoryCards();
             setupGalleryClicks();
         })
         .catch(function() {
-            renderGallery([]);
-            setupCategoryCards();
-            setupGalleryClicks();
+            if (window.loadImagesFromFolders) {
+                window.loadImagesFromFolders().then(function(folderList) {
+                    window.allCasesData = folderList || [];
+                    renderGallery(window.allCasesData);
+                    setupCategoryCards();
+                    setupGalleryClicks();
+                }).catch(function() {
+                    renderGallery([]);
+                    setupCategoryCards();
+                    setupGalleryClicks();
+                });
+            } else {
+                renderGallery([]);
+                setupCategoryCards();
+                setupGalleryClicks();
+            }
         });
 });
 </script>
