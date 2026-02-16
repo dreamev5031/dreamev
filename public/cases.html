@@ -260,12 +260,20 @@
                                         image: firstImage,
                                         gallery: galleryList,
                                         date: frontmatter.date || '',
-                                        body: frontmatter.body || ''
+                                        body: frontmatter.body || '',
+                                        _filename: file.name || ''
                                     };
                                 })
                                 .catch(function() { return null; });
                         })).then(function(cases) {
-                            return (cases || []).filter(function(c) { return c && ((c.gallery && c.gallery.length) || c.image); });
+                            var list = (cases || []).filter(function(c) { return c && ((c.gallery && c.gallery.length) || c.image); });
+                            list.sort(function(a, b) {
+                                var aT = (a.date && new Date(a.date).getTime()) || 0;
+                                var bT = (b.date && new Date(b.date).getTime()) || 0;
+                                if (bT !== aT) return bT - aT;
+                                return (b._filename || '').localeCompare(a._filename || '', undefined, { numeric: true });
+                            });
+                            return list;
                         });
                     })
                     .catch(function() { return []; });
@@ -574,7 +582,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 제작사례 데이터: content/cases 마크다운만 사용. 폴더 스캔·cases.json 미사용. CMS에 발행된 게시물(md)의 Frontmatter 이미지만 표시.
+    // 제작사례 데이터: content/cases 마크다운만 사용. date 내림차순(최신 먼저), 동일 시 파일명 내림차순.
     var contentPromise = window.loadCasesFromContent ? window.loadCasesFromContent() : Promise.resolve([]);
     contentPromise
         .then(function(contentList) {
