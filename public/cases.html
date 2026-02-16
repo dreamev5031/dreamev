@@ -143,6 +143,9 @@
             <button type="button" class="case-modal-close" id="modalClose" aria-label="닫기">&times;</button>
             <div class="case-modal-image-wrap">
                 <img id="modalImage" class="case-modal-image" src="" alt="">
+                <button type="button" class="case-modal-nav case-modal-prev" id="modalPrev" aria-label="이전 사진" style="display:none;">&#10094;</button>
+                <button type="button" class="case-modal-nav case-modal-next" id="modalNext" aria-label="다음 사진" style="display:none;">&#10095;</button>
+                <div class="case-modal-dots" id="modalDots"></div>
             </div>
             <div class="case-modal-body">
                 <div class="case-modal-header">
@@ -215,7 +218,7 @@
 
         // Load CMS cases data
         (function() {
-            var gallery = document.getElementById('gallery');
+            var gallery = document.getElementById('caseGallery');
             if (!gallery) return;
 
             // Category mapping: 한글 -> 영문
@@ -253,11 +256,11 @@
                 var item = document.createElement('div');
                 item.className = 'gallery-item';
                 item.setAttribute('data-category', data.category);
-                // Store case data for modal
                 item.setAttribute('data-case-title', data.title || '');
                 item.setAttribute('data-case-category', data.categoryLabel || '');
                 item.setAttribute('data-case-image', data.image || '');
                 item.setAttribute('data-case-body', data.body || '');
+                item.setAttribute('data-case-gallery', JSON.stringify(data.gallery || (data.image ? [{ image: data.image }] : [])));
                 
                 var img = document.createElement('img');
                 img.src = data.image;
@@ -305,12 +308,14 @@
                                 .then(function(content) {
                                     var frontmatter = parseFrontmatter(content);
                                     var category = categoryMap[frontmatter.category] || frontmatter.category.toLowerCase();
-                                    
+                                    var galleryList = frontmatter.gallery && Array.isArray(frontmatter.gallery) ? frontmatter.gallery : (frontmatter.image ? [{ image: frontmatter.image }] : []);
+                                    var firstImage = (galleryList[0] && galleryList[0].image) || frontmatter.image || '';
                                     return {
                                         title: frontmatter.title || '',
                                         category: category,
                                         categoryLabel: frontmatter.category || '',
-                                        image: frontmatter.image || '',
+                                        image: firstImage,
+                                        gallery: galleryList,
                                         date: frontmatter.date || '',
                                         body: frontmatter.body || ''
                                     };
@@ -324,7 +329,7 @@
                         Promise.all(promises)
                             .then(function(cases) {
                                 // Filter out null values
-                                cases = cases.filter(function(c) { return c && c.image; });
+                                cases = cases.filter(function(c) { return c && ((c.gallery && c.gallery.length) || c.image); });
                                 
                                 // Create gallery items and prepend to gallery (CMS items appear first)
                                 cases.forEach(function(caseData) {
@@ -368,10 +373,38 @@
                 return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
             }
 
-            // Open modal with case data (이미지 확대, 제목·날짜·상세 설명)
+            // 갤러리 배열을 경로 문자열 배열로 정규화
+            function normalizeGalleryPaths(gallery) {
+                if (!gallery || !gallery.length) return [];
+                return gallery.map(function(item) {
+                    var path = (item && item.image) ? item.image : (typeof item === 'string' ? item : '');
+                    return path.indexOf('/') === 0 ? path : ('/' + path);
+                });
+            }
+
+            var modalGallery = [];
+            var modalGalleryIndex = 0;
+            var modalPrevBtn = document.getElementById('modalPrev');
+            var modalNextBtn = document.getElementById('modalNext');
+            var modalDotsEl = document.getElementById('modalDots');
+
+            function updateModalImageByIndex() {
+                if (!modalGallery.length) return;
+                modalGalleryIndex = Math.max(0, Math.min(modalGalleryIndex, modalGallery.length - 1));
+                modalImage.src = modalGallery[modalGalleryIndex];
+                if (modalDotsEl) {
+                    var dots = modalDotsEl.querySelectorAll('.case-modal-dot');
+                    dots.forEach(function(d, i) { d.classList.toggle('active', i === modalGalleryIndex); });
+                }
+            }
+
+            // Open modal with case data (이미지 확대, 제목·날짜·상세 설명). gallery 배열이 있으면 여러 장 슬라이드.
             window.openCaseModal = function(caseData) {
                 if (!modal) return;
-                var imgSrc = (caseData.image || '').indexOf('/') === 0 ? caseData.image : ('/' + (caseData.image || ''));
+                var gallery = caseData.gallery && Array.isArray(caseData.gallery) ? caseData.gallery : (caseData.image ? [{ image: caseData.image }] : []);
+                modalGallery = normalizeGalleryPaths(gallery);
+                modalGalleryIndex = 0;
+                var imgSrc = modalGallery.length ? modalGallery[0] : ((caseData.image || '').indexOf('/') === 0 ? caseData.image : ('/' + (caseData.image || '')));
                 modalImage.src = imgSrc;
                 modalImage.alt = caseData.title || '제작사례';
                 modalTitle.textContent = caseData.title || '제작사례';
@@ -383,6 +416,21 @@
                     modalContent.innerHTML = marked.parse(bodyContent);
                 } else {
                     modalContent.innerHTML = bodyContent ? ('<p>' + bodyContent.replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>') + '</p>') : '';
+                }
+                if (modalPrevBtn) { modalPrevBtn.style.display = modalGallery.length > 1 ? '' : 'none'; modalPrevBtn.onclick = function() { modalGalleryIndex--; updateModalImageByIndex(); }; }
+                if (modalNextBtn) { modalNextBtn.style.display = modalGallery.length > 1 ? '' : 'none'; modalNextBtn.onclick = function() { modalGalleryIndex++; updateModalImageByIndex(); }; }
+                if (modalDotsEl) {
+                    modalDotsEl.innerHTML = '';
+                    if (modalGallery.length > 1) {
+                        for (var i = 0; i < modalGallery.length; i++) {
+                            var dot = document.createElement('button');
+                            dot.type = 'button';
+                            dot.className = 'case-modal-dot' + (i === 0 ? ' active' : '');
+                            dot.setAttribute('aria-label', '사진 ' + (i + 1));
+                            (function(idx) { dot.addEventListener('click', function() { modalGalleryIndex = idx; updateModalImageByIndex(); }); })(i);
+                            modalDotsEl.appendChild(dot);
+                        }
+                    }
                 }
                 modal.classList.add('active');
                 modal.setAttribute('aria-hidden', 'false');
@@ -551,10 +599,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!caseGallery) return;
         var jsonHtml = '';
         (list || []).forEach(function(item, i) {
-            if (!item.image) return;
+            var gallery = item.gallery && Array.isArray(item.gallery) ? item.gallery : (item.image ? [{ image: item.image }] : []);
+            var thumbSrc = (gallery[0] && gallery[0].image) ? gallery[0].image : item.image;
+            if (!thumbSrc) return;
             var categoryNorm = norm(item.category || '');
-            jsonHtml += '<div class="gallery-item" data-category="' + (item.slug || '') + '" data-category-norm="' + categoryNorm + '" data-case-index="' + i + '">';
-            jsonHtml += '<img src="/' + item.image + '" alt="' + (item.title || '').replace(/"/g, '&quot;') + '" loading="lazy">';
+            var thumbPath = thumbSrc.indexOf('/') === 0 ? thumbSrc : '/' + thumbSrc;
+            jsonHtml += '<div class="gallery-item" data-category="' + (item.slug || '') + '" data-category-norm="' + categoryNorm + '" data-case-index="' + i + '" data-case-gallery="' + (JSON.stringify(gallery).replace(/"/g, '&quot;')) + '">';
+            jsonHtml += '<img src="' + thumbPath + '" alt="' + (item.title || '').replace(/"/g, '&quot;') + '" loading="lazy">';
             jsonHtml += '</div>';
         });
         caseGallery.innerHTML = staticPlaceholders + jsonHtml;
@@ -575,7 +626,7 @@ document.addEventListener('DOMContentLoaded', () => {
         filterGallery('all');
     }
 
-    // 갤러리 이미지 클릭 → 상세 모달 열기 (cases.json 데이터 또는 플레이스홀더)
+    // 갤러리 이미지 클릭 → 상세 모달 열기 (cases.json 데이터 또는 data-case-gallery)
     function setupGalleryClicks() {
         if (!caseGallery) return;
         caseGallery.addEventListener('click', function(e) {
@@ -584,11 +635,30 @@ document.addEventListener('DOMContentLoaded', () => {
             var idx = item.getAttribute('data-case-index');
             var data;
             if (idx !== null && idx !== '' && window.allCasesData && window.allCasesData[parseInt(idx, 10)]) {
-                data = window.allCasesData[parseInt(idx, 10)];
-                data = { title: data.title, image: '/' + (data.image || ''), date: data.date, description: data.description, categoryLabel: data.category, category: data.category };
+                var raw = window.allCasesData[parseInt(idx, 10)];
+                data = {
+                    title: raw.title,
+                    image: (raw.image && raw.image.indexOf('/') === 0) ? raw.image : ('/' + (raw.image || '')),
+                    gallery: raw.gallery || (raw.image ? [{ image: raw.image }] : []),
+                    date: raw.date,
+                    description: raw.description,
+                    body: raw.body,
+                    categoryLabel: raw.category,
+                    category: raw.category
+                };
             } else {
                 var img = item.querySelector('img');
-                data = { title: img ? img.alt : '', image: img ? img.src : '', date: '', description: '', categoryLabel: '' };
+                var galleryJson = item.getAttribute('data-case-gallery');
+                var gallery = galleryJson ? (function() { try { return JSON.parse(galleryJson.replace(/&quot;/g, '"')); } catch (e) { return []; } })() : (img ? [{ image: img.src }] : []);
+                data = {
+                    title: item.getAttribute('data-case-title') || (img ? img.alt : ''),
+                    image: img ? img.src : '',
+                    gallery: gallery,
+                    date: '',
+                    description: item.getAttribute('data-case-body') || '',
+                    body: item.getAttribute('data-case-body') || '',
+                    categoryLabel: item.getAttribute('data-case-category') || ''
+                };
             }
             if (window.openCaseModal) window.openCaseModal(data);
         });
