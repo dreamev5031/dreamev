@@ -79,7 +79,7 @@
         <div class="case-gallery-wrap">
             <p class="gallery-label">선택한 카테고리의 제작 사례</p>
             <div class="gallery" id="caseGallery" data-dynamic="true">
-                <!-- 갤러리 항목은 content/cases 데이터·cases.json·이미지 폴더 스캔으로만 동적 생성됩니다. 파일명 하드코딩 없음. -->
+                <!-- 갤러리 항목은 각 제작사례 Frontmatter(또는 cases.json)의 gallery/image만 사용. CMS에서 선택한 이미지만 표시. -->
             </div>
         </div>
     </section>
@@ -207,14 +207,28 @@
                     var fmText = match[1];
                     body = match[2] || '';
                     var lines = fmText.split('\n');
-                    lines.forEach(function(line) {
+                    for (var i = 0; i < lines.length; i++) {
+                        var line = lines[i];
+                        if (line.match(/^gallery\s*:\s*$/)) {
+                            frontmatter.gallery = [];
+                            i++;
+                            while (i < lines.length) {
+                                var m = lines[i].match(/^\s*-\s*image\s*:\s*(.+)$/);
+                                if (m) {
+                                    frontmatter.gallery.push({ image: m[1].trim().replace(/^["']|["']$/g, '') });
+                                    i++;
+                                } else break;
+                            }
+                            i--;
+                            continue;
+                        }
                         var colonIndex = line.indexOf(':');
-                        if (colonIndex > 0) {
+                        if (colonIndex > 0 && !line.match(/^\s/)) {
                             var key = line.substring(0, colonIndex).trim();
                             var value = line.substring(colonIndex + 1).trim().replace(/^["']|["']$/g, '');
-                            frontmatter[key] = value;
+                            if (key !== 'gallery') frontmatter[key] = value;
                         }
-                    });
+                    }
                 }
                 frontmatter.body = body;
                 return frontmatter;
@@ -257,28 +271,7 @@
                     .catch(function() { return []; });
             };
 
-            // 정적 사이트용 동적 가져오기: GitHub API로 public/images, public/images/work 스캔 → 이미지 파일만 리스트 반환. 폴더에 이미지만 넣으면 갤러리에 자동 표시(fs/glob 대신 API 사용).
-            window.loadImagesFromFolders = function() {
-                var api = 'https://api.github.com/repos/dreamev5031/dreamev/contents';
-                var ext = /\.(webp|jpg|jpeg|png|gif)$/i;
-                function toItem(entry, prefix) {
-                    var path = prefix ? prefix + '/' + entry.name : entry.name;
-                    return { title: '제작사례', category: 'custom', categoryLabel: '맞춤제작', image: path, gallery: [{ image: path }], date: '', body: '' };
-                }
-                return Promise.all([
-                    fetch(api + '/public/images').then(function(r) { return r.ok ? r.json() : []; }).catch(function() { return []; }),
-                    fetch(api + '/public/images/work').then(function(r) { return r.ok ? r.json() : []; }).catch(function() { return []; })
-                ]).then(function(results) {
-                    var list = [];
-                    (results[0] || []).forEach(function(f) {
-                        if (f.type === 'file' && ext.test(f.name)) list.push(toItem(f, 'images'));
-                    });
-                    (results[1] || []).forEach(function(f) {
-                        if (f.type === 'file' && ext.test(f.name)) list.push(toItem(f, 'images/work'));
-                    });
-                    return list;
-                });
-            };
+            // 폴더 스캔(glob/fs) 없음. 제작사례 이미지는 Frontmatter(또는 cases.json)의 gallery/image 필드만 사용.
         })();
 
         // Modal functionality
@@ -524,7 +517,7 @@ document.addEventListener('DOMContentLoaded', () => {
             jsonHtml += '<img src="' + thumbPath + '" alt="' + (item.title || '').replace(/"/g, '&quot;') + '" loading="lazy">';
             jsonHtml += '</div>';
         });
-        if (!jsonHtml) jsonHtml = '<p class="gallery-empty-msg">등록된 제작사례가 없습니다. Admin에서 추가하거나 <code>public/images</code>에 이미지를 넣어보세요.</p>';
+        if (!jsonHtml) jsonHtml = '<p class="gallery-empty-msg">등록된 제작사례가 없습니다. Admin(CMS)에서 제작사례를 추가하고 이미지 갤러리에 표시할 사진을 선택해 주세요.</p>';
         caseGallery.innerHTML = jsonHtml;
     }
 
@@ -581,32 +574,24 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 동적 가져오기: (1) content/cases (2) cases.json (3) public/images·public/images/work 폴더 스캔(GitHub API). 이미지만 폴더에 넣어도 갤러리에 자동 표시.
+    // 제작사례 데이터: Frontmatter(content/cases 마크다운) + cases.json만 사용. 폴더 스캔 없음. CMS에서 선택한 이미지(gallery)만 표시.
     var jsonPromise = fetch('/cases.json').then(function(r) { return r.ok ? r.json() : []; }).catch(function() { return []; });
     var contentPromise = window.loadCasesFromContent ? window.loadCasesFromContent() : Promise.resolve([]);
-    var folderPromise = window.loadImagesFromFolders ? window.loadImagesFromFolders() : Promise.resolve([]);
-    Promise.all([jsonPromise, contentPromise, folderPromise])
+    Promise.all([jsonPromise, contentPromise])
         .then(function(results) {
             var jsonList = Array.isArray(results[0]) ? results[0] : [];
             var contentList = Array.isArray(results[1]) ? results[1] : [];
-            var folderList = Array.isArray(results[2]) ? results[2] : [];
-            var merged = contentList.concat(jsonList).concat(folderList);
+            var merged = contentList.concat(jsonList);
             window.allCasesData = merged;
             renderGallery(merged);
             setupCategoryCards();
             setupGalleryClicks();
         })
         .catch(function() {
-            window.loadImagesFromFolders ? window.loadImagesFromFolders().then(function(folderList) {
-                window.allCasesData = folderList || [];
-                renderGallery(window.allCasesData);
-                setupCategoryCards();
-                setupGalleryClicks();
-            }).catch(function() {
-                renderGallery([]);
-                setupCategoryCards();
-                setupGalleryClicks();
-            }) : (function() { renderGallery([]); setupCategoryCards(); setupGalleryClicks(); })();
+            window.allCasesData = [];
+            renderGallery([]);
+            setupCategoryCards();
+            setupGalleryClicks();
         });
 });
 </script>
