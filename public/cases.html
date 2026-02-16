@@ -79,7 +79,7 @@
         <div class="case-gallery-wrap">
             <p class="gallery-label">선택한 카테고리의 제작 사례</p>
             <div class="gallery" id="caseGallery" data-dynamic="true">
-                <!-- 갤러리 항목은 각 제작사례 Frontmatter(또는 cases.json)의 gallery/image만 사용. CMS에서 선택한 이미지만 표시. -->
+                <!-- 갤러리: content/cases 마크다운 Frontmatter만 사용. 폴더 스캔·cases.json 미사용. CMS 발행 게시물의 이미지만 표시. -->
             </div>
         </div>
     </section>
@@ -271,7 +271,7 @@
                     .catch(function() { return []; });
             };
 
-            // 폴더 스캔(glob/fs) 없음. 제작사례 이미지는 Frontmatter(또는 cases.json)의 gallery/image 필드만 사용.
+            // 폴더 스캔(glob/fs) 없음. 제작사례는 content/cases 마크다운 Frontmatter의 gallery/image만 사용.
         })();
 
         // Modal functionality
@@ -465,7 +465,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 제작 사례 갤러리: cases.json + 정적 플레이스홀더. 카테고리 매칭은 띄어쓰기 무시(버튼 "산업용 전동차" ↔ JSON "산업용")
+    // 제작 사례 갤러리: content/cases 마크다운만 사용. 카테고리 매칭은 띄어쓰기 무시.
     var categoryNav = document.getElementById('caseCategoryNav');
     var caseGallery = document.getElementById('caseGallery');
     var btnAllCases = document.getElementById('btnAllCases');
@@ -536,7 +536,7 @@ document.addEventListener('DOMContentLoaded', () => {
         filterGallery('all');
     }
 
-    // 갤러리 이미지 클릭 → 상세 모달 열기 (cases.json 데이터 또는 data-case-gallery)
+    // 갤러리 이미지 클릭 → 상세 모달 열기 (allCasesData 또는 data-case-gallery)
     function setupGalleryClicks() {
         if (!caseGallery) return;
         caseGallery.addEventListener('click', function(e) {
@@ -574,16 +574,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 제작사례 데이터: Frontmatter(content/cases 마크다운) + cases.json만 사용. 폴더 스캔 없음. CMS에서 선택한 이미지(gallery)만 표시.
-    var jsonPromise = fetch('/cases.json').then(function(r) { return r.ok ? r.json() : []; }).catch(function() { return []; });
+    // 제작사례 데이터: content/cases 마크다운만 사용. 폴더 스캔·cases.json 미사용. CMS에 발행된 게시물(md)의 Frontmatter 이미지만 표시.
     var contentPromise = window.loadCasesFromContent ? window.loadCasesFromContent() : Promise.resolve([]);
-    Promise.all([jsonPromise, contentPromise])
-        .then(function(results) {
-            var jsonList = Array.isArray(results[0]) ? results[0] : [];
-            var contentList = Array.isArray(results[1]) ? results[1] : [];
-            var merged = contentList.concat(jsonList);
-            window.allCasesData = merged;
-            renderGallery(merged);
+    contentPromise
+        .then(function(contentList) {
+            var list = Array.isArray(contentList) ? contentList : [];
+            window.allCasesData = list;
+            renderGallery(list);
             setupCategoryCards();
             setupGalleryClicks();
         })
