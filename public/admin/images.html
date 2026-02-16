@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>이미지 URL 목록 - 드림전동차 Admin</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 900px; margin: 2rem auto; padding: 0 1rem; }
+    h1 { font-size: 1.25rem; }
+    .back { margin-bottom: 1rem; }
+    .back a { color: #0066cc; }
+    section { margin: 1.5rem 0; }
+    section h2 { font-size: 1rem; margin-bottom: 0.5rem; }
+    ul { list-style: none; padding: 0; }
+    li { margin: 0.25rem 0; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+    .url { font-family: monospace; font-size: 0.85rem; background: #f0f0f0; padding: 0.2rem 0.4rem; border-radius: 4px; word-break: break-all; }
+    .copy { font-size: 0.8rem; cursor: pointer; color: #0066cc; }
+    .copy:hover { text-decoration: underline; }
+    .loading, .error { color: #666; font-style: italic; }
+    .error { color: #c00; }
+  </style>
+</head>
+<body>
+  <div class="back"><a href="index.html">← Admin(Decap CMS)으로 돌아가기</a></div>
+  <h1>이미지 URL 목록</h1>
+  <p>미디어 라이브러리에서 파일이 안 보일 때, 아래 URL을 복사해 Decap CMS 이미지 필드의 <strong>「URL로 삽입」</strong>에 붙여 넣으세요.</p>
+  <p><strong>기본 URL:</strong> <span class="url">https://dreamev.kr/images/</span> 또는 <span class="url">https://dreamev.kr/images/work/</span></p>
+
+  <section>
+    <h2>public/images (루트)</h2>
+    <ul id="list-root"></ul>
+    <p id="loading-root" class="loading">불러오는 중…</p>
+    <p id="error-root" class="error" style="display:none;"></p>
+  </section>
+  <section>
+    <h2>public/images/work</h2>
+    <ul id="list-work"></ul>
+    <p id="loading-work" class="loading">불러오는 중…</p>
+    <p id="error-work" class="error" style="display:none;"></p>
+  </section>
+
+  <script>
+    var base = 'https://dreamev.kr';
+    var api = 'https://api.github.com/repos/dreamev5031/dreamev/contents';
+
+    function render(listId, loadingId, errorId, folder, publicPath) {
+      var ul = document.getElementById(listId);
+      var loading = document.getElementById(loadingId);
+      var errEl = document.getElementById(errorId);
+      fetch(api + '/' + folder)
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          loading.style.display = 'none';
+          if (Array.isArray(data)) {
+            data.filter(function (x) { return x.type === 'file'; }).forEach(function (f) {
+              var url = base + '/' + publicPath + '/' + f.name;
+              var li = document.createElement('li');
+              li.innerHTML = '<span class="url">' + url + '</span> <span class="copy" data-url="' + url + '">복사</span>';
+              li.querySelector('.copy').onclick = function () {
+                navigator.clipboard.writeText(url);
+                this.textContent = '복사됨';
+                setTimeout(function () { this.textContent = '복사'; }.bind(this), 1500);
+              };
+              ul.appendChild(li);
+            });
+            if (ul.children.length === 0) { ul.innerHTML = '<li class="loading">(파일 없음)</li>'; }
+          } else {
+            errEl.textContent = data.message || '목록을 불러올 수 없습니다.';
+            errEl.style.display = 'block';
+          }
+        })
+        .catch(function (e) {
+          loading.style.display = 'none';
+          errEl.textContent = '오류: ' + e.message;
+          errEl.style.display = 'block';
+        });
+    }
+    render('list-root', 'loading-root', 'error-root', 'public/images', 'images');
+    render('list-work', 'loading-work', 'error-work', 'public/images/work', 'images/work');
+  </script>
+</body>
+</html>

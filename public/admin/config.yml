@@ -21,12 +21,13 @@ collections:
     fields:
       - {label: "제목", name: "title", widget: "string"}
       - {label: "카테고리", name: "category", widget: "select", options: ["산업용", "농업용", "다목적", "맞춤제작"]}
-      # 대표 이미지: public/images/work 폴더 사용, webp/jpg/png 등 선택 가능
+      # 대표 이미지: public/images/work 폴더 사용. 미디어 라이브러리가 비어 보이면 'URL로 삽입' 또는 아래 이미지 목록 페이지 사용
       - label: "대표 이미지"
         name: "image"
         widget: "image"
         media_folder: "public/images/work"
         public_folder: "images/work"
-        hint: "images/work 폴더의 webp 파일을 선택하거나 새로 올리세요."
+        choose_url: true
+        hint: "미디어가 안 보이면 'URL로 삽입'에 https://dreamev.kr/images/work/파일명.webp 입력. 목록은 /admin/images.html 참고."
       - {label: "작업 날짜", name: "date", widget: "datetime"}
       - {label: "상세 내용", name: "body", widget: "markdown"}
