@@ -1,0 +1,2 @@
+# 제작사례용 이미지 넣는 폴더 (jpg/png 넣고 scripts/convert_to_webp.py 실행 → webp 변환)
+# choose image 할 때 이 폴더 안 파일이 나오도록 경로를 public/images/work 로 지정하면 됨

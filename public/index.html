@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>드림전동차 - 산업용 전동차</title>
+    <link rel="stylesheet" href="css/style.css?v=20260214-999">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
+</head>
+<body>
+    <!-- GNB -->
+    <header class="gnb">
+        <a href="index.html" class="gnb-logo main-logo-link">
+            <img src="images/logo.png" alt="DREAM EV 드림전동차" class="logo-img">
+        </a>
+
+        <nav class="gnb-nav">
+            <ul class="mobile-menu-list">
+                <li><a href="about.html">회사소개</a></li>
+                <li><a href="cases.html">제작사례</a></li>
+                <li><a href="support.html">고객센터</a></li>
+                <li><a href="contact.html">견적문의</a></li>
+            </ul>
+        </nav>
+
+        <button class="mobile-menu-toggle" aria-label="메뉴 열기">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+
+        <a href="contact.html" class="header-btn btn-primary">견적문의</a>
+    </header>
+
+    <!-- Hero Slider -->
+    <section class="hero">
+        <div class="hero-slider" id="heroSlider">
+            <div class="hero-slide active" style="background-image: url('images/main1.webp');">
+                <div class="hero-content">
+                    <h1 class="hero-main-copy">녹슬지 않는 기술력, 현장의 답을 아는 기술자가 만듭니다.</h1>
+                    <p class="hero-sub-copy">
+                        전 기종 <span class="highlight-text">올 스테인리스(All Stainless)</span> 바디와 <span class="highlight-text">검증된 국산 컨트롤러</span> 탑재로 압도적인 내구성을 실현했습니다.
+                    </p>
+                    <a href="cases.html" class="hero-cta-btn">제작사례 및 견적문의 바로가기</a>
+                </div>
+            </div>
+            <div class="hero-slide" style="background-image: url('images/main2.webp');">
+                <div class="hero-content">
+                    <h1 class="hero-main-copy">녹슬지 않는 기술력, 현장의 답을 아는 기술자가 만듭니다.</h1>
+                    <p class="hero-sub-copy">
+                        전 기종 <span class="highlight-text">올 스테인리스(All Stainless)</span> 바디와 <span class="highlight-text">검증된 국산 컨트롤러</span> 탑재로 압도적인 내구성을 실현했습니다.
+                    </p>
+                    <a href="cases.html" class="hero-cta-btn">제작사례 및 견적문의 바로가기</a>
+                </div>
+            </div>
+            <div class="hero-slide" style="background-image: url('images/main3.webp');">
+                <div class="hero-content">
+                    <h1 class="hero-main-copy">녹슬지 않는 기술력, 현장의 답을 아는 기술자가 만듭니다.</h1>
+                    <p class="hero-sub-copy">
+                        전 기종 <span class="highlight-text">올 스테인리스(All Stainless)</span> 바디와 <span class="highlight-text">검증된 국산 컨트롤러</span> 탑재로 압도적인 내구성을 실현했습니다.
+                    </p>
+                    <a href="cases.html" class="hero-cta-btn">제작사례 및 견적문의 바로가기</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 드림전동차 대표 모델 TOP 3 -->
+    <section class="featured-section" id="featured-models">
+        <div class="featured-section-header">
+            <h2>드림전동차 대표 모델 TOP 3</h2>
+            <p>검증된 성능과 내구성, 현장에 최적화된 라인업을 만나보세요.</p>
+        </div>
+        <div class="featured-model-grid">
+            <div class="model-card">
+                <div class="model-card-image-wrap">
+                    <img src="images/main1.webp" alt="전동 지게차 A-1" loading="lazy">
+                </div>
+                <div class="model-card-body">
+                    <h3>전동 지게차 A-1</h3>
+                    <ul class="model-specs">
+                        <li>적재중량 <strong>2.5 Ton</strong></li>
+                        <li>주행거리 <strong>150km</strong></li>
+                        <li>48V / 500Ah</li>
+                    </ul>
+                    <button type="button" class="model-card-cta-btn" data-model="model-a1">상세 스펙 보기</button>
+                </div>
+            </div>
+            <div class="model-card">
+                <div class="model-card-image-wrap">
+                    <img src="images/main2.webp" alt="다목적 전동 카트 B-3" loading="lazy">
+                </div>
+                <div class="model-card-body">
+                    <h3>다목적 전동 카트 B-3</h3>
+                    <ul class="model-specs">
+                        <li>탑승 <strong>4인</strong></li>
+                        <li>주행거리 <strong>100km</strong></li>
+                        <li>48V / 300Ah</li>
+                    </ul>
+                    <button type="button" class="model-card-cta-btn" data-model="model-b3">상세 스펙 보기</button>
+                </div>
+            </div>
+            <div class="model-card">
+                <div class="model-card-image-wrap">
+                    <img src="images/main3.webp" alt="대형 전동 운반차 C-MAX" loading="lazy">
+                </div>
+                <div class="model-card-body">
+                    <h3>대형 전동 운반차 C-MAX</h3>
+                    <ul class="model-specs">
+                        <li>적재중량 <strong>5 Ton</strong></li>
+                        <li>주행거리 <strong>120km</strong></li>
+                        <li>72V / 800Ah</li>
+                    </ul>
+                    <button type="button" class="model-card-cta-btn" data-model="model-cmax">상세 스펙 보기</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Process Section: 제작 프로세스 (PC: 화살표 흐름) -->
+    <section class="process-section">
+        <div class="process-header">
+            <h2>드림전동차 제작 프로세스</h2>
+            <p>상담부터 사후관리까지, 원스톱으로 책임집니다.</p>
+        </div>
+        <div class="process-container">
+            <div class="process-step">
+                <div class="step-icon"><i class="fas fa-comments"></i></div>
+                <span class="step-num">STEP 01</span>
+                <h3>상담 및 견적</h3>
+                <p>사용 목적과 현장 환경에 맞춰<br>최적의 모델과 스펙을 제안합니다.</p>
+            </div>
+            <div class="process-step">
+                <div class="step-icon"><i class="fas fa-pencil-ruler"></i></div>
+                <span class="step-num">STEP 02</span>
+                <h3>현장 맞춤 설계</h3>
+                <p>좁은 농로, 경사지 등 작업 환경을<br>정밀 분석하여 1:1 맞춤 설계합니다.</p>
+            </div>
+            <div class="process-step">
+                <div class="step-icon"><i class="fas fa-tools"></i></div>
+                <span class="step-num">STEP 03</span>
+                <h3>정밀 제작 & 검수</h3>
+                <p>부식 없는 <strong>올 스테인리스</strong>와<br>검증된 <strong>국산 부품</strong>으로 제작합니다.</p>
+            </div>
+            <div class="process-step">
+                <div class="step-icon"><i class="fas fa-truck-loading"></i></div>
+                <span class="step-num">STEP 04</span>
+                <h3>납품 및 A/S</h3>
+                <p><strong>1년 무상 A/S</strong> 제공 후,<br>평생 유상 관리로 끝까지 책임집니다.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 대표 모델 상세 스펙 팝업: 좌측 슬라이더 / 우측 제원표 -->
+    <div class="featured-modal" id="featuredModelModal" aria-hidden="true">
+        <div class="featured-modal-overlay"></div>
+        <div class="featured-modal-content">
+            <div class="featured-modal-left">
+                <div class="featured-modal-slider-wrap">
+                    <button type="button" class="featured-modal-slider-prev" aria-label="이전 이미지">&lsaquo;</button>
+                    <div class="featured-modal-slider">
+                        <img id="featuredModalImage" src="" alt="">
+                    </div>
+                    <button type="button" class="featured-modal-slider-next" aria-label="다음 이미지">&rsaquo;</button>
+                </div>
+                <p class="featured-modal-slider-dots" id="featuredModalDots"></p>
+            </div>
+            <div class="featured-modal-right">
+                <button type="button" class="featured-modal-close" id="featuredModalClose" aria-label="닫기">&times;</button>
+                <h2 class="featured-modal-title" id="featuredModalTitle"></h2>
+                <div class="featured-modal-specs-wrap">
+                    <table class="featured-modal-specs-table" id="featuredModalSpecsTable">
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="common-footer" id="contact">
+        <div class="footer-container">
+            <div class="footer-content">
+                <div class="footer-section brand-section">
+                    <h2>드림전동차</h2>
+                    <p class="slogan">현장이 신뢰하는 기술, 변치 않는 내구성</p>
+                </div>
+                <div class="footer-section contact-section">
+                    <h3>고객지원 센터</h3>
+                    <p class="desc">친절하고 상세하게 안내해 드립니다.</p>
+                    <div class="phone-box">
+                        <a href="tel:010-3789-7653" class="phone-number">010-3789-7653</a>
+                    </div>
+                    <p class="work-time">평일 09:00 - 18:00 (주말/공휴일 휴무)</p>
+                </div>
+                <div class="footer-section info-section">
+                    <h3>사업자 정보</h3>
+                    <address>
+                        <p class="addr">본사/공장 : 경기도 양주시 광적면 부흥로 956번길 174</p>
+                        <p class="biz-info">사업자등록번호 : 560-86-02294 | 대표 : 배창호</p>
+                    </address>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2026 Dream EV. All Rights Reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/script.js"></script>
+    <script>
+        // Mobile Menu Toggle - 기존 코드 주석 처리
+        /*
+        (function() {
+            var menuToggle = document.getElementById('mobileMenuToggle');
+            var menuDrawer = document.getElementById('mobileMenuDrawer');
+            
+            if (!menuToggle || !menuDrawer) return;
+            
+            function toggleMenu() {
+                var isActive = menuDrawer.classList.contains('active');
+                
+                if (isActive) {
+                    menuDrawer.classList.remove('active');
+                    menuToggle.classList.remove('active');
+                    document.body.style.overflow = '';
+                } else {
+                    menuDrawer.classList.add('active');
+                    menuToggle.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                }
+            }
+            
+            function closeMenu() {
+                menuDrawer.classList.remove('active');
+                menuToggle.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+            
+            menuToggle.addEventListener('click', function(e) {
+                e.stopPropagation();
+                toggleMenu();
+            });
+            
+            // Close menu when clicking overlay
+            var overlay = menuDrawer.querySelector('.mobile-menu-overlay');
+            if (overlay) {
+                overlay.addEventListener('click', closeMenu);
+            }
+            
+            // Close menu when clicking menu links
+            var menuLinks = menuDrawer.querySelectorAll('.mobile-menu-list a');
+            menuLinks.forEach(function(link) {
+                link.addEventListener('click', function() {
+                    setTimeout(closeMenu, 100); // Small delay for navigation
+                });
+            });
+            
+            // Close menu on ESC key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && menuDrawer.classList.contains('active')) {
+                    closeMenu();
+                }
+            });
+        })();
+        */
+
+        // Hero auto slider with cross-fade effect
+        (function() {
+            var slider = document.getElementById('heroSlider');
+            if (!slider) return;
+            var slides = slider.querySelectorAll('.hero-slide');
+            var total = slides.length;
+            var idx = 0;
+            
+            // 첫 번째 슬라이드 활성화
+            if (slides.length > 0) {
+                slides[0].classList.add('active');
+            }
+            
+            setInterval(function() {
+                // 현재 슬라이드 비활성화
+                slides[idx].classList.remove('active');
+                
+                // 다음 슬라이드로 이동
+                idx = (idx + 1) % total;
+                
+                // 다음 슬라이드 활성화
+                slides[idx].classList.add('active');
+            }, 5000);
+        })();
+
+        // Scroll reveal for model items (optimized)
+        (function() {
+            var revealEls = document.querySelectorAll('.scroll-reveal');
+            if (revealEls.length === 0) return;
+            
+            var observer = new IntersectionObserver(function(entries) {
+                entries.forEach(function(entry) {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                        // Stop observing once visible for performance
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { rootMargin: '0px 0px -100px 0px', threshold: 0.1 });
+            
+            revealEls.forEach(function(el) { observer.observe(el); });
+        })();
+
+        // Global Footer initialization (only for support.html)
+        (function() {
+            // FAQ Accordion (only if FAQ section exists)
+            var faqItems = document.querySelectorAll('.global-faq-section .faq-item');
+            if (faqItems.length > 0) {
+                faqItems.forEach(function(item) {
+                    var question = item.querySelector('.faq-question');
+                    var answer = item.querySelector('.faq-answer');
+                    var toggle = item.querySelector('.faq-toggle');
+                    
+                    if (!question || !answer || !toggle) return;
+                    
+                    question.addEventListener('click', function() {
+                        var isOpen = item.classList.contains('active');
+                        
+                        // Close all other items
+                        faqItems.forEach(function(otherItem) {
+                            if (otherItem !== item) {
+                                otherItem.classList.remove('active');
+                                var otherToggle = otherItem.querySelector('.faq-toggle');
+                                if (otherToggle) otherToggle.textContent = '+';
+                            }
+                        });
+                        
+                        // Toggle current item
+                        if (isOpen) {
+                            item.classList.remove('active');
+                            toggle.textContent = '+';
+                        } else {
+                            item.classList.add('active');
+                            toggle.textContent = '−';
+                        }
+                    });
+                });
+            }
+
+            // Global Inquiry Form submission (only if form exists)
+            var form = document.getElementById('globalInquiryForm');
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    var formData = new FormData(form);
+                    var data = {};
+                    formData.forEach(function(value, key) {
+                        data[key] = value;
+                    });
+                    
+                    console.log('Global inquiry submitted:', data);
+                    alert('상담 신청이 접수되었습니다.\n빠른 시일 내에 연락드리겠습니다.');
+                    form.reset();
+                });
+            }
+        })();
+
+    </script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const btn = document.querySelector('.mobile-menu-toggle');
+    const nav = document.querySelector('.gnb-nav');
+
+    if (btn && nav) {
+        // 기존 버튼 복제하여 이벤트 중복 방지 (안전장치)
+        const newBtn = btn.cloneNode(true);
+        btn.parentNode.replaceChild(newBtn, btn);
+
+        newBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            newBtn.classList.toggle('active'); // 버튼 모양 X
+            nav.classList.toggle('active');    // 메뉴판 열기
+
+            // 스크롤 제어
+            document.body.style.overflow = nav.classList.contains('active') ? 'hidden' : 'auto';
+        });
+
+        // 메뉴 링크 클릭 시 닫기 (사용자 편의)
+        nav.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                newBtn.classList.remove('active');
+                nav.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            });
+        });
+    }
+
+    // ========== [사용자 설정 구역] 대표 모델 데이터 — 사진/제원 수정은 여기만 하세요 ==========
+    const featuredModels = {
+        "model-a1": {
+            title: "전동 지게차 A-1",
+            images: ["images/farm.webp", "images/custom.webp", "images/industrial.webp"],
+            specs: {
+                "적재중량": "2.5 Ton",
+                "주행거리": "150km (1회 충전)",
+                "배터리": "리튬이온 48V 500Ah",
+                "최고속도": "25 km/h",
+                "등판능력": "30%",
+                "모터출력": "5kW AC",
+                "충전시간": "6~8시간",
+                "타이어": "공기압 / 솔리드 선택"
+            }
+        },
+        "model-b3": {
+            title: "다목적 전동 카트 B-3",
+            images: ["images/industrial.webp", "images/farm.webp", "images/custom.webp"],
+            specs: {
+                "탑승인원": "4인",
+                "주행거리": "100km (1회 충전)",
+                "배터리": "리튬이온 48V 300Ah",
+                "최고속도": "25 km/h",
+                "등판능력": "25%",
+                "모터출력": "3kW AC",
+                "충전시간": "5~6시간",
+                "타이어": "공기압 / 솔리드 선택"
+            }
+        },
+        "model-cmax": {
+            title: "대형 전동 운반차 C-MAX",
+            images: ["images/custom.webp", "images/industrial.webp", "images/farm.webp"],
+            specs: {
+                "적재중량": "5 Ton",
+                "주행거리": "120km (1회 충전)",
+                "배터리": "리튬이온 72V 800Ah",
+                "최고속도": "20 km/h",
+                "등판능력": "25%",
+                "모터출력": "8kW AC",
+                "충전시간": "8~10시간",
+                "타이어": "공기압 / 솔리드 선택"
+            }
+        }
+    };
+
+    // ========== 로직: 팝업 열기/닫기, 슬라이더, 제원표 렌더 ==========
+    const modal = document.getElementById("featuredModelModal");
+    const modalTitle = document.getElementById("featuredModalTitle");
+    const modalImage = document.getElementById("featuredModalImage");
+    const modalSpecsTbody = document.getElementById("featuredModalSpecsTable").querySelector("tbody");
+    const modalDots = document.getElementById("featuredModalDots");
+    let currentSliderIndex = 0;
+    let currentModelData = null;
+
+    function openFeaturedModal(modelId) {
+        const data = featuredModels[modelId];
+        if (!data) return;
+        currentModelData = data;
+        currentSliderIndex = 0;
+
+        modalTitle.textContent = data.title;
+
+        // 이미지 슬라이더: images 배열 사용
+        if (data.images && data.images.length > 0) {
+            modalImage.src = data.images[0];
+            modalImage.alt = data.title;
+            updateSliderDots(data.images.length);
+        }
+
+        // 제원표: specs 객체를 반복해서 테이블로 출력
+        modalSpecsTbody.innerHTML = "";
+        if (data.specs && typeof data.specs === "object") {
+            Object.entries(data.specs).forEach(function(entry) {
+                const tr = document.createElement("tr");
+                tr.innerHTML = "<th>" + entry[0] + "</th><td>" + entry[1] + "</td>";
+                modalSpecsTbody.appendChild(tr);
+            });
+        }
+
+        modal.classList.add("active");
+        modal.setAttribute("aria-hidden", "false");
+        document.body.style.overflow = "hidden";
+    }
+
+    function updateSliderDots(total) {
+        if (!modalDots) return;
+        modalDots.textContent = "";
+        for (let i = 0; i < total; i++) {
+            const span = document.createElement("span");
+            span.className = "featured-modal-dot" + (i === currentSliderIndex ? " active" : "");
+            span.setAttribute("data-index", i);
+            modalDots.appendChild(span);
+        }
+    }
+
+    function setSliderIndex(index) {
+        if (!currentModelData || !currentModelData.images || currentModelData.images.length === 0) return;
+        const len = currentModelData.images.length;
+        currentSliderIndex = (index + len) % len;
+        modalImage.src = currentModelData.images[currentSliderIndex];
+        modalImage.alt = currentModelData.title;
+        const dots = modalDots.querySelectorAll(".featured-modal-dot");
+        dots.forEach(function(d, i) { d.classList.toggle("active", i === currentSliderIndex); });
+    }
+
+    function closeFeaturedModal() {
+        modal.classList.remove("active");
+        modal.setAttribute("aria-hidden", "true");
+        document.body.style.overflow = "";
+    }
+
+    document.querySelectorAll(".model-card-cta-btn").forEach(function(btn) {
+        btn.addEventListener("click", function() {
+            const modelId = btn.getAttribute("data-model");
+            if (modelId) openFeaturedModal(modelId);
+        });
+    });
+
+    document.getElementById("featuredModalClose").addEventListener("click", closeFeaturedModal);
+    modal.querySelector(".featured-modal-overlay").addEventListener("click", closeFeaturedModal);
+
+    const prevBtn = modal.querySelector(".featured-modal-slider-prev");
+    const nextBtn = modal.querySelector(".featured-modal-slider-next");
+    if (prevBtn) prevBtn.addEventListener("click", function() { setSliderIndex(currentSliderIndex - 1); });
+    if (nextBtn) nextBtn.addEventListener("click", function() { setSliderIndex(currentSliderIndex + 1); });
+
+    if (modalDots) modalDots.addEventListener("click", function(e) {
+        const dot = e.target.closest(".featured-modal-dot");
+        if (dot) setSliderIndex(parseInt(dot.getAttribute("data-index"), 10));
+    });
+
+    document.addEventListener("keydown", function(e) {
+        if (e.key === "Escape" && modal.classList.contains("active")) closeFeaturedModal();
+    });
+});
+</script>
+</body>
+</html>

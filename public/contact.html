@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>견적문의 - 드림전동차</title>
+    <link rel="stylesheet" href="css/style.css?v=20260214-999">
+</head>
+<body class="support-page">
+    <!-- GNB -->
+    <header class="gnb">
+        <a href="index.html" class="gnb-logo main-logo-link">
+            <img src="images/logo.png" alt="DREAM EV 드림전동차" class="logo-img">
+        </a>
+
+        <nav class="gnb-nav">
+            <ul class="mobile-menu-list">
+                <li><a href="about.html">회사소개</a></li>
+                <li><a href="cases.html">제작사례</a></li>
+                <li><a href="support.html">고객센터</a></li>
+                <li><a href="contact.html">견적문의</a></li>
+            </ul>
+        </nav>
+
+        <button class="mobile-menu-toggle" aria-label="메뉴 열기">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+
+        <a href="contact.html" class="header-btn btn-primary">견적문의</a>
+    </header>
+
+    <!-- 견적문의 Hero Banner -->
+    <section class="support-hero-banner">
+        <div class="support-hero-banner-overlay"></div>
+        <div class="support-hero-banner-content">
+            <h1 class="support-hero-banner-title">견적 · 상담 문의</h1>
+            <p class="support-hero-banner-subtitle">원하시는 사양과 용도를 알려주시면 빠르게 견적과 상담을 도와드립니다.</p>
+        </div>
+    </section>
+
+    <!-- 문의 폼 -->
+    <section class="section global-inquiry-section">
+        <h2 class="section-title">더 궁금하신 점이 있나요? <span>상담 신청하기</span></h2>
+        <div class="global-inquiry-container">
+            <form id="globalInquiryForm" class="global-inquiry-form" action="https://snowy-voice-ba2c.nbbhlin.workers.dev" method="POST">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="globalInquiryNameContact">성함 <span class="required">*</span></label>
+                        <input type="text" id="globalInquiryNameContact" name="name" required placeholder="홍길동">
+                    </div>
+                    <div class="form-group">
+                        <label for="globalInquiryPhoneContact">연락처 <span class="required">*</span></label>
+                        <input type="tel" id="globalInquiryPhoneContact" name="phone" required placeholder="010-1234-5678">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="globalInquiryMessageContact">문의 내용 <span class="required">*</span></label>
+                    <textarea id="globalInquiryMessageContact" name="message" rows="6" required placeholder="문의하실 내용을 자세히 적어주시면 더 정확한 답변을 드릴 수 있습니다."></textarea>
+                </div>
+                <button type="submit" class="btn-submit">상담 신청하기</button>
+            </form>
+        </div>
+    </section>
+
+    <footer class="common-footer" id="contact">
+        <div class="footer-container">
+            <div class="footer-content">
+                <div class="footer-section brand-section">
+                    <h2>드림전동차</h2>
+                    <p class="slogan">현장이 신뢰하는 기술, 변치 않는 내구성</p>
+                </div>
+                <div class="footer-section contact-section">
+                    <h3>고객지원 센터</h3>
+                    <p class="desc">친절하고 상세하게 안내해 드립니다.</p>
+                    <div class="phone-box">
+                        <a href="tel:010-3789-7653" class="phone-number">010-3789-7653</a>
+                    </div>
+                    <p class="work-time">평일 09:00 - 18:00 (주말/공휴일 휴무)</p>
+                </div>
+                <div class="footer-section info-section">
+                    <h3>사업자 정보</h3>
+                    <address>
+                        <p class="addr">본사/공장 : 경기도 양주시 광적면 부흥로 956번길 174</p>
+                        <p class="biz-info">사업자등록번호 : 560-86-02294 | 대표 : 배창호</p>
+                    </address>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2026 Dream EV. All Rights Reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/script.js"></script>
+    <script>
+        (function() {
+            var form = document.getElementById('globalInquiryForm');
+            if (form) {
+                form.addEventListener('submit', function() {
+                    /* Formspree로 전송 (action="https://formspree.io/f/mdalglra", method="POST") */
+                });
+            }
+        })();
+    </script>
+    <script>
+document.addEventListener('DOMContentLoaded', () => {
+    const btn = document.querySelector('.mobile-menu-toggle');
+    const nav = document.querySelector('.gnb-nav');
+
+    if (btn && nav) {
+        const newBtn = btn.cloneNode(true);
+        btn.parentNode.replaceChild(newBtn, btn);
+
+        newBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            newBtn.classList.toggle('active');
+            nav.classList.toggle('active');
+            document.body.style.overflow = nav.classList.contains('active') ? 'hidden' : 'auto';
+        });
+
+        nav.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                newBtn.classList.remove('active');
+                nav.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            });
+        });
+    }
+});
+</script>
+</body>
+</html>

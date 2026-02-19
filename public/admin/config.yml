@@ -1,0 +1,32 @@
+backend:
+  name: github
+  repo: dreamev5031/dreamev
+  branch: main
+  base_url: https://dreamev.kr
+  auth_endpoint: auth
+
+site_url: https://dreamev.kr
+display_url: https://dreamev.kr
+
+# 미디어: 저장소 루트 기준 절대 경로. 기존 public/images 파일이 Media 탭에 자동 표시됨.
+media_folder: "/public/images"
+public_folder: "/images"
+
+collections:
+  - name: "cases"
+    label: "제작사례"
+    folder: "public/content/cases"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - {label: "제목", name: "title", widget: "string"}
+      - {label: "카테고리", name: "category", widget: "select", options: ["산업용", "농업용", "다목적", "맞춤제작"]}
+      - label: "이미지 갤러리"
+        name: "gallery"
+        widget: "list"
+        summary: "{{fields.image}}"
+        allow_add: true
+        fields:
+          - { label: "사진 선택", name: "image", widget: "image", media_folder: "/public/images", public_folder: "/images" }
+      - {label: "작업 날짜", name: "date", widget: "datetime"}
+      - {label: "상세 내용", name: "body", widget: "markdown"}
