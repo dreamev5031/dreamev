@@ -1,6 +1,2 @@
 /*
-  Cross-Origin-Embedder-Policy: unsafe-none
-  Cross-Origin-Opener-Policy: unsafe-none
-  Cross-Origin-Resource-Policy: cross-origin
-  Access-Control-Allow-Origin: *
-  Content-Security-Policy: frame-src 'self' https://*.google.com https://*.googleapis.com;
+  Cache-Control: no-cache, no-store, must-revalidate
