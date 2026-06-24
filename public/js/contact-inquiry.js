@@ -78,8 +78,8 @@
             setFieldError(messageGroup, false);
         }
 
-        var privacyGroup = getEl('globalInquiryPrivacy')?.closest('.form-group');
-        var privacyInput = getEl('globalInquiryPrivacy');
+        var privacyGroup = getEl('privacyConsent')?.closest('.privacy-consent');
+        var privacyInput = getEl('privacyConsent');
         if (!privacyInput || !privacyInput.checked) {
             setFieldError(privacyGroup, true);
             valid = false;

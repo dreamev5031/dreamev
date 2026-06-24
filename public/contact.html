@@ -93,28 +93,32 @@
                     <p class="field-error">문의 내용을 입력해 주세요.</p>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group form-group--attach">
                     <label for="globalInquiryPhotos">사진 첨부</label>
                     <div class="contact-file-field">
                         <input type="file" id="globalInquiryPhotos" name="photos" accept="image/*" multiple class="contact-file-input">
                         <label for="globalInquiryPhotos" class="contact-file-btn">사진 선택하기</label>
                         <span class="contact-file-name" id="globalInquiryPhotosName">선택된 파일 없음</span>
                     </div>
-                    <p class="form-hint">차량 전체, 고장 부위, 배터리 또는 컨트롤러 명판 사진을 첨부해 주세요.</p>
+                    <p class="form-hint form-hint--attach">차량 전체, 고장 부위, 배터리 또는 컨트롤러 명판 사진을 첨부해 주세요.</p>
                 </div>
 
-                <div class="form-group privacy-consent-group">
-                    <label class="privacy-consent-label">
-                        <input type="checkbox" id="globalInquiryPrivacy" name="privacy" value="yes" required>
+                <div class="privacy-consent">
+                    <label class="privacy-consent__label" for="privacyConsent">
+                        <input type="checkbox" id="privacyConsent" name="privacy" value="yes" required>
                         <span>개인정보 수집 및 이용에 동의합니다. <span class="required">*</span></span>
                     </label>
-                    <p class="form-hint privacy-consent-desc">수집 항목: 성함, 연락처, 지역, 문의 내용 · 이용 목적: 상담 및 견적 안내 · 보유 기간: 문의 처리 후 1년</p>
+                    <p class="privacy-consent__details">
+                        수집 항목: 성함, 연락처, 지역, 문의 내용<br>
+                        이용 목적: 상담 및 견적 안내<br>
+                        보유 기간: 문의 처리 후 1년
+                    </p>
                     <p class="field-error">개인정보 수집 및 이용에 동의해 주세요.</p>
                 </div>
 
                 <p id="inquiryFormStatus" class="inquiry-form-status" role="alert" hidden></p>
 
-                <button type="submit" class="btn-submit">상담 신청하기</button>
+                <button type="submit" class="btn-submit contact-submit">상담 신청하기</button>
             </form>
         </div>
     </section>
