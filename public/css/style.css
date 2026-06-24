@@ -251,24 +251,23 @@ nav {
     gap: 10px;
 }
 
-/* ===== Hero Slider (100vh) ===== */
+/* ===== Hero Slider ===== */
 .hero {
     position: relative;
     width: 100%;
-    height: calc(100vh - 70px); /* 헤더 높이만큼 빼서 빈 공간 밀림 방지 */
-    min-height: 500px;
+    height: clamp(620px, 72vh, 760px);
+    min-height: 620px;
+    max-height: 760px;
     margin: 0 !important;
     padding: 0 !important;
     display: flex;
     align-items: center;
     justify-content: center;
-    overflow: hidden; /* 사진 확대 시 밖으로 삐져나감 방지 */
+    overflow: hidden;
     box-sizing: border-box;
-    /* Prevent scroll blocking - ensure hero doesn't block document scroll */
     pointer-events: auto;
     touch-action: pan-y;
     -webkit-overflow-scrolling: touch;
-    /* Ensure hero section doesn't create scroll barrier */
     z-index: 0;
     isolation: isolate;
 }
@@ -303,7 +302,7 @@ nav {
     box-sizing: border-box;
     background-color: #1F2937;
     background-size: cover;
-    background-position: center;
+    background-position: center 42%;
     background-repeat: no-repeat;
     opacity: 0;
     transition: opacity 1.5s ease-in-out;
@@ -334,12 +333,15 @@ nav {
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(to right, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0.4) 50%, rgba(0, 0, 0, 0.2) 100%);
+    background: linear-gradient(
+        135deg,
+        rgba(0, 0, 0, 0.72) 0%,
+        rgba(0, 0, 0, 0.55) 45%,
+        rgba(0, 0, 0, 0.38) 100%
+    );
     z-index: 1;
-    /* Ensure overlay doesn't block scroll */
     pointer-events: none;
     touch-action: none;
-    /* Prevent overlay from interfering with scroll */
     overflow: visible;
 }
 
@@ -373,7 +375,8 @@ nav {
 
 .hero-content {
     position: relative;
-    z-index: 1;
+    z-index: 2;
+    max-width: 920px;
     text-align: center;
     padding: 2rem;
     opacity: 0;
@@ -381,11 +384,62 @@ nav {
     -webkit-transform: translateY(50px) translateZ(0);
     transition: opacity 1s ease-out 0.3s, transform 1s ease-out 0.3s;
     will-change: transform, opacity;
-    /* Ensure content doesn't block scroll */
     pointer-events: auto;
     touch-action: pan-y;
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
+}
+
+.hero-content::before {
+    content: '';
+    position: absolute;
+    inset: -1.5rem -2rem;
+    background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.38) 0%, transparent 72%);
+    z-index: -1;
+    pointer-events: none;
+}
+
+.hero-main-copy {
+    margin: 0;
+    color: #fff;
+    font-size: 2.625rem;
+    font-weight: 800;
+    line-height: 1.3;
+    letter-spacing: -0.02em;
+    word-break: keep-all;
+    text-shadow: 0 2px 18px rgba(0, 0, 0, 0.55), 0 1px 4px rgba(0, 0, 0, 0.45);
+}
+
+.hero-sub-copy {
+    margin: 1.25rem auto 0;
+    max-width: 42rem;
+    color: rgba(255, 255, 255, 0.94);
+    font-size: 1.125rem;
+    line-height: 1.75;
+    word-break: keep-all;
+    text-shadow: 0 1px 12px rgba(0, 0, 0, 0.5);
+}
+
+.hero-sub-copy .highlight-text {
+    color: #6ee7b7;
+    font-weight: 600;
+}
+
+@media (min-width: 769px) {
+    .hero-main-copy {
+        font-size: 2.875rem;
+    }
+
+    .hero-sub-copy {
+        font-size: 1.1875rem;
+        line-height: 1.8;
+    }
+}
+
+@media (min-width: 1440px) {
+    .hero-main-copy {
+        font-size: 3rem;
+    }
 }
 
 .hero-slide.active .hero-content {
@@ -1284,7 +1338,7 @@ nav {
 /* ===== 메인 전용 서비스 선택 (index.html) — 프리미엄 배너 ===== */
 .home-service-section {
     background-color: #1a202c;
-    padding: 2rem 20px 1.25rem;
+    padding: 1.5rem 20px 1.25rem;
     overflow: visible !important;
 }
 
@@ -1445,7 +1499,7 @@ nav {
 
 @media (min-width: 769px) {
     .home-service-section {
-        padding: 2.5rem 20px 1.25rem;
+        padding: 2rem 20px 1.25rem;
     }
 
     .home-service-header {
@@ -3471,19 +3525,29 @@ nav {
     }
 
     /* ===== 1. Hero 섹션 (메인 배너) ===== */
+    .hero {
+        height: clamp(520px, 68vh, 85vh);
+        min-height: 520px;
+        max-height: none;
+    }
+
+    .hero-slide {
+        background-position: center 40%;
+    }
+
     .hero-content {
         padding: 0 20px !important;
         text-align: center !important;
     }
     .hero-main-copy {
-        font-size: 1.6rem !important;
-        line-height: 1.3 !important;
+        font-size: 1.75rem !important;
+        line-height: 1.35 !important;
         word-break: keep-all !important;
     }
     .hero-sub-copy {
-        font-size: 1rem !important;
-        margin-top: 15px !important;
-        line-height: 1.6 !important;
+        font-size: 1.0625rem !important;
+        margin-top: 1rem !important;
+        line-height: 1.75 !important;
         word-break: keep-all !important;
     }
 
