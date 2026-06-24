@@ -1284,11 +1284,11 @@ nav {
 /* ===== 메인 전용 서비스 선택 (index.html) ===== */
 .home-service-section {
     background-color: #1a202c;
-    padding: 2.5rem 20px 2.25rem;
+    padding: 2.5rem 20px 2rem;
 }
 
 .home-service-inner {
-    max-width: 720px;
+    max-width: 960px;
     margin: 0 auto;
 }
 
@@ -1298,144 +1298,201 @@ nav {
 }
 
 .home-service-header h2 {
-    color: #fff;
-    font-size: 1.375rem;
-    font-weight: 800;
-    margin: 0 0 0.625rem 0;
-    line-height: 1.4;
-    letter-spacing: -0.01em;
+    color: var(--text-main);
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem 0;
+    line-height: 1.35;
 }
 
 .home-service-header p {
-    color: #a0aec0;
-    font-size: 0.9375rem;
+    color: var(--text-muted);
+    font-size: 1rem;
     margin: 0;
-    line-height: 1.65;
+    line-height: 1.6;
 }
 
 .home-service-grid {
     display: flex;
     flex-direction: column;
-    gap: 28px;
+    gap: 1.25rem;
 }
 
 .home-service-card {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    padding: 1.25rem 1.5rem;
-    background: #2d3748;
-    border-radius: 22px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    gap: 0.875rem;
+    padding: 1.5rem;
+    background: var(--bg-card);
+    border-radius: 16px;
+    border: 1px solid var(--glass-border);
     text-align: left;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    text-decoration: none;
+    color: inherit;
+    box-sizing: border-box;
+    cursor: pointer;
+    transition: transform 0.3s ease, background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.home-service-card:hover {
+    border-color: rgba(16, 185, 129, 0.45);
+    background: rgba(55, 65, 81, 0.92);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.22);
+}
+
+.home-service-card:hover .home-service-card-icon {
+    background: rgba(16, 185, 129, 0.28);
+    color: #6ee7b7;
 }
 
 .home-service-card-icon {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 56px;
-    height: 56px;
-    margin-bottom: 0.875rem;
-    border-radius: 14px;
+    width: 64px;
+    height: 64px;
+    border-radius: 16px;
     background: rgba(16, 185, 129, 0.14);
     color: var(--primary);
-    font-size: 1.375rem;
+    font-size: 1.5rem;
     flex-shrink: 0;
+    transition: background 0.3s ease, color 0.3s ease;
 }
 
 .home-service-card-content {
-    margin-bottom: 1rem;
     width: 100%;
+    flex: 1;
+    min-width: 0;
 }
 
 .home-service-card-title {
-    color: #f7fafc;
-    font-size: 1.125rem;
+    color: var(--text-main);
+    font-size: 1.25rem;
     font-weight: 700;
     margin: 0 0 0.5rem 0;
-    line-height: 1.4;
+    line-height: 1.35;
     text-align: left;
 }
 
 .home-service-card-desc {
     margin: 0;
-    color: #a0aec0;
+    color: var(--text-muted);
     font-size: 0.9375rem;
-    line-height: 1.7;
+    line-height: 1.6;
     text-align: left;
+    word-break: keep-all;
 }
 
 .home-service-card-btn {
-    display: inline-flex;
+    display: flex;
     align-items: center;
     justify-content: center;
-    align-self: flex-start;
-    min-width: 148px;
+    width: 100%;
+    min-width: 0;
     min-height: 48px;
-    margin-top: auto;
-    padding: 0.625rem 1.25rem;
+    margin-top: 0.25rem;
+    padding: 0.75rem 1.25rem;
     background: var(--primary);
-    border: none;
     border-radius: 10px;
     color: #0f172a;
     font-size: 0.9375rem;
     font-weight: 700;
-    text-decoration: none;
     text-align: center;
     box-sizing: border-box;
+    flex-shrink: 0;
+    pointer-events: none;
     transition: background 0.2s ease;
 }
 
-.home-service-card-btn:hover {
+.home-service-card:hover .home-service-card-btn {
     background: var(--primary-hover);
-    color: #0f172a;
 }
 
 @media (min-width: 769px) {
     .home-service-section {
-        padding: 3rem 20px 2.75rem;
+        padding: 3.5rem 20px 2.5rem;
     }
 
     .home-service-header {
-        margin-bottom: 1.75rem;
+        text-align: center;
+        margin-bottom: 2.5rem;
     }
 
     .home-service-header h2 {
-        font-size: 1.75rem;
+        color: #fff;
+        font-size: 2.5rem;
+        font-weight: 700;
         margin-bottom: 0.625rem;
     }
 
     .home-service-header p {
+        color: #a0aec0;
         font-size: 1rem;
     }
 
     .home-service-grid {
-        gap: 30px;
+        gap: 1.5rem;
     }
 
     .home-service-card {
-        padding: 1.375rem 1.75rem;
+        flex-direction: row;
+        align-items: center;
+        gap: 1.5rem;
+        min-height: 180px;
+        padding: 0 2.25rem;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
     }
 
     .home-service-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.2);
+        transform: translateY(-4px);
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(16, 185, 129, 0.5);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .home-service-card-icon {
+        margin-bottom: 0;
+    }
+
+    .home-service-card-content {
+        flex: 1;
+        margin-bottom: 0;
+        padding: 1.25rem 0;
     }
 
     .home-service-card-title {
-        font-size: 1.2rem;
+        color: #fff;
+        font-size: 1.375rem;
+        font-weight: 700;
+        margin-bottom: 0.75rem;
     }
 
     .home-service-card-desc {
-        font-size: 0.975rem;
+        color: #cbd5e0;
+        font-size: 1rem;
+        line-height: 1.7;
+    }
+
+    .home-service-card-btn {
+        width: auto;
+        min-width: 170px;
+        margin-top: 0;
+        padding: 0.875rem 1.5rem;
+        font-size: 1rem;
     }
 }
 
 .home-service-section + .process-section {
     padding-top: 2.5rem;
+}
+
+@media (min-width: 769px) {
+    .home-service-section + .process-section {
+        padding-top: 4rem !important;
+    }
 }
 
 /* ===== 수리 신청 페이지 (repair.html) ===== */
