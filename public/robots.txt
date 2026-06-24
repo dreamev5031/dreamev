@@ -1,6 +1,4 @@
 User-agent: *
 Allow: /
 
-Disallow: /admin/
-
 Sitemap: https://dreamev.kr/sitemap.xml
