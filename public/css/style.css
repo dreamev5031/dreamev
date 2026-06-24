@@ -1281,6 +1281,92 @@ nav {
     color: #1a202c;
 }
 
+/* ===== 서비스 선택 카드 (index.html) ===== */
+.service-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 28px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    align-items: stretch;
+}
+
+.service-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: #2d3748;
+    border-radius: 20px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.service-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+.service-card-image-wrap {
+    width: 100%;
+    aspect-ratio: 4/3;
+    overflow: hidden;
+    background: #1a202c;
+    flex-shrink: 0;
+}
+
+.service-card-image-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.service-card-body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding: 1.5rem;
+    text-align: left;
+}
+
+.service-card-body h3 {
+    color: #f7fafc;
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin: 0 0 12px 0;
+}
+
+.service-card-desc {
+    flex: 1;
+    margin: 0 0 20px 0;
+    color: #a0aec0;
+    font-size: 0.95rem;
+    line-height: 1.7;
+}
+
+.service-card-cta-btn {
+    display: inline-block;
+    align-self: flex-start;
+    margin-top: auto;
+    padding: 0.5rem 1rem;
+    background: transparent;
+    border: 1px solid var(--primary);
+    border-radius: 8px;
+    color: var(--primary);
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+
+.service-card-cta-btn:hover {
+    background: var(--primary);
+    color: #1a202c;
+}
+
 /* ===== 대표 모델 상세 스펙 팝업: 좌측 슬라이더 / 우측 제원표 (다크 #1a202c) ===== */
 .featured-modal {
     display: none;
@@ -1510,6 +1596,14 @@ nav {
     .model-card:hover {
         transform: translateY(-6px) scale(1.02);
         z-index: 50;
+    }
+    .service-cards-grid {
+        grid-template-columns: 1fr;
+        gap: 24px;
+        padding: 0 16px;
+    }
+    .service-card:hover {
+        transform: translateY(-6px);
     }
 }
 
