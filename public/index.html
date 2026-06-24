@@ -33,35 +33,27 @@
         <a href="contact.html" class="header-btn btn-primary">상담·견적 문의</a>
     </header>
 
-    <!-- Hero Slider -->
+    <!-- Hero -->
     <section class="hero hero--home">
-        <div class="hero-slider" id="heroSlider">
-            <div class="hero-slide active" style="background-image: url('images/main1.webp');">
-                <div class="hero-content">
-                    <h1 class="hero-main-copy hero__title">녹슬지 않는 기술력, 현장의 답을 아는 기술자가 만듭니다.</h1>
-                    <p class="hero-sub-copy hero__description">
-                        전 기종 <span class="highlight-text">올 스테인리스(All Stainless)</span> 바디와 <span class="highlight-text">검증된 국산 컨트롤러</span> 탑재로 압도적인 내구성을 실현했습니다.
-                    </p>
-                    <a href="cases.html" class="hero-cta-btn">제작사례 및 견적문의 바로가기</a>
-                </div>
+        <div class="hero__media" id="heroSlider" aria-hidden="true">
+            <div class="hero-slide active" aria-hidden="false">
+                <div class="hero-slide__bg" style="background-image: url('images/main1.webp');"></div>
             </div>
-            <div class="hero-slide" style="background-image: url('images/main2.webp');">
-                <div class="hero-content">
-                    <h1 class="hero-main-copy hero__title">녹슬지 않는 기술력, 현장의 답을 아는 기술자가 만듭니다.</h1>
-                    <p class="hero-sub-copy hero__description">
-                        전 기종 <span class="highlight-text">올 스테인리스(All Stainless)</span> 바디와 <span class="highlight-text">검증된 국산 컨트롤러</span> 탑재로 압도적인 내구성을 실현했습니다.
-                    </p>
-                    <a href="cases.html" class="hero-cta-btn">제작사례 및 견적문의 바로가기</a>
-                </div>
+            <div class="hero-slide" aria-hidden="true">
+                <div class="hero-slide__bg" style="background-image: url('images/main2.webp');"></div>
             </div>
-            <div class="hero-slide" style="background-image: url('images/main3.webp');">
-                <div class="hero-content">
-                    <h1 class="hero-main-copy hero__title">녹슬지 않는 기술력, 현장의 답을 아는 기술자가 만듭니다.</h1>
-                    <p class="hero-sub-copy hero__description">
-                        전 기종 <span class="highlight-text">올 스테인리스(All Stainless)</span> 바디와 <span class="highlight-text">검증된 국산 컨트롤러</span> 탑재로 압도적인 내구성을 실현했습니다.
-                    </p>
-                    <a href="cases.html" class="hero-cta-btn">제작사례 및 견적문의 바로가기</a>
-                </div>
+            <div class="hero-slide" aria-hidden="true">
+                <div class="hero-slide__bg" style="background-image: url('images/main3.webp');"></div>
+            </div>
+        </div>
+
+        <div class="hero__content">
+            <h1 class="hero-main-copy hero__title">녹슬지 않는 기술력, 현장의 답을 아는 기술자가 만듭니다.</h1>
+            <p class="hero-sub-copy hero__description">
+                전 기종 <span class="highlight-text">올 스테인리스(All Stainless)</span> 바디와 <span class="highlight-text">검증된 국산 컨트롤러</span> 탑재로 압도적인 내구성을 실현했습니다.
+            </p>
+            <div class="hero__actions">
+                <a href="cases.html" class="hero-cta-btn">제작사례 및 견적문의 바로가기</a>
             </div>
         </div>
     </section>
@@ -279,29 +271,43 @@
         })();
         */
 
-        // Hero auto slider with cross-fade effect
+        // Hero: 자동 페이드 전환만 (드래그·스와이프 비활성)
         (function() {
-            var slider = document.getElementById('heroSlider');
-            if (!slider) return;
-            var slides = slider.querySelectorAll('.hero-slide');
-            var total = slides.length;
+            var media = document.getElementById('heroSlider');
+            if (!media) return;
+
+            var slides = media.querySelectorAll('.hero-slide');
+            if (slides.length <= 1) return;
+
             var idx = 0;
-            
-            // 첫 번째 슬라이드 활성화
-            if (slides.length > 0) {
-                slides[0].classList.add('active');
-            }
-            
-            setInterval(function() {
-                // 현재 슬라이드 비활성화
+
+            function showSlide(nextIdx) {
                 slides[idx].classList.remove('active');
-                
-                // 다음 슬라이드로 이동
-                idx = (idx + 1) % total;
-                
-                // 다음 슬라이드 활성화
+                slides[idx].setAttribute('aria-hidden', 'true');
+                idx = nextIdx;
                 slides[idx].classList.add('active');
+                slides[idx].setAttribute('aria-hidden', 'false');
+            }
+
+            slides.forEach(function(slide, i) {
+                slide.classList.toggle('active', i === 0);
+                slide.setAttribute('aria-hidden', i === 0 ? 'false' : 'true');
+            });
+
+            setInterval(function() {
+                showSlide((idx + 1) % slides.length);
             }, 5000);
+
+            media.addEventListener('dragstart', function(e) {
+                e.preventDefault();
+            });
+
+            var hero = media.closest('.hero--home');
+            if (hero) {
+                hero.addEventListener('dragstart', function(e) {
+                    e.preventDefault();
+                });
+            }
         })();
 
         // Scroll reveal for model items (optimized)
