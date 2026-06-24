@@ -1281,76 +1281,95 @@ nav {
     color: #1a202c;
 }
 
-/* ===== 서비스 선택 카드 (index.html) ===== */
-.service-cards-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 28px;
+/* ===== 메인 전용 서비스 선택 (index.html) ===== */
+.home-service-section {
+    background-color: #1a202c;
+    padding: 4rem 1.25rem;
+}
+
+.home-service-inner {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 0 20px;
+}
+
+.home-service-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+}
+
+.home-service-header h2 {
+    color: #fff;
+    font-size: 2rem;
+    font-weight: 800;
+    margin: 0 0 0.75rem 0;
+    line-height: 1.35;
+}
+
+.home-service-header p {
+    color: #a0aec0;
+    font-size: 1.05rem;
+    margin: 0;
+    line-height: 1.6;
+}
+
+.home-service-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
     align-items: stretch;
 }
 
-.service-card {
+.home-service-card {
     display: flex;
     flex-direction: column;
     height: 100%;
+    padding: 1.75rem 1.5rem;
     background: #2d3748;
-    border-radius: 20px;
-    overflow: hidden;
+    border-radius: 16px;
     border: 1px solid rgba(255, 255, 255, 0.08);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    text-align: left;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
-.service-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+.home-service-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
 }
 
-.service-card-image-wrap {
-    width: 100%;
-    aspect-ratio: 4/3;
-    overflow: hidden;
-    background: #1a202c;
+.home-service-card-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    margin-bottom: 1rem;
+    border-radius: 12px;
+    background: rgba(16, 185, 129, 0.12);
+    color: var(--primary);
+    font-size: 1.25rem;
     flex-shrink: 0;
 }
 
-.service-card-image-wrap img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-}
-
-.service-card-body {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-    padding: 1.5rem;
-    text-align: left;
-}
-
-.service-card-body h3 {
+.home-service-card-title {
     color: #f7fafc;
-    font-size: 1.25rem;
+    font-size: 1.2rem;
     font-weight: 700;
-    margin: 0 0 12px 0;
+    margin: 0 0 0.75rem 0;
 }
 
-.service-card-desc {
+.home-service-card-desc {
     flex: 1;
-    margin: 0 0 20px 0;
+    margin: 0 0 1.25rem 0;
     color: #a0aec0;
     font-size: 0.95rem;
-    line-height: 1.7;
+    line-height: 1.65;
 }
 
-.service-card-cta-btn {
+.home-service-card-btn {
     display: inline-block;
     align-self: flex-start;
     margin-top: auto;
-    padding: 0.5rem 1rem;
+    padding: 0.55rem 1rem;
     background: transparent;
     border: 1px solid var(--primary);
     border-radius: 8px;
@@ -1358,13 +1377,173 @@ nav {
     font-size: 0.9rem;
     font-weight: 600;
     text-decoration: none;
-    cursor: pointer;
     transition: background 0.2s, color 0.2s;
 }
 
-.service-card-cta-btn:hover {
+.home-service-card-btn:hover {
     background: var(--primary);
     color: #1a202c;
+}
+
+/* ===== 수리 신청 페이지 (repair.html) ===== */
+.repair-page-section {
+    padding: 3rem 1.25rem 4rem;
+    background: var(--bg-main);
+    min-height: calc(100vh - 80px);
+}
+
+.repair-page-inner {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.repair-page-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.repair-page-header h1 {
+    color: var(--text-main);
+    font-size: 1.75rem;
+    font-weight: 800;
+    margin: 0 0 0.75rem 0;
+}
+
+.repair-page-header p {
+    color: var(--text-muted);
+    font-size: 1rem;
+    margin: 0;
+    line-height: 1.6;
+}
+
+.repair-form-panel {
+    background: var(--bg-card);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    padding: 2rem 1.75rem;
+}
+
+.repair-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.repair-form .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+}
+
+.repair-form .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.repair-form .form-group label,
+.repair-form .form-group-label {
+    font-weight: 600;
+    color: var(--text-main);
+    font-size: 0.95rem;
+}
+
+.repair-form .form-group .required {
+    color: var(--primary);
+}
+
+.repair-form .form-group input,
+.repair-form .form-group select,
+.repair-form .form-group textarea {
+    padding: 0.75rem 1rem;
+    background: var(--bg-main);
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    color: var(--text-main);
+    font-family: inherit;
+    font-size: 1rem;
+    transition: border-color 0.2s;
+}
+
+.repair-form .form-group input:focus,
+.repair-form .form-group select:focus,
+.repair-form .form-group textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+.repair-form .form-group input.is-invalid,
+.repair-form .form-group select.is-invalid,
+.repair-form .form-group textarea.is-invalid {
+    border-color: #f87171;
+}
+
+.repair-form .field-error {
+    display: none;
+    color: #f87171;
+    font-size: 0.85rem;
+    margin: 0;
+}
+
+.repair-form .form-group.has-error .field-error {
+    display: block;
+}
+
+.repair-form .form-hint {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    margin: 0;
+}
+
+.repair-form .radio-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.repair-form .radio-option {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--text-main);
+    font-size: 0.95rem;
+    cursor: pointer;
+}
+
+.repair-form .radio-option input {
+    accent-color: var(--primary);
+}
+
+.repair-form .btn-submit {
+    margin-top: 0.5rem;
+    padding: 0.85rem 1.5rem;
+    background: var(--primary);
+    border: none;
+    border-radius: 8px;
+    color: #1a202c;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.repair-form .btn-submit:hover {
+    background: var(--primary-hover);
+}
+
+@media (max-width: 768px) {
+    .repair-page-section {
+        padding: 2rem 1rem 3rem;
+    }
+    .repair-form-panel {
+        padding: 1.5rem 1.25rem;
+    }
+    .repair-form .form-row {
+        grid-template-columns: 1fr;
+    }
+    .repair-page-header h1 {
+        font-size: 1.5rem;
+    }
 }
 
 /* ===== 대표 모델 상세 스펙 팝업: 좌측 슬라이더 / 우측 제원표 (다크 #1a202c) ===== */
@@ -1597,13 +1776,18 @@ nav {
         transform: translateY(-6px) scale(1.02);
         z-index: 50;
     }
-    .service-cards-grid {
-        grid-template-columns: 1fr;
-        gap: 24px;
-        padding: 0 16px;
+    .home-service-section {
+        padding: 3rem 1rem;
     }
-    .service-card:hover {
-        transform: translateY(-6px);
+    .home-service-header h2 {
+        font-size: 1.5rem;
+    }
+    .home-service-grid {
+        grid-template-columns: 1fr;
+        gap: 1.25rem;
+    }
+    .home-service-card:hover {
+        transform: translateY(-2px);
     }
 }
 
