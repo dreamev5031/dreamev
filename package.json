@@ -1,0 +1,8 @@
+{
+  "name": "dreamev-functions",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test functions/test/*.test.js"
+  }
+}
