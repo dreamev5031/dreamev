@@ -329,11 +329,14 @@ nav {
         object-fit: contain;
         display: block;
     }
+}
+
+@media (min-width: 1025px) {
     .gnb-nav {
-        gap: 50px;
+        gap: 2rem;
     }
     .gnb-nav a {
-        font-size: 1.3rem !important;
+        font-size: 1.2rem !important;
         font-weight: 800 !important;
     }
 }
@@ -374,6 +377,23 @@ nav {
 
 .gnb-nav a:hover::after {
     width: 100%;
+}
+
+.gnb-nav a.active {
+    color: var(--primary);
+}
+
+.gnb-nav a.active::after {
+    width: 100%;
+}
+
+.gnb-nav.active a.active {
+    color: var(--primary) !important;
+}
+
+header nav a.active {
+    color: var(--primary);
+    font-weight: 800;
 }
 
 .gnb-cta {
@@ -3810,72 +3830,61 @@ nav {
     padding: 0 1.5rem;
 }
 
-/* === PC 버전 (769px 이상) === */
-@media (min-width: 769px) {
+/* === PC 버전 (1025px 이상) === */
+@media (min-width: 1025px) {
     .mobile-menu-toggle { display: none; } /* PC에선 햄버거 숨김 */
-    .gnb-nav ul { display: flex; gap: 2rem; list-style: none; margin: 0; padding: 0; } /* 메뉴 가로 정렬 */
+    .gnb-nav ul { display: flex; gap: 1.75rem; list-style: none; margin: 0; padding: 0; } /* 메뉴 가로 정렬 */
     .gnb-nav a { color: white; font-weight: bold; text-decoration: none; }
 }
 
-.header-btn.btn-primary {
-    display: inline-block;
-    padding: 0.6rem 1.5rem;
-    background: var(--primary);
-    color: #fff;
-    font-weight: 600;
-    border-radius: 8px;
-    text-decoration: none;
-}
-.header-btn.btn-primary:hover {
-    background: var(--primary-hover);
-}
-
-/* === 모바일 전용 스타일 통합 (768px 이하) === */
-@media (max-width: 768px) {
-
-    /* [중요] 헤더가 메뉴판을 가두지 못하게 잠금 해제 */
+/* === 태블릿·모바일 GNB (1024px 이하, 햄버거) === */
+@media (max-width: 1024px) {
     .gnb {
         transform: none !important;
         filter: none !important;
         overflow: visible !important;
         z-index: 10000 !important;
         position: relative !important;
-        justify-content: center !important; /* 모바일: 로고 가운데 */
+        justify-content: center !important;
     }
 
-    /* 모바일: 로고 가운데 정렬 */
     .gnb-logo {
         position: absolute !important;
         left: 50% !important;
         transform: translateX(-50%) !important;
+        z-index: 100001 !important;
     }
 
-    /* 모바일에서만 견적문의 버튼 숨김, 햄버거만 오른쪽 끝에 */
     .header-btn {
         display: none !important;
     }
 
-    /* 1. 햄버거 버튼 (오른쪽 고정, 로고와 겹치지 않게) */
     .mobile-menu-toggle {
         display: flex !important;
         flex-direction: column;
         justify-content: space-between;
-        width: 30px; height: 20px;
-        background: transparent; border: none; cursor: pointer;
+        width: 30px;
+        height: 20px;
+        background: transparent;
+        border: none;
+        cursor: pointer;
         position: absolute !important;
         right: 1rem !important;
         z-index: 100001 !important;
     }
+
     .mobile-menu-toggle span {
-        width: 100%; height: 3px; background-color: white; border-radius: 2px; transition: 0.3s;
+        width: 100%;
+        height: 3px;
+        background-color: white;
+        border-radius: 2px;
+        transition: 0.3s;
     }
 
-    /* 2. 버튼 클릭 시 X 변신 */
     .mobile-menu-toggle.active span:nth-child(1) { transform: translateY(8.5px) rotate(45deg); }
     .mobile-menu-toggle.active span:nth-child(2) { opacity: 0; }
     .mobile-menu-toggle.active span:nth-child(3) { transform: translateY(-8.5px) rotate(-45deg); }
 
-    /* 3. 메뉴판 (헤더 무시하고 화면 전체 덮기) */
     .gnb-nav {
         display: none !important;
     }
@@ -3887,21 +3896,18 @@ nav {
         left: 0 !important;
         width: 100vw !important;
         height: 100vh !important;
-
         background-color: rgba(26, 32, 44, 0.98) !important;
         z-index: 100000 !important;
-
         flex-direction: column !important;
         justify-content: center !important;
         align-items: center !important;
-        padding: 0 !important; margin: 0 !important;
+        padding: 0 !important;
+        margin: 0 !important;
         box-sizing: border-box !important;
-
         overflow-y: hidden !important;
         touch-action: none;
     }
 
-    /* 4. 메뉴 리스트 & 글자 스타일 */
     .gnb-nav.active ul,
     .gnb-nav.active .mobile-menu-list {
         display: flex !important;
@@ -3920,17 +3926,25 @@ nav {
         text-decoration: none !important;
         display: block !important;
     }
+}
 
-    /* 5. 로고·햄버거 클릭 가능하게 위로 (로고는 가운데 유지) */
-    .gnb-logo {
-        z-index: 100001 !important;
-    }
-    .header-btn {
-        position: relative;
-        z-index: 100001 !important;
-    }
+.header-btn.btn-primary {
+    display: inline-block;
+    padding: 0.6rem 1.5rem;
+    background: var(--primary);
+    color: #fff;
+    font-weight: 600;
+    border-radius: 8px;
+    text-decoration: none;
+}
+.header-btn.btn-primary:hover {
+    background: var(--primary-hover);
+}
 
-    /* ===== 1. Hero 섹션 (메인 배너) ===== */
+/* === 모바일 전용 스타일 통합 (768px 이하) === */
+@media (max-width: 768px) {
+
+    /* [중요] 헤더가 메뉴판을 가두지 못하게 잠금 해제 — GNB 햄버거는 1024px 블록에서 처리 */
     .hero--home {
         height: clamp(var(--hero-home-min), var(--hero-home-vh), var(--hero-home-max));
         min-height: var(--hero-home-min);
