@@ -23,6 +23,54 @@
     /* 헤더/글래스: 배경 투명도 0.9 */
     --glass-bg: rgba(31, 41, 55, 0.9);
     --glass-border: rgba(255, 255, 255, 0.1);
+
+    /* 히어로 높이·간격 (데스크톱 기본) */
+    --hero-home-min: 520px;
+    --hero-home-max: 720px;
+    --hero-home-vh: 68vh;
+    --hero-sub-min: 320px;
+    --hero-sub-max: 460px;
+    --hero-sub-vh: 38vh;
+    --hero-overlay-start: rgba(4, 10, 16, 0.58);
+    --hero-overlay-mid: rgba(4, 10, 16, 0.30);
+    --hero-overlay-end: rgba(4, 10, 16, 0.40);
+    --hero-content-max: 780px;
+    --hero-content-px: 2rem;
+    --hero-title-gap: 18px;
+    --hero-gap-after: 72px;
+}
+
+@media (max-width: 1024px) {
+    :root {
+        --hero-home-min: 500px;
+        --hero-home-max: 640px;
+        --hero-home-vh: 64vh;
+        --hero-sub-min: 300px;
+        --hero-sub-max: 400px;
+        --hero-sub-vh: 34vh;
+    }
+}
+
+@media (max-width: 768px) {
+    :root {
+        --hero-home-min: 480px;
+        --hero-home-max: 620px;
+        --hero-home-vh: 62vh;
+        --hero-sub-min: 260px;
+        --hero-sub-max: 360px;
+        --hero-sub-vh: 32vh;
+        --hero-content-px: 24px;
+        --hero-gap-after: 48px;
+    }
+}
+
+@supports (height: 1dvh) {
+    @media (max-width: 768px) {
+        :root {
+            --hero-home-vh: 62dvh;
+            --hero-sub-vh: 32dvh;
+        }
+    }
 }
 
 /* ===== Location Map (support, about) ===== */
@@ -353,13 +401,10 @@ nav {
     gap: 10px;
 }
 
-/* ===== Hero Slider ===== */
+/* ===== Hero (공통 + 메인/서브 변형) ===== */
 .hero {
     position: relative;
     width: 100%;
-    height: clamp(620px, 72vh, 760px);
-    min-height: 620px;
-    max-height: 760px;
     margin: 0 !important;
     padding: 0 !important;
     display: flex;
@@ -372,6 +417,106 @@ nav {
     -webkit-overflow-scrolling: touch;
     z-index: 0;
     isolation: isolate;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.hero--home {
+    height: clamp(var(--hero-home-min), var(--hero-home-vh), var(--hero-home-max));
+    min-height: var(--hero-home-min);
+    max-height: var(--hero-home-max);
+}
+
+.hero--subpage {
+    height: clamp(var(--hero-sub-min), var(--hero-sub-vh), var(--hero-sub-max));
+    min-height: var(--hero-sub-min);
+    max-height: var(--hero-sub-max);
+}
+
+.hero__overlay,
+.support-hero-banner-overlay,
+.about-intro-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background: linear-gradient(
+        90deg,
+        var(--hero-overlay-start),
+        var(--hero-overlay-mid),
+        var(--hero-overlay-end)
+    );
+}
+
+.hero__content,
+.support-hero-banner-content,
+.about-intro-content {
+    position: relative;
+    z-index: 2;
+    max-width: var(--hero-content-max);
+    width: 100%;
+    padding: 0 var(--hero-content-px);
+    text-align: center;
+    box-sizing: border-box;
+}
+
+.hero__title,
+.hero--home .hero-main-copy {
+    margin: 0;
+    color: #fff;
+    font-size: clamp(30px, 2.4vw, 48px);
+    font-weight: 800;
+    line-height: 1.3;
+    letter-spacing: -0.02em;
+    word-break: keep-all;
+    text-shadow: 0 2px 18px rgba(0, 0, 0, 0.55), 0 1px 4px rgba(0, 0, 0, 0.45);
+}
+
+.hero__description,
+.hero--home .hero-sub-copy {
+    margin: var(--hero-title-gap) auto 0;
+    max-width: 42rem;
+    color: rgba(255, 255, 255, 0.94);
+    font-size: clamp(15px, 1.1vw, 19px);
+    line-height: 1.75;
+    word-break: keep-all;
+    text-shadow: 0 1px 12px rgba(0, 0, 0, 0.5);
+}
+
+.hero--subpage .hero__title,
+.hero--subpage .support-hero-banner-title,
+.hero--subpage .about-intro-title,
+.hero--subpage.case-page-hero .header-text-box h3 {
+    margin: 0;
+    color: #fff;
+    font-size: clamp(26px, 2vw, 40px);
+    font-weight: 800;
+    line-height: 1.35;
+    word-break: keep-all;
+    text-shadow: 0 2px 14px rgba(0, 0, 0, 0.45);
+}
+
+.hero--subpage .hero__description,
+.hero--subpage .support-hero-banner-subtitle,
+.hero--subpage .about-intro-desc,
+.hero--subpage.case-page-hero .header-text-box p {
+    margin: var(--hero-title-gap) auto 0;
+    max-width: 36rem;
+    color: rgba(255, 255, 255, 0.92);
+    font-size: clamp(15px, 1vw, 18px);
+    line-height: 1.7;
+    word-break: keep-all;
+    text-shadow: 0 1px 10px rgba(0, 0, 0, 0.4);
+}
+
+.hero--home + .home-service-section {
+    padding-top: var(--hero-gap-after);
+}
+
+.hero--subpage.about-intro + .about-tech-section,
+.hero--subpage + .global-inquiry-section {
+    padding-top: var(--hero-gap-after);
 }
 
 .hero-slider {
@@ -436,10 +581,10 @@ nav {
     right: 0;
     bottom: 0;
     background: linear-gradient(
-        135deg,
-        rgba(0, 0, 0, 0.72) 0%,
-        rgba(0, 0, 0, 0.55) 45%,
-        rgba(0, 0, 0, 0.38) 100%
+        90deg,
+        var(--hero-overlay-start),
+        var(--hero-overlay-mid),
+        var(--hero-overlay-end)
     );
     z-index: 1;
     pointer-events: none;
@@ -478,9 +623,10 @@ nav {
 .hero-content {
     position: relative;
     z-index: 2;
-    max-width: 920px;
+    max-width: var(--hero-content-max);
     text-align: center;
-    padding: 2rem;
+    padding: 0 var(--hero-content-px);
+    box-sizing: border-box;
     opacity: 0;
     transform: translateY(50px) translateZ(0);
     -webkit-transform: translateY(50px) translateZ(0);
@@ -501,47 +647,9 @@ nav {
     pointer-events: none;
 }
 
-.hero-main-copy {
-    margin: 0;
-    color: #fff;
-    font-size: 2.625rem;
-    font-weight: 800;
-    line-height: 1.3;
-    letter-spacing: -0.02em;
-    word-break: keep-all;
-    text-shadow: 0 2px 18px rgba(0, 0, 0, 0.55), 0 1px 4px rgba(0, 0, 0, 0.45);
-}
-
-.hero-sub-copy {
-    margin: 1.25rem auto 0;
-    max-width: 42rem;
-    color: rgba(255, 255, 255, 0.94);
-    font-size: 1.125rem;
-    line-height: 1.75;
-    word-break: keep-all;
-    text-shadow: 0 1px 12px rgba(0, 0, 0, 0.5);
-}
-
 .hero-sub-copy .highlight-text {
     color: #6ee7b7;
     font-weight: 600;
-}
-
-@media (min-width: 769px) {
-    .hero-main-copy {
-        font-size: 2.875rem;
-    }
-
-    .hero-sub-copy {
-        font-size: 1.1875rem;
-        line-height: 1.8;
-    }
-}
-
-@media (min-width: 1440px) {
-    .hero-main-copy {
-        font-size: 3rem;
-    }
 }
 
 .hero-slide.active .hero-content {
@@ -1030,47 +1138,10 @@ nav {
 
 /* ===== About Page ===== */
 .about-intro {
-    position: relative;
-    min-height: 70vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 140px 2rem 4rem;
     background-color: #1F2937;
     background-image: url('../images/about-bg.webp');
-    background-size: cover;
     background-position: center;
-    background-repeat: no-repeat;
     will-change: transform;
-}
-
-.about-intro-overlay {
-    position: absolute;
-    inset: 0;
-    background: rgba(31, 41, 55, 0.85);
-}
-
-.about-intro-content {
-    position: relative;
-    z-index: 2;
-    text-align: center;
-    max-width: 720px;
-}
-
-.about-intro-title {
-    font-size: clamp(2rem, 4vw, 3rem);
-    font-weight: 700;
-    color: var(--text-main);
-    margin: 0 0 1rem 0;
-    line-height: 1.4;
-}
-
-.about-intro-desc {
-    font-size: 1.2rem;
-    font-weight: 600;
-    color: var(--text-main);
-    margin: 0;
-    line-height: 1.6;
 }
 
 .core-values-grid {
@@ -3053,55 +3124,14 @@ nav {
 
 /* ===== Support Page ===== */
 .support-hero-banner {
-    position: relative;
-    width: 100%;
-    height: 450px;
     background-image: url('../images/cs.webp');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    background-position: center 40%;
     margin-top: 0 !important;
-    overflow: hidden;
-}
-
-.support-hero-banner-overlay {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6));
-    z-index: 1;
-}
-
-.support-hero-banner-content {
-    position: relative;
-    z-index: 2;
-    max-width: 900px;
-    padding: 2rem;
-    text-align: center;
-}
-
-.support-hero-banner-title {
-    font-size: clamp(2rem, 5vw, 3rem);
-    font-weight: 800;
-    color: #FFFFFF;
-    margin: 0 0 1.5rem 0;
-    line-height: 1.4;
-    text-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-}
-
-.support-hero-banner-subtitle {
-    font-size: clamp(1.1rem, 2.5vw, 1.3rem);
-    color: #FFFFFF;
-    margin: 0;
-    line-height: 1.8;
-    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
 }
 
 .support-hero {
     background: linear-gradient(135deg, #059669 0%, #047857 100%);
-    padding: 180px 2rem 4rem;
+    padding: 3.5rem 2rem 4rem;
     text-align: center;
     margin-top: 0 !important;
 }
@@ -3901,30 +3931,61 @@ nav {
     }
 
     /* ===== 1. Hero 섹션 (메인 배너) ===== */
-    .hero {
-        height: clamp(520px, 68vh, 85vh);
-        min-height: 520px;
-        max-height: none;
+    .hero--home {
+        height: clamp(var(--hero-home-min), var(--hero-home-vh), var(--hero-home-max));
+        min-height: var(--hero-home-min);
+        max-height: var(--hero-home-max);
+    }
+
+    .hero--subpage {
+        height: clamp(var(--hero-sub-min), var(--hero-sub-vh), var(--hero-sub-max));
+        min-height: var(--hero-sub-min);
+        max-height: var(--hero-sub-max);
     }
 
     .hero-slide {
-        background-position: center 40%;
+        background-position: 58% center;
     }
 
     .hero-content {
-        padding: 0 20px !important;
+        padding: 0 var(--hero-content-px) !important;
         text-align: center !important;
     }
-    .hero-main-copy {
-        font-size: 1.75rem !important;
+
+    .hero--home .hero-main-copy,
+    .hero--home .hero__title {
+        font-size: clamp(26px, 7vw, 34px) !important;
         line-height: 1.35 !important;
-        word-break: keep-all !important;
     }
-    .hero-sub-copy {
-        font-size: 1.0625rem !important;
-        margin-top: 1rem !important;
+
+    .hero--home .hero-sub-copy,
+    .hero--home .hero__description {
+        font-size: clamp(15px, 4vw, 17px) !important;
+        margin-top: var(--hero-title-gap) !important;
         line-height: 1.75 !important;
-        word-break: keep-all !important;
+    }
+
+    .hero--subpage .hero__title,
+    .hero--subpage .support-hero-banner-title,
+    .hero--subpage .about-intro-title,
+    .hero--subpage.case-page-hero .header-text-box h3 {
+        font-size: clamp(22px, 5.5vw, 30px) !important;
+        line-height: 1.35 !important;
+    }
+
+    .hero--subpage .hero__description,
+    .hero--subpage .support-hero-banner-subtitle,
+    .hero--subpage .about-intro-desc,
+    .hero--subpage.case-page-hero .header-text-box p {
+        font-size: clamp(15px, 3.8vw, 17px) !important;
+        line-height: 1.65 !important;
+    }
+
+    .case-page-hero .header-icon-box {
+        width: 72px;
+        height: 72px;
+        font-size: 2.25rem;
+        margin-bottom: 12px;
     }
 
     /* ===== 대표 라인업 (Best Sellers) ===== */
@@ -4166,7 +4227,7 @@ nav {
     /* 1. 배경 및 레이아웃 – overflow 제거로 스크롤 트랩 방지 */
     .support-hero {
         background-color: #1a202c !important;
-        padding: 120px 0 !important;
+        padding: 4rem 0 !important;
         display: flex !important;
         justify-content: center !important;
         align-items: center !important;
@@ -5285,11 +5346,55 @@ nav {
 /* === 제작사례 페이지(cases.html) 갤러리: 1x4 카드 + 갤러리 연결 === */
 .case-page-section {
     background-color: #1a202c !important;
-    padding: 100px 20px 80px !important; /* 상단 여유로 호버 시 잘림 방지 */
+    padding: 0 20px 80px !important;
     text-align: center !important;
     overflow: visible !important;
 }
-/* === 제작사례 갤러리형 헤더 스타일 === */
+
+/* === 제작사례 갤러리형 헤더 (서브 히어로) === */
+.case-page-hero.gallery-header {
+    margin-bottom: var(--hero-gap-after);
+    background-color: #1a202c;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    gap: 0;
+}
+
+.case-page-hero .header-text-box h2 {
+    font-size: 0.85rem;
+    color: #48bb78;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+    font-weight: bold;
+    text-transform: uppercase;
+    opacity: 0.9;
+}
+
+.case-page-hero .header-text-box h3 {
+    margin-bottom: 0;
+}
+
+.case-page-hero .btn-all-cases {
+    display: inline-block;
+    margin-top: 14px;
+    padding: 0.5rem 1.25rem;
+    background: rgba(72, 187, 120, 0.2);
+    color: #48bb78;
+    border: 1px solid #48bb78;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.case-page-hero .btn-all-cases:hover {
+    background: #48bb78;
+    color: #1a202c;
+}
+
 .gallery-header {
     margin-bottom: 60px;
     display: flex;
@@ -5355,12 +5460,23 @@ nav {
 }
 
 @media (min-width: 769px) {
-    .gallery-header {
+    .gallery-header:not(.case-page-hero) {
         flex-direction: row;
         justify-content: center;
         align-items: center;
         gap: 40px;
         text-align: left;
+    }
+    .case-page-hero.gallery-header {
+        flex-direction: row;
+        gap: 32px;
+        text-align: left;
+    }
+    .case-page-hero .header-icon-box {
+        margin-bottom: 0;
+        width: 100px;
+        height: 100px;
+        font-size: 3.25rem;
     }
     .gallery-header .header-icon-box {
         margin-bottom: 0;
@@ -5368,7 +5484,8 @@ nav {
         height: 120px;
         font-size: 4rem;
     }
-    .gallery-header .header-text-box p {
+    .gallery-header .header-text-box p,
+    .case-page-hero .header-text-box p {
         margin: 0;
     }
 }
