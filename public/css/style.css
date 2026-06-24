@@ -25,16 +25,118 @@
     --glass-border: rgba(255, 255, 255, 0.1);
 }
 
-/* 지도 상자: 부모 높이 상속, iframe 꽉 채움 */
-#map {
-    width: 100% !important;
-    height: 100% !important;
-    min-height: 500px;
+/* ===== Location Map (support, about) ===== */
+.location-map-box,
+.map-frame {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    flex: 1 1 auto;
 }
-#map iframe {
-    width: 100% !important;
-    height: 100% !important;
+
+.location-map {
+    width: 100%;
+    max-width: 100%;
+    aspect-ratio: 16 / 8;
+    overflow: hidden;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    position: relative;
+    background: #1f2937;
+}
+
+.location-map iframe {
     display: block;
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    border: 0;
+}
+
+.map-buttons,
+.map-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    width: 100%;
+    margin-top: 1.5rem;
+}
+
+.map-btn,
+.btn-naver,
+.btn-kakao {
+    flex: 1 1 calc(50% - 7px);
+    min-width: 0;
+    min-height: 48px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.875rem 1rem;
+    text-align: center;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    text-decoration: none;
+    white-space: nowrap;
+    box-sizing: border-box;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+@media (max-width: 360px) {
+    .map-btn,
+    .btn-naver,
+    .btn-kakao {
+        flex: 1 1 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .location-map {
+        aspect-ratio: 16 / 10;
+        border-radius: 16px;
+        min-height: 240px;
+    }
+
+    .location-map-box {
+        width: 100%;
+        max-width: 100%;
+        height: auto !important;
+        min-height: 0 !important;
+        margin: 1.25rem 0 1.75rem !important;
+    }
+
+    .map-frame {
+        width: 100%;
+        max-width: 100%;
+        height: auto !important;
+        min-height: 0 !important;
+    }
+
+    .about-map-section {
+        padding: 2.5rem 20px 2rem !important;
+    }
+
+    .about-map-container {
+        min-height: 0 !important;
+        height: auto !important;
+        margin-bottom: 0 !important;
+    }
+
+    .location-section {
+        padding-bottom: 2rem !important;
+    }
+
+    .location-container {
+        min-height: 0 !important;
+        height: auto !important;
+        align-items: stretch !important;
+    }
+
+    .map-buttons,
+    .map-links {
+        flex-direction: row;
+        gap: 14px;
+    }
 }
 
 * {
@@ -2560,6 +2662,38 @@ nav {
     padding-left: 1.75rem;
 }
 
+.service-fee-notice {
+    margin-bottom: 1.5rem;
+    padding: 1.125rem 1.125rem 1.125rem 1.25rem;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-left: 4px solid var(--primary);
+    border-radius: 12px;
+}
+
+.service-fee-notice-title {
+    margin: 0 0 0.625rem;
+    color: #f7fafc;
+    font-size: 1.0625rem;
+    font-weight: 700;
+    line-height: 1.4;
+}
+
+.service-fee-notice-body,
+.service-fee-notice-sub {
+    margin: 0;
+    color: #cbd5e0;
+    font-size: 0.9375rem;
+    line-height: 1.75;
+    word-break: keep-all;
+}
+
+.service-fee-notice-sub {
+    margin-top: 0.625rem;
+    color: #a0aec0;
+    font-size: 0.875rem;
+}
+
 /* ===== Global Footer: Official Footer ===== */
 .global-footer,
 .final-footer {
@@ -3920,14 +4054,18 @@ nav {
     .location-buttons-large,
     .map-buttons {
         display: flex !important;
-        flex-direction: column !important;
-        gap: 10px !important;
+        flex-direction: row !important;
+        flex-wrap: wrap !important;
+        gap: 14px !important;
         width: 100% !important;
     }
     .btn-directions-large,
     .map-btn {
-        width: 100% !important;
-        padding: 15px !important;
+        flex: 1 1 calc(50% - 7px) !important;
+        width: auto !important;
+        min-height: 48px !important;
+        padding: 0.875rem 1rem !important;
+        white-space: nowrap !important;
     }
 
     /* (4) 견적문의 폼: 모바일 최적화 */
@@ -4326,10 +4464,12 @@ nav {
         min-height: 100% !important;
     }
 
-    .location-map-box #map {
+    .location-map-box .location-map {
         width: 100% !important;
         height: 100% !important;
         min-height: 100% !important;
+        aspect-ratio: auto !important;
+        border-radius: 0 !important;
     }
 
     .location-map-box iframe {
@@ -4401,10 +4541,12 @@ nav {
         height: 100% !important;
         min-height: 100% !important;
     }
-    .support-page .location-map-box #map {
+    .support-page .location-map-box .location-map {
         flex: 1 !important;
         height: 100% !important;
         width: 100% !important;
+        aspect-ratio: auto !important;
+        border-radius: 0 !important;
     }
     .support-page .location-map-box iframe {
         width: 100% !important;
@@ -4494,9 +4636,11 @@ nav {
     }
 
     .location-map-box {
-        height: 300px !important;
-        border-radius: 15px !important;
+        height: auto !important;
+        min-height: 0 !important;
+        border-radius: 16px !important;
         overflow: hidden !important;
+        margin: 1.25rem 0 1.75rem !important;
     }
 
     /* === 모바일 세로 찌그러짐 최종 해결 (768px 이하) === */
@@ -4569,7 +4713,7 @@ nav {
 }
 
 .about-map-section {
-    padding: 40px 20px 60px;
+    padding: 2.5rem 20px 2rem;
 }
 
 .about-map-container {
@@ -4602,19 +4746,28 @@ nav {
 
 .map-links {
     display: flex;
-    gap: 12px;
-    margin-top: 24px;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-top: 1.5rem;
+    width: 100%;
 }
 
 .btn-naver,
 .btn-kakao {
-    flex: 1;
-    padding: 14px;
+    flex: 1 1 calc(50% - 7px);
+    min-width: 0;
+    min-height: 48px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.875rem 1rem;
     text-align: center;
     border-radius: 12px;
-    font-weight: bold;
+    font-weight: 700;
     text-decoration: none;
     font-size: 0.95rem;
+    white-space: nowrap;
+    box-sizing: border-box;
     transition: 0.3s;
 }
 
@@ -4630,31 +4783,11 @@ nav {
 
 .map-frame {
     width: 100%;
-    height: 100%;
-    min-height: 100%;
+    max-width: 100%;
+    min-width: 0;
 }
 
-.map-frame iframe,
-.map-frame #map {
-    width: 100%;
-    height: 100%;
-    min-height: 100%;
-    display: block;
-}
-
-/* 지도 영역 모바일에서 화면 너비 100% */
-@media (max-width: 768px) {
-    .map-frame,
-    .location-map-box {
-        width: 100% !important;
-        max-width: 100% !important;
-    }
-    .map-frame iframe,
-    .location-map-box iframe {
-        width: 100% !important;
-        max-width: 100% !important;
-    }
-}
+/* 지도 영역: .location-map 공통 스타일 사용 */
 
 /* === about 페이지 PC 전용: 와이드 레이아웃 (769px 이상) === */
 @media (min-width: 769px) {
@@ -4718,20 +4851,16 @@ nav {
     }
 
     .map-frame {
-        flex: 1 !important;
+        flex: none !important;
         width: 100% !important;
-        height: 100% !important;
+        height: auto !important;
+        min-height: 0 !important;
     }
 
-    .map-frame #map {
+    .map-frame .location-map {
         width: 100% !important;
-        height: 100% !important;
-        min-height: 100% !important;
-    }
-
-    .map-frame iframe {
-        width: 100% !important;
-        height: 100% !important;
+        height: auto !important;
+        min-height: 240px !important;
     }
 
     .btn-naver:hover,
@@ -4802,7 +4931,7 @@ nav {
     /* 3. 오시는 길 섹션 */
     .location-section {
         background-color: #0b1a2d !important;
-        padding: 50px 20px !important;
+        padding: 2.5rem 20px 2rem !important;
         text-align: center !important;
     }
 
@@ -4828,34 +4957,44 @@ nav {
 
     .location-map-box {
         width: 100% !important;
-        height: 250px !important;
-        border-radius: 20px !important;
+        max-width: 100% !important;
+        height: auto !important;
+        min-height: 0 !important;
+        border-radius: 16px !important;
         overflow: hidden !important;
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4) !important;
-        margin: 20px 0 40px 0 !important;
+        margin: 1.25rem 0 1.75rem !important;
     }
 
+    .location-map-box .location-map,
     .location-map-box iframe {
         width: 100% !important;
-        height: 100% !important;
+        max-width: 100% !important;
         border: 0 !important;
     }
 
     .map-buttons {
         display: flex !important;
-        flex-direction: column !important;
-        gap: 15px !important;
+        flex-direction: row !important;
+        flex-wrap: wrap !important;
+        gap: 14px !important;
         max-width: 100% !important;
+        margin-top: 1.25rem !important;
     }
 
     .map-btn {
-        display: block !important;
-        width: 100% !important;
-        padding: 18px 0 !important;
-        border-radius: 15px !important;
-        font-weight: 800 !important;
-        font-size: 1.1rem !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        flex: 1 1 calc(50% - 7px) !important;
+        width: auto !important;
+        min-height: 48px !important;
+        padding: 0.875rem 1rem !important;
+        border-radius: 12px !important;
+        font-weight: 700 !important;
+        font-size: 0.95rem !important;
         text-decoration: none !important;
+        white-space: nowrap !important;
     }
 
     .map-btn.naver {
