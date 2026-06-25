@@ -2,11 +2,11 @@ import {
   deleteCaseImage,
   normalizeCaseId,
   normalizeImageFileName,
-} from '../../../lib/case-manage.js';
-import { buildUploadSuccessMessage, triggerPagesDeploy } from '../../../lib/deploy.js';
-import { errorResponse, handleOptions, successResponse } from '../../../lib/http.js';
-import { commitUrl } from '../../../lib/github.js';
-import { requireGithubConfig, requireUploadAuth } from '../../../lib/session.js';
+} from '../../../../lib/case-manage.js';
+import { buildUploadSuccessMessage, triggerPagesDeploy } from '../../../../lib/deploy.js';
+import { errorResponse, handleOptions, successResponse } from '../../../../lib/http.js';
+import { commitUrl } from '../../../../lib/github.js';
+import { requireGithubConfig, requireUploadAuth } from '../../../../lib/session.js';
 
 function readContentType(url) {
   const contentType = url.searchParams.get('contentType');
