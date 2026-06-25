@@ -1,0 +1,23 @@
+name: Trigger Cloudflare Pages Deploy
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Cloudflare Deploy Hook
+        env:
+          HOOK_URL: ${{ secrets.CLOUDFLARE_DEPLOY_HOOK_URL }}
+        run: |
+          if [ -z "$HOOK_URL" ]; then
+            echo "CLOUDFLARE_DEPLOY_HOOK_URL secret is not set. Skipping deploy hook."
+            exit 0
+          fi
+          curl -fsS -X POST "$HOOK_URL"
+          echo "Cloudflare Pages deploy hook triggered."
