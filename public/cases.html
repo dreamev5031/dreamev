@@ -223,6 +223,7 @@
                             frontmatter.gallery = [];
                             i++;
                             while (i < lines.length) {
+                                if (!lines[i].trim()) { i++; continue; }
                                 var m = lines[i].match(/^\s*-\s*image\s*:\s*(.+)$/);
                                 if (m) {
                                     frontmatter.gallery.push({ image: m[1].trim().replace(/^["']|["']$/g, '') });

@@ -141,6 +141,7 @@ export function buildMarkdown({
     `category: ${category}`,
     'gallery:',
     ...galleryLines,
+    '',
     `date: ${formatKstDateTime(date)}`,
     '---',
     '',

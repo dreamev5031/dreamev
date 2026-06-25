@@ -74,9 +74,10 @@ test('markdown frontmatter field order', () => {
   assert.match(lines[2], /^category:/);
   assert.match(lines[3], /^gallery:/);
   assert.match(lines[4], /^\s+- image: \/images\//);
-  assert.match(lines[5], /^date:/);
-  assert.equal(lines[6], '---');
-  assert.equal(lines[7], '');
+  assert.equal(lines[5], '');
+  assert.match(lines[6], /^date:/);
+  assert.equal(lines[7], '---');
+  assert.equal(lines[8], '');
   assert.match(md, /## 고객 요청/);
 });
 

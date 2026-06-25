@@ -31,14 +31,22 @@ function readImages(formData) {
   return formData.getAll('images').filter((v) => v instanceof File);
 }
 
-async function resolveUniqueImageNames(env, stamp, count) {
+async function resolveFinalImageNames(env, proposedNames, stamp, count) {
   const names = [];
-  for (let i = 1; i <= count; i++) {
-    let candidate = makeImageFileName(stamp, i);
+  for (let i = 0; i < count; i++) {
+    const proposed = proposedNames[i];
+    if (isValidImageFileName(proposed) && !names.includes(proposed)) {
+      const imagePath = `public/images/${proposed}`;
+      if (!(await pathExists(env, imagePath))) {
+        names.push(proposed);
+        continue;
+      }
+    }
     let attempt = 0;
-    while (await pathExists(env, `public/images/${candidate}`)) {
+    let candidate = makeImageFileName(stamp, i + 1);
+    while (names.includes(candidate) || await pathExists(env, `public/images/${candidate}`)) {
       attempt += 1;
-      candidate = makeImageFileName(stamp, i, `d${attempt}`);
+      candidate = makeImageFileName(stamp, i + 1, `d${attempt}`);
     }
     names.push(candidate);
   }
@@ -105,8 +113,8 @@ export async function onRequestPost(context) {
     const existingMd = await listExistingMdNames(env);
     const mdFileName = resolveMdFileName(mdBase, date, existingMd);
 
-    const stamp = imageStamp || proposedNames[0].slice(0, 15);
-    const finalImageNames = await resolveUniqueImageNames(env, stamp, images.length);
+    const stamp = imageStamp || proposedNames[0]?.slice(0, 15) || '';
+    const finalImageNames = await resolveFinalImageNames(env, proposedNames, stamp, images.length);
 
     const markdown = buildMarkdown({
       title,
