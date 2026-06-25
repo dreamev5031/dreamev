@@ -153,6 +153,7 @@
         </div>
     </div>
 
+    <script src="js/case-image-lightbox.js"></script>
     <script src="js/script.js"></script>
     <script>
         // Mobile Menu Toggle - 기존 코드 주석 처리
@@ -371,25 +372,26 @@
                 if (!container) return;
                 container.innerHTML = '';
                 var title = caseData.title || '제작사례';
+                var paths = [];
 
                 if (caseData.gallery && Array.isArray(caseData.gallery) && caseData.gallery.length > 0) {
-                    var paths = normalizeGalleryPaths(caseData.gallery);
-                    paths.forEach(function(imgUrl) {
-                        var img = document.createElement('img');
-                        img.src = imgUrl;
-                        img.alt = title;
-                        img.className = 'case-modal-image detail-image';
-                        img.loading = 'lazy';
-                        container.appendChild(img);
-                    });
+                    paths = normalizeGalleryPaths(caseData.gallery);
                 } else if (caseData.image) {
                     var raw = (caseData.image + '').trim();
-                    var singleSrc = (raw.indexOf('/') === 0 || raw.indexOf('http') === 0) ? raw : ('/' + raw.replace(/^\//, ''));
+                    paths = [(raw.indexOf('/') === 0 || raw.indexOf('http') === 0) ? raw : ('/' + raw.replace(/^\//, ''))];
+                }
+
+                paths.forEach(function(imgUrl) {
                     var img = document.createElement('img');
-                    img.src = singleSrc;
+                    img.src = imgUrl;
                     img.alt = title;
                     img.className = 'case-modal-image detail-image';
+                    img.loading = 'lazy';
                     container.appendChild(img);
+                });
+
+                if (window.CaseImageLightbox && paths.length) {
+                    window.CaseImageLightbox.bindDetailImages(container, paths, title);
                 }
             }
 
@@ -484,9 +486,14 @@
             var modalBack = document.getElementById('modalBackList');
             if (modalBack) modalBack.addEventListener('click', function(e) { e.preventDefault(); closeModal(); });
 
-            // ESC key
+            // ESC key (라이트박스가 열려 있으면 먼저 닫기)
             document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape' && modal && modal.classList.contains('active')) {
+                if (e.key !== 'Escape') return;
+                if (window.CaseImageLightbox && window.CaseImageLightbox.isOpen()) {
+                    window.CaseImageLightbox.close();
+                    return;
+                }
+                if (modal && modal.classList.contains('active')) {
                     closeModal();
                 }
             });

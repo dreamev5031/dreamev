@@ -1154,6 +1154,118 @@ header nav a.active {
     margin-bottom: 0;
 }
 
+.case-modal-detail-images .detail-image,
+.case-modal-detail-images .case-modal-image {
+    cursor: pointer;
+    pointer-events: auto;
+}
+
+/* 사례 상세 이미지 확대 라이트박스 */
+.case-image-lightbox {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 11050;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.25s ease-out;
+}
+
+.case-image-lightbox.active {
+    display: flex;
+    pointer-events: auto;
+    opacity: 1;
+}
+
+.case-image-lightbox-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.92);
+    cursor: pointer;
+}
+
+.case-image-lightbox-stage {
+    position: relative;
+    z-index: 1;
+    max-width: min(96vw, 1200px);
+    max-height: 88vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.case-image-lightbox-img {
+    display: block;
+    max-width: 100%;
+    max-height: 88vh;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    border-radius: 8px;
+    user-select: none;
+    -webkit-user-drag: none;
+}
+
+.case-image-lightbox-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    z-index: 2;
+    width: 44px;
+    height: 44px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.12);
+    color: #fff;
+    font-size: 1.75rem;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.case-image-lightbox-close:hover {
+    background: rgba(255, 255, 255, 0.22);
+}
+
+.case-image-lightbox-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
+    width: 44px;
+    height: 44px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.55);
+    color: #fff;
+    font-size: 1.75rem;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.case-image-lightbox-nav:hover {
+    background: rgba(0, 0, 0, 0.75);
+}
+
+.case-image-lightbox-prev { left: 0.75rem; }
+.case-image-lightbox-next { right: 0.75rem; }
+
+.case-image-lightbox-counter {
+    position: absolute;
+    bottom: 1.25rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2;
+    margin: 0;
+    padding: 0.35rem 0.75rem;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.55);
+    color: #e2e8f0;
+    font-size: 0.9rem;
+}
+
 .case-modal-nav {
     position: absolute;
     top: 50%;
