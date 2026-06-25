@@ -16,6 +16,7 @@ import {
   findUnselectedWorkMentions,
   findInformalSpeechInText,
   findDraftInformalSpeechViolations,
+  resolveOpenAiModel,
 } from '../lib/openai-draft.js';
 
 const env = {
@@ -191,6 +192,27 @@ test('callOpenAiDraft succeeds with selectedWorkItems in prompt', async () => {
 
 test('default model is gpt-4.1-mini', () => {
   assert.equal(openAiDraftInternals.DEFAULT_MODEL, 'gpt-4.1-mini');
+});
+
+test('resolveOpenAiModel uses OPENAI_MODEL env when set', () => {
+  assert.equal(resolveOpenAiModel({ OPENAI_MODEL: 'gpt-4.1-mini' }), 'gpt-4.1-mini');
+  assert.equal(resolveOpenAiModel({ OPENAI_MODEL: '  gpt-4.1-mini  ' }), 'gpt-4.1-mini');
+  assert.equal(resolveOpenAiModel({}), 'gpt-4.1-mini');
+});
+
+test('callOpenAiDraft sends OPENAI_MODEL to OpenAI API', async () => {
+  let requestModel = '';
+  const fetchImpl = async (_url, init) => {
+    requestModel = JSON.parse(init.body).model;
+    return openAiSuccessResponse(repairSampleDraft);
+  };
+  const result = await callOpenAiDraft(
+    { ...env, OPENAI_MODEL: 'gpt-4.1-mini' },
+    normalizeDraftInput(repairInput2),
+    fetchImpl,
+  );
+  assert.equal(result.ok, true);
+  assert.equal(requestModel, 'gpt-4.1-mini');
 });
 
 test('isMeaninglessTitle detects numeric title', () => {

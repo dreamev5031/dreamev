@@ -2,6 +2,7 @@ import {
   callOpenAiDraft,
   normalizeDraftInput,
   openAiDraftInternals,
+  resolveOpenAiModel,
   validateDraftInput,
 } from '../lib/openai-draft.js';
 import { createRequestId, errorResponse, handleOptions, readJsonBody, successResponse } from '../lib/http.js';
@@ -23,7 +24,7 @@ export async function onRequestPost(context) {
       console.warn('generate-case-draft failed', {
         requestId,
         stage: 'openai_config_missing',
-        model: (env.OPENAI_MODEL || openAiDraftInternals.DEFAULT_MODEL).trim(),
+        model: resolveOpenAiModel(env),
         endpoint: openAiDraftInternals.OPENAI_ENDPOINT,
       });
       return errorResponse(
@@ -89,6 +90,7 @@ export async function onRequestPost(context) {
 
     return successResponse({
       requestId,
+      model: result.model,
       draft: result.draft,
     });
   } catch (err) {

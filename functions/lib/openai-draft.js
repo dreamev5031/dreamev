@@ -166,6 +166,11 @@ function trimText(value, max) {
   return String(value || '').trim().slice(0, max);
 }
 
+/** Cloudflare OPENAI_MODEL 환경변수 → OpenAI API model 파라미터 */
+export function resolveOpenAiModel(env) {
+  return trimText(env?.OPENAI_MODEL, 80) || DEFAULT_MODEL;
+}
+
 function emptyAsBlank(value) {
   const text = trimText(value, LIMITS.singleField);
   return EMPTY_MARKERS.has(text) ? '' : text;
@@ -625,11 +630,11 @@ async function requestOpenAi(env, input, fetchImpl) {
       message: 'AI 기능 설정이 완료되지 않았습니다.',
       status: 503,
       stage: 'config_missing',
-      model: trimText(env.OPENAI_MODEL, 80) || DEFAULT_MODEL,
+      model: resolveOpenAiModel(env),
     };
   }
 
-  const model = trimText(env.OPENAI_MODEL, 80) || DEFAULT_MODEL;
+  const model = resolveOpenAiModel(env);
   const prompt = buildDraftPrompt(input);
   const jsonSchema = input.contentType === 'repair'
     ? REPAIR_JSON_SCHEMA
@@ -843,6 +848,7 @@ export async function callOpenAiDraft(env, input, fetchImpl = fetch) {
 
 export const openAiDraftInternals = {
   DEFAULT_MODEL,
+  resolveOpenAiModel,
   OPENAI_ENDPOINT,
   OPENAI_TIMEOUT_MS,
   REPAIR_JSON_SCHEMA,
