@@ -5,7 +5,7 @@ import {
   normalizeContentType,
   parseFrontmatterFields,
 } from './case-content.js';
-import { commitChanges, getFile, listMdFilesInDir } from './github.js';
+import { commitChanges, getFile, listMdFilesInDir, pathExists } from './github.js';
 
 export const CONTENT_DIRS = {
   production: 'public/content/cases',
@@ -98,18 +98,22 @@ export async function loadAllCaseFiles(env) {
     const names = await listMdFilesInDir(env, dir);
     for (const name of names) {
       const path = `${dir}/${name}`;
-      const file = await getFile(env, path);
-      if (!file) continue;
-      const parsed = parseFrontmatterFields(file.content);
-      if (!parsed.ok) continue;
-      results.push({
-        contentType,
-        path,
-        mdFileName: name,
-        sha: file.sha,
-        content: file.content,
-        parsed,
-      });
+      try {
+        const file = await getFile(env, path);
+        if (!file) continue;
+        const parsed = parseFrontmatterFields(file.content);
+        if (!parsed.ok) continue;
+        results.push({
+          contentType,
+          path,
+          mdFileName: name,
+          sha: file.sha,
+          content: file.content,
+          parsed,
+        });
+      } catch (err) {
+        console.warn('loadAllCaseFiles skipped', path, err.message);
+      }
     }
   }
   return results;
@@ -170,7 +174,11 @@ export async function getCaseDetail(env, contentType, mdFileName) {
   };
 }
 
-export async function deleteCaseImage(env, contentType, mdFileName, imageFileName) {
+export async function deleteCaseImage(env, contentType, caseIdOrFileName, imageFileName) {
+  const mdFileName = normalizeCaseId(caseIdOrFileName);
+  if (!mdFileName) {
+    return { ok: false, code: 'VALIDATION_ERROR', message: '유효하지 않은 게시물 ID입니다.' };
+  }
   const type = normalizeContentType(contentType);
   const dir = CONTENT_DIRS[type];
   const mdPath = `${dir}/${mdFileName}`;
@@ -199,7 +207,10 @@ export async function deleteCaseImage(env, contentType, mdFileName, imageFileNam
   const imageRepoPath = `public/images/${imageFileName}`;
 
   const upserts = [{ path: mdPath, content: newMarkdown }];
-  const deletes = deleteImageFile ? [{ path: imageRepoPath }] : [];
+  const deletes = [];
+  if (deleteImageFile && await pathExists(env, imageRepoPath)) {
+    deletes.push({ path: imageRepoPath });
+  }
 
   const commitSha = await commitChanges(env, { upserts, deletes }, `이미지 삭제: ${mdFileName} / ${imageFileName}`);
 
@@ -207,16 +218,23 @@ export async function deleteCaseImage(env, contentType, mdFileName, imageFileNam
     ok: true,
     commitSha,
     mdPath,
-    imageDeleted: deleteImageFile,
+    imageDeleted: deleteImageFile && deletes.length > 0,
+    imageMissingInRepo: deleteImageFile && deletes.length === 0,
     imageKeptForOtherCases: !deleteImageFile,
     remainingGallery: parsed.gallery,
     message: deleteImageFile
-      ? '이미지가 삭제되었습니다.'
+      ? (deletes.length > 0
+        ? '이미지가 삭제되었습니다.'
+        : 'gallery에서 이미지를 제거했습니다. (이미지 파일은 저장소에 없었습니다.)')
       : '다른 게시물에서 사용 중인 이미지 파일은 보존하고 gallery에서만 제거했습니다.',
   };
 }
 
-export async function deleteCase(env, contentType, mdFileName) {
+export async function deleteCase(env, contentType, caseIdOrFileName) {
+  const mdFileName = normalizeCaseId(caseIdOrFileName);
+  if (!mdFileName) {
+    return { ok: false, code: 'VALIDATION_ERROR', message: '유효하지 않은 게시물 ID입니다.' };
+  }
   const type = normalizeContentType(contentType);
   const dir = CONTENT_DIRS[type];
   const mdPath = `${dir}/${mdFileName}`;
@@ -235,6 +253,7 @@ export async function deleteCase(env, contentType, mdFileName) {
   const deletes = [{ path: mdPath }];
   const imagesDeleted = [];
   const imagesKept = [];
+  const imagesMissing = [];
 
   for (const g of parsed.gallery) {
     const norm = g.replace(/^["']|["']$/g, '');
@@ -242,8 +261,13 @@ export async function deleteCase(env, contentType, mdFileName) {
     if (!fileName || !isValidImageFileName(fileName)) continue;
     const otherRefs = usageMap.get(norm) || [];
     if (otherRefs.length === 0) {
-      deletes.push({ path: `public/images/${fileName}` });
-      imagesDeleted.push(fileName);
+      const imageRepoPath = `public/images/${fileName}`;
+      if (await pathExists(env, imageRepoPath)) {
+        deletes.push({ path: imageRepoPath });
+        imagesDeleted.push(fileName);
+      } else {
+        imagesMissing.push(fileName);
+      }
     } else {
       imagesKept.push({ fileName, usedBy: otherRefs });
     }
@@ -257,6 +281,7 @@ export async function deleteCase(env, contentType, mdFileName) {
     mdPath,
     imagesDeleted,
     imagesKept,
+    imagesMissing,
     message: '게시물이 삭제되었습니다.',
   };
 }

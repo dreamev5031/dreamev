@@ -16,12 +16,39 @@ function repoBase(env) {
 export async function pathExists(env, path) {
   const { owner, repo } = repoBase(env);
   const token = env.GITHUB_TOKEN;
-  const res = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${encodeURIComponent(path)}`, {
+  const encodedPath = path.split('/').map(encodeURIComponent).join('/');
+  const res = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${encodedPath}`, {
     headers: githubHeaders(token),
   });
   if (res.status === 404) return false;
-  if (!res.ok) throw new Error(`GitHub contents check failed: ${res.status}`);
+  if (!res.ok) {
+    const err = await githubResponseError('GitHub contents check failed', res);
+    throw err;
+  }
   return true;
+}
+
+async function readGithubErrorBody(res) {
+  try {
+    const text = await res.text();
+    if (!text) return '';
+    try {
+      const data = JSON.parse(text);
+      return data.message || text;
+    } catch {
+      return text;
+    }
+  } catch {
+    return '';
+  }
+}
+
+export async function githubResponseError(prefix, res) {
+  const detail = await readGithubErrorBody(res);
+  const err = new Error(detail ? `${prefix}: ${res.status} ${detail}` : `${prefix}: ${res.status}`);
+  err.code = 'GITHUB_ERROR';
+  err.status = res.status;
+  return err;
 }
 
 export async function listExistingMdNames(env, contentDir = 'public/content/cases') {
@@ -36,7 +63,7 @@ export async function listMdFilesInDir(env, contentDir) {
     headers: githubHeaders(token),
   });
   if (res.status === 404) return [];
-  if (!res.ok) throw new Error(`GitHub list ${contentDir} failed: ${res.status}`);
+  if (!res.ok) throw await githubResponseError(`GitHub list ${contentDir} failed`, res);
   const data = await res.json();
   if (!Array.isArray(data)) return [];
   return data.filter((f) => f.type === 'file' && f.name.endsWith('.md')).map((f) => f.name);
@@ -50,7 +77,7 @@ export async function getFile(env, path) {
     headers: githubHeaders(token),
   });
   if (res.status === 404) return null;
-  if (!res.ok) throw new Error(`GitHub get file failed: ${res.status}`);
+  if (!res.ok) throw await githubResponseError('GitHub get file failed', res);
   const data = await res.json();
   if (!data.content || !data.sha) return null;
   const binary = atob(data.content.replace(/\n/g, ''));
@@ -65,14 +92,14 @@ async function getBranchState(env) {
   const refRes = await fetch(`https://api.github.com/repos/${owner}/${repo}/git/ref/heads/${branch}`, {
     headers: githubHeaders(token),
   });
-  if (!refRes.ok) throw new Error(`GitHub ref fetch failed: ${refRes.status}`);
+  if (!refRes.ok) throw await githubResponseError('GitHub ref fetch failed', refRes);
   const refData = await refRes.json();
   const commitSha = refData.object.sha;
 
   const commitRes = await fetch(`https://api.github.com/repos/${owner}/${repo}/git/commits/${commitSha}`, {
     headers: githubHeaders(token),
   });
-  if (!commitRes.ok) throw new Error(`GitHub commit fetch failed: ${commitRes.status}`);
+  if (!commitRes.ok) throw await githubResponseError('GitHub commit fetch failed', commitRes);
   const commitData = await commitRes.json();
   return { commitSha, treeSha: commitData.tree.sha };
 }
@@ -90,7 +117,7 @@ async function createBlob(env, content, encoding = 'base64') {
     headers: { ...githubHeaders(token), 'Content-Type': 'application/json' },
     body: JSON.stringify({ content, encoding }),
   });
-  if (!res.ok) throw new Error(`GitHub blob create failed: ${res.status}`);
+  if (!res.ok) throw await githubResponseError('GitHub blob create failed', res);
   const data = await res.json();
   return data.sha;
 }
@@ -147,7 +174,7 @@ export async function commitChanges(env, { upserts = [], deletes = [] }, message
       headers: { ...githubHeaders(token), 'Content-Type': 'application/json' },
       body: JSON.stringify({ base_tree: treeSha, tree: treeItems }),
     });
-    if (!treeRes.ok) throw new Error(`GitHub tree create failed: ${treeRes.status}`);
+    if (!treeRes.ok) throw await githubResponseError('GitHub tree create failed', treeRes);
     const treeData = await treeRes.json();
 
     const commitRes = await fetch(`https://api.github.com/repos/${owner}/${repo}/git/commits`, {
@@ -159,7 +186,7 @@ export async function commitChanges(env, { upserts = [], deletes = [] }, message
         parents: [commitSha],
       }),
     });
-    if (!commitRes.ok) throw new Error(`GitHub commit create failed: ${commitRes.status}`);
+    if (!commitRes.ok) throw await githubResponseError('GitHub commit create failed', commitRes);
     const newCommit = await commitRes.json();
 
     const updateRes = await fetch(`https://api.github.com/repos/${owner}/${repo}/git/refs/heads/${branch}`, {
@@ -171,7 +198,7 @@ export async function commitChanges(env, { upserts = [], deletes = [] }, message
     if (updateRes.status === 409) {
       return { conflict: true };
     }
-    if (!updateRes.ok) throw new Error(`GitHub ref update failed: ${updateRes.status}`);
+    if (!updateRes.ok) throw await githubResponseError('GitHub ref update failed', updateRes);
     return { conflict: false, commitSha: newCommit.sha };
   };
 

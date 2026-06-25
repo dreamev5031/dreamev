@@ -4,6 +4,10 @@ const CORS_HEADERS = {
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
 };
 
+export function createRequestId() {
+  return crypto.randomUUID();
+}
+
 export function withCors(response) {
   const headers = new Headers(response.headers);
   Object.entries(CORS_HEADERS).forEach(([k, v]) => headers.set(k, v));
@@ -23,8 +27,8 @@ export function json(data, status = 200) {
   );
 }
 
-export function errorResponse(code, message, status = 400) {
-  return json({ success: false, code, message }, status);
+export function errorResponse(code, message, status = 400, extra = {}) {
+  return json({ success: false, code, message, ...extra }, status);
 }
 
 export function successResponse(data) {
