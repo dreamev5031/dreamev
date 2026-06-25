@@ -55,9 +55,10 @@ ${POLITE_STYLE_RULE}
 * 현장 기술자가 실제로 작성한 것처럼 구체적이고 차분한 문체를 사용합니다.
 * 과장 광고, 감탄 표현, 막연한 홍보 문구는 사용하지 않습니다.
 * 일반 고객도 이해할 수 있는 표현을 사용합니다.
-* 각 항목은 중복 없이 역할이 분명해야 합니다.
+* 각 항목은 중복 없이 역할이 분명해야 합니다. summary, diagnosis, workDetails, result에 같은 작업 내용을 반복하지 않습니다.
 * "(이)가", "을(를)", "은(는)" 같은 선택형 조사 표현을 절대 출력하지 않습니다.
 * "확인했습니다"라는 표현을 한 글에서 지나치게 반복하지 않습니다.
+* 동작 서술 시 "실시했습니다"보다 "진행했습니다"를 우선 사용합니다.
 * 입력에 없는 정상 작동이나 수리 성공을 임의로 단정하지 않습니다.
 * 작업 결과에 정상 주행 확인이 입력된 경우에만 정상 작동을 확인했습니다고 작성합니다.
 * 실제 교체가 입력된 경우에만 "교체"라고 작성합니다.
@@ -83,10 +84,20 @@ const REPAIR_DEVELOPER_PROMPT = `contentType이 repair인 수리사례를 작성
 
 작성 품질 규칙:
 * 입력 문장·키워드를 그대로 복사하지 말고, 의미를 유지한 채 전문적인 사례 문장으로 다시 작성합니다.
-* 각 본문 항목은 최소 1문장, 권장 2문장입니다. summary와 workDetails는 2~3문장까지 허용합니다.
-* 항목끼리 연결되도록 작성하되, 같은 표현을 반복하지 않습니다.
+* 각 본문 항목은 최소 1문장, 권장 2문장입니다. summary는 2문장 이내로 짧은 개요만 작성합니다.
+* 항목별 역할을 분리합니다. 같은 사실(충전기 점검, 시운전, 정상 주행 확인 등)을 여러 필드에서 반복하지 않습니다.
 * 사실 확장은 금지합니다. 입력에 없는 부품·원인·작업·시운전·배선 점검 등을 임의로 추가하지 않습니다.
 * 광고 문구나 과장 표현은 넣지 않습니다.
+* 동작 서술 시 "실시했습니다"보다 "진행했습니다"를 우선 사용합니다.
+
+필드별 역할 (중복 금지):
+* summary: 전체 작업의 짧은 개요만. 증상과 핵심 원인·주요 작업을 한눈에 요약. 시운전·충전기 점검·최종 주행 결과는 상세히 쓰지 않음.
+* customerRequest: 고객 요청·증상만.
+* diagnosis: 확인된 고장 원인과 점검에서 밝혀진 사실만. 실제 작업·시운전·최종 결과는 쓰지 않음.
+* workDetails: 실제 교체·보수·점검·시운전 과정만. 최종 정상 주행 여부는 쓰지 않음.
+* result: 최종 상태만. 작업 과정·점검 내용을 다시 설명하지 않음.
+* diagnosis, workDetails, result에 같은 문장이나 같은 작업 내용이 겹치면 한 항목에서만 자세히 작성합니다.
+* diagnosis에 이미 적은 원인·부품(예: 충전기 불량)을 summary·workDetails에서 다시 설명하지 않습니다.
 
 금지 예 (너무 짧거나 기계적인 출력):
 * "주행 정상 확인", "현장 수리 완료", "점검 진행", "컨트롤러 교체", "충전기 확인"처럼 입력을 그대로 적는 것
@@ -99,19 +110,19 @@ const REPAIR_DEVELOPER_PROMPT = `contentType이 repair인 수리사례를 작성
 * "충전기 점검" → "충전기의 작동 상태와 연결 상태를 점검해 추가 이상 여부를 확인했습니다."
 
 참고 출력 수준 (입력: 산업용 SUV, 주행 불가, 컨트롤러 이상, 컨트롤러 교체, 충전기 점검, 주행 정상 확인):
-summary: "산업용 SUV 전동차에서 주행 불가 증상이 발생해 현장 점검을 진행했습니다. 점검 결과 컨트롤러 이상이 확인되어 교체 작업을 진행했으며, 충전기 상태도 함께 확인했습니다."
+summary: "산업용 SUV 전동차에서 주행 불가 증상으로 현장 점검을 진행했습니다. 점검 결과 컨트롤러 이상이 확인되어 교체 작업을 진행했습니다."
 customerRequest: "산업용 SUV 전동차가 주행되지 않는 증상으로 점검과 수리를 요청받았습니다."
-diagnosis: "차량의 주행 계통과 전원 상태를 점검한 결과 컨트롤러 이상이 확인되었습니다. 충전기 상태도 함께 확인해 추가 이상 여부를 점검했습니다."
-workDetails: "이상이 확인된 컨트롤러를 교체했습니다. 이후 충전기 작동 상태를 점검하고 차량의 주행 상태를 확인하기 위해 시운전을 진행했습니다." (시운전이 입력된 경우에만)
-result: "작업 후 시운전을 통해 차량이 정상적으로 주행하는 것을 확인했습니다."
+diagnosis: "차량의 주행 계통과 전원 상태를 점검한 결과 컨트롤러 이상이 확인되었습니다."
+workDetails: "이상이 확인된 컨트롤러를 교체했습니다. 이후 충전기 작동 상태를 점검하고 주행 확인을 위해 시운전을 진행했습니다."
+result: "작업 후 차량이 정상적으로 주행하는 것을 확인했습니다."
 
 필드별 길이·구성:
 title: 차량 종류 + 핵심 증상 + 주요 점검 또는 수리 내용, 22~45자 권장, 의미 없는 userTitle 무시, 지역은 입력된 경우에만, 명사형 제목
-summary: 2문장, 증상·핵심 원인 또는 확인 사항·주요 작업·결과를 자연스럽게 요약, 80~160자 권장, 존댓말
+summary: 2문장 이내, 전체 개요만, 80~160자 권장, 존댓말
 customerRequest: 1~2문장, 고객이 어떤 증상으로 점검 또는 수리를 요청했는지, 40~100자 권장, 존댓말
-diagnosis: 1~2문장, 입력된 점검 결과·원인만 사용, 무엇을 확인했는지 구체적으로, 40~120자 권장, 존댓말
-workDetails: 2~3문장, 교체·보수·점검·시운전을 순서대로, selectedWorkItems와 work를 자연스럽게 합침, 70~180자 권장, 존댓말
-result: 1~2문장, 입력 결과만, 40~100자 권장, 존댓말. "주행 정상 확인" 입력 시 시운전 후 정상 주행 확인으로 문장화
+diagnosis: 1~2문장, 입력된 점검 결과·원인만, 40~120자 권장, 존댓말
+workDetails: 2~3문장, 교체·보수·점검·시운전 과정만, 70~180자 권장, 존댓말
+result: 1~2문장, 최종 상태만, 40~100자 권장, 존댓말. "주행 정상 확인" 입력 시 정상 주행 확인으로 문장화
 seoTitle: 30~55자, 회사명 불필요 시 생략, 명사형 제목
 seoDescription: 70~140자, 키워드 나열 금지, 존댓말
 keywords: 4~7개 문자열 배열, 구체적 조합, 입력 없는 지역·부품 금지
@@ -331,15 +342,28 @@ export function buildOpenAiUserInput(input) {
   };
 }
 
-export function buildDraftPrompt(input) {
+export function buildDraftPrompt(input, options = {}) {
   const developer = input.contentType === 'repair'
     ? REPAIR_DEVELOPER_PROMPT
     : PRODUCTION_DEVELOPER_PROMPT;
 
+  const retryHints = {
+    field_duplication: `중요: 이전 응답은 항목 간 내용이 중복되었습니다. 아래 역할 분리를 반드시 지키세요.
+- summary: 전체 개요만 (시운전·충전기 점검·정상 주행 결과는 넣지 않음)
+- diagnosis: 확인된 원인만 (작업·시운전·최종 결과 없음)
+- workDetails: 실제 작업 과정만 (최종 정상 주행 여부 없음)
+- result: 최종 상태만 (작업 과정·시운전 재설명 없음)
+충전기는 diagnosis 또는 workDetails 중 한 곳에만, 시운전은 workDetails 또는 result 중 한 곳에만, 정상 주행 확인은 result에만 작성하세요.`,
+    insufficient_expansion: '중요: 이전 응답이 너무 짧거나 입력을 그대로 복사했습니다. 각 항목을 완전한 존댓말 문장으로 확장하되 사실은 추가하지 마세요.',
+    informal_speech: '중요: 이전 응답에 해라체가 포함되었습니다. 모든 서술문을 ~했습니다, ~되었습니다 존댓말로 작성하세요.',
+  };
+  const retryHint = retryHints[options.qualityRetryReason] || '';
+
   return {
     system: `${COMMON_SYSTEM_PROMPT}\n\n${developer}`,
-    user: `아래 JSON 입력만 사용해 사례 초안 JSON을 작성하세요. 빈 문자열은 정보 없음입니다.
-입력 문장·키워드를 그대로 복사하지 말고, 각 항목을 자연스러운 기술 사례 문장으로 확장하세요. 사실은 추가하지 마세요.
+    user: `${retryHint ? `${retryHint}\n\n` : ''}아래 JSON 입력만 사용해 사례 초안 JSON을 작성하세요. 빈 문자열은 정보 없음입니다.
+입력 문장·키워드를 그대로 복사하지 말고, 각 항목을 자연스러운 기술 사례 문장으로 확장하세요.
+summary·diagnosis·workDetails·result는 역할이 다르므로 같은 내용을 반복하지 마세요. 사실은 추가하지 마세요.
 
 ${JSON.stringify(buildOpenAiUserInput(input))}`,
   };
@@ -491,6 +515,121 @@ export function isSummaryInsufficient(summaryText) {
   return sentences === 1 && text.length < 70;
 }
 
+export function splitSentences(text) {
+  return cleanField(text).split(/[.!?]+/).map((part) => part.trim()).filter(Boolean);
+}
+
+function sentencesAreSimilar(a, b) {
+  const na = normalizeCompareText(a);
+  const nb = normalizeCompareText(b);
+  if (!na || !nb) return false;
+  if (na === nb) return true;
+  const minLen = Math.min(na.length, nb.length);
+  const maxLen = Math.max(na.length, nb.length);
+  return minLen >= 10 && minLen / maxLen >= 0.55 && (na.includes(nb) || nb.includes(na));
+}
+
+const CROSS_FIELD_REPEAT_TOPICS = [
+  { id: 'test_drive', pattern: /시운전/ },
+  { id: 'charger', pattern: /충전기/ },
+  { id: 'normal_drive', pattern: /정상적(?:으로)?\s*주행|정상\s*주행/ },
+];
+
+function getRepairFieldTexts(draft) {
+  return {
+    summary: cleanField(draft.summary),
+    diagnosis: cleanField(draft.diagnosis ?? draft.inspectionResult),
+    workDetails: cleanField(draft.workDetails),
+    result: cleanField(draft.result),
+  };
+}
+
+function fieldsMatchingTopic(fieldTexts, pattern) {
+  return Object.entries(fieldTexts)
+    .filter(([, text]) => pattern.test(text))
+    .map(([field]) => field);
+}
+
+function workInputMentionsDiagnosisTerm(term, input) {
+  const norm = normalizeCompareText(term);
+  const sources = [...input.work, ...input.selectedWorkItems];
+  return sources.some((source) => {
+    const ns = normalizeCompareText(source);
+    if (ns.includes(norm) || norm.includes(ns)) return true;
+    const tokens = String(term).match(/[가-힣A-Za-z0-9]{2,}/g) || [];
+    return tokens.some((token) => {
+      const nt = normalizeCompareText(token);
+      return nt.length >= 2 && ns.includes(nt);
+    });
+  });
+}
+
+function findTopicDuplicationViolations(fieldTexts, input) {
+  const violations = [];
+
+  const testDriveFields = fieldsMatchingTopic(fieldTexts, /시운전/);
+  if (testDriveFields.includes('workDetails') && testDriveFields.includes('result')) {
+    violations.push({ issue: 'repeated_topic', topic: 'test_drive', fields: ['workDetails', 'result'] });
+  }
+  if (testDriveFields.includes('summary') && testDriveFields.some((f) => f === 'workDetails' || f === 'result')) {
+    violations.push({ issue: 'repeated_topic', topic: 'test_drive', fields: testDriveFields });
+  }
+
+  const chargerFields = fieldsMatchingTopic(fieldTexts, /충전기/);
+  if (chargerFields.includes('summary') && chargerFields.some((f) => f === 'diagnosis' || f === 'workDetails')) {
+    violations.push({ issue: 'repeated_topic', topic: 'charger', fields: chargerFields });
+  }
+  if (chargerFields.includes('diagnosis') && chargerFields.includes('workDetails')) {
+    if (!workInputMentionsDiagnosisTerm('충전기', input)) {
+      violations.push({ issue: 'repeated_topic', topic: 'charger', fields: ['diagnosis', 'workDetails'] });
+    }
+  }
+
+  const driveFields = fieldsMatchingTopic(fieldTexts, /정상적(?:으로)?\s*주행|정상\s*주행/);
+  const driveOutsideResult = driveFields.filter((f) => f !== 'result');
+  if (driveOutsideResult.length > 0) {
+    violations.push({ issue: 'repeated_topic', topic: 'normal_drive', fields: driveFields });
+  }
+
+  return violations;
+}
+
+export function findDraftFieldDuplicationViolations(draft, input = null) {
+  if (!draft || typeof draft !== 'object') return [];
+
+  const violations = [];
+  const fieldTexts = getRepairFieldTexts(draft);
+
+  const detailFields = ['diagnosis', 'workDetails', 'result'];
+  for (let i = 0; i < detailFields.length; i += 1) {
+    for (let j = i + 1; j < detailFields.length; j += 1) {
+      const f1 = detailFields[i];
+      const f2 = detailFields[j];
+      for (const s1 of splitSentences(fieldTexts[f1])) {
+        for (const s2 of splitSentences(fieldTexts[f2])) {
+          if (sentencesAreSimilar(s1, s2)) {
+            violations.push({
+              issue: 'duplicate_sentence',
+              fields: [f1, f2],
+              excerpt: s1.slice(0, 80),
+            });
+          }
+        }
+      }
+    }
+  }
+
+  if (input?.contentType === 'repair') {
+    violations.push(...findTopicDuplicationViolations(fieldTexts, input));
+  }
+
+  if (countSentences(fieldTexts.summary) > 2) {
+    violations.push({ issue: 'summary_too_long', field: 'summary' });
+  }
+
+  return violations;
+}
+
 export function findDraftExpansionViolations(draft, input) {
   if (!draft || input.contentType !== 'repair') return [];
 
@@ -604,6 +743,15 @@ export function validateDraftQuality(draft, input) {
         ok: false,
         reason: 'insufficient_expansion',
         expansionViolations,
+      };
+    }
+
+    const duplicationViolations = findDraftFieldDuplicationViolations(draft, input);
+    if (duplicationViolations.length > 0) {
+      return {
+        ok: false,
+        reason: 'field_duplication',
+        duplicationViolations,
       };
     }
   } else {
@@ -781,7 +929,7 @@ function createOpenAiFetchSignal(timeoutMs) {
   return controller.signal;
 }
 
-async function requestOpenAi(env, input, fetchImpl) {
+async function requestOpenAi(env, input, fetchImpl, options = {}) {
   const apiKey = (env.OPENAI_API_KEY || '').trim();
   if (!apiKey) {
     return {
@@ -795,7 +943,7 @@ async function requestOpenAi(env, input, fetchImpl) {
   }
 
   const model = resolveOpenAiModel(env);
-  const prompt = buildDraftPrompt(input);
+  const prompt = buildDraftPrompt(input, options);
   const jsonSchema = input.contentType === 'repair'
     ? REPAIR_JSON_SCHEMA
     : PRODUCTION_JSON_SCHEMA;
@@ -912,7 +1060,9 @@ export async function callOpenAiDraft(env, input, fetchImpl = fetch) {
   let lastQualityReason = '';
 
   for (let attempt = 0; attempt <= MAX_RETRIES; attempt += 1) {
-    const response = await requestOpenAi(env, input, fetchImpl);
+    const response = await requestOpenAi(env, input, fetchImpl, {
+      qualityRetryReason: attempt > 0 ? lastQualityReason : '',
+    });
     if (!response.ok) {
       logOpenAiDraftFailure({
         stage: response.stage,
@@ -939,7 +1089,9 @@ export async function callOpenAiDraft(env, input, fetchImpl = fetch) {
           ? 'AI 초안 문체가 존댓말 규칙에 맞지 않습니다. 다시 시도해 주세요.'
           : lastQualityReason === 'insufficient_expansion'
             ? 'AI 초안이 입력 내용을 충분히 확장하지 못했습니다. 다시 시도해 주세요.'
-            : `AI 응답 품질 검증에 실패했습니다. (${lastQualityReason})`,
+            : lastQualityReason === 'field_duplication'
+              ? 'AI 초안 항목 간 내용이 중복됩니다. 다시 시도해 주세요.'
+              : `AI 응답 품질 검증에 실패했습니다. (${lastQualityReason})`,
         status: 502,
         openAiStatus: response.openAiStatus,
         openAiRequestId: response.openAiRequestId,
@@ -947,6 +1099,7 @@ export async function callOpenAiDraft(env, input, fetchImpl = fetch) {
         qualityReason: lastQualityReason,
         informalViolations: quality.informalViolations,
         expansionViolations: quality.expansionViolations,
+        duplicationViolations: quality.duplicationViolations,
         stage: 'quality_validation',
       };
       logOpenAiDraftFailure({
