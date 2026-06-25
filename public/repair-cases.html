@@ -530,6 +530,14 @@ document.addEventListener('DOMContentLoaded', () => {
         return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
     }
 
+    function openGalleryItem(item) {
+        if (!item || item.classList.contains('hidden')) return;
+        var idx = parseInt(item.getAttribute('data-case-index'), 10);
+        if (!isNaN(idx) && window.openModalAt) {
+            window.openModalAt(idx);
+        }
+    }
+
     function renderGallery(list) {
         if (!caseGallery) return;
         var items = list || [];
@@ -541,8 +549,11 @@ document.addEventListener('DOMContentLoaded', () => {
             var thumbPath = thumbSrc.indexOf('/') === 0 ? thumbSrc : '/' + thumbSrc;
             var dateLabel = formatDateShort(item.date);
             var locLabel = item.location || '';
-            jsonHtml += '<div class="gallery-item gallery-item--repair" data-case-index="' + i + '">';
-            jsonHtml += '<img src="' + thumbPath + '" alt="' + (item.title || '').replace(/"/g, '&quot;') + '" loading="lazy">';
+            var caseId = (item._filename || String(i)).replace(/"/g, '');
+            var titleEsc = (item.title || '').replace(/"/g, '&quot;');
+            jsonHtml += '<div class="gallery-item gallery-item--repair" role="button" tabindex="0" aria-label="' + titleEsc + ' 상세 보기"';
+            jsonHtml += ' data-case-id="' + caseId + '" data-case-index="' + i + '">';
+            jsonHtml += '<img src="' + thumbPath + '" alt="' + titleEsc + '" loading="lazy" draggable="false">';
             jsonHtml += '<div class="gallery-item-caption">';
             jsonHtml += '<h4 class="gallery-item-title">' + (item.title || '').replace(/</g, '&lt;') + '</h4>';
             jsonHtml += '<p class="gallery-item-meta-line">';
@@ -557,14 +568,22 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function setupGalleryClicks() {
-        if (!caseGallery) return;
+        if (!caseGallery || caseGallery.dataset.clickBound === '1') return;
+        caseGallery.dataset.clickBound = '1';
+
         caseGallery.addEventListener('click', function(e) {
             var item = e.target.closest('.gallery-item');
-            if (!item) return;
-            var idx = parseInt(item.getAttribute('data-case-index'), 10);
-            if (!isNaN(idx) && window.openModalAt) {
-                window.openModalAt(idx);
-            }
+            if (!item || item.classList.contains('hidden')) return;
+            e.preventDefault();
+            openGalleryItem(item);
+        });
+
+        caseGallery.addEventListener('keydown', function(e) {
+            if (e.key !== 'Enter' && e.key !== ' ') return;
+            var item = e.target.closest('.gallery-item');
+            if (!item || item.classList.contains('hidden')) return;
+            e.preventDefault();
+            openGalleryItem(item);
         });
     }
 

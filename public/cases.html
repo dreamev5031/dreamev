@@ -348,6 +348,21 @@
             var modalOverlay = modal ? modal.querySelector('.case-modal-overlay') : null;
             var currentModalIndex = -1;
 
+            var SPEC_LABELS = {
+                voltage: '전압',
+                battery: '배터리',
+                motor: '모터',
+                controller: '컨트롤러',
+                chargingMethod: '충전 방식',
+                brake: '브레이크',
+                tire: '타이어',
+                topSpeed: '최고속도',
+                payload: '적재중량',
+                curbWeight: '공차중량',
+                frameMaterial: '프레임 재질'
+            };
+            var SPEC_ORDER = ['voltage', 'battery', 'motor', 'controller', 'chargingMethod', 'brake', 'tire', 'topSpeed', 'payload', 'curbWeight', 'frameMaterial'];
+
             // 날짜 포맷 (YYYY-MM-DD 또는 ISO 문자열 → 읽기 쉬운 형식)
             function formatDate(str) {
                 if (!str) return '';
@@ -449,7 +464,7 @@
                 window.openCaseModal({
                     title: raw.title,
                     category: raw.category,
-                    categoryLabel: raw.category,
+                    categoryLabel: raw.categoryLabel || raw.category,
                     specifications: raw.specifications,
                     image: raw.image,
                     gallery: raw.gallery,
@@ -502,8 +517,13 @@
             var existingItems = document.querySelectorAll('.gallery-item');
             existingItems.forEach(function(item) {
                 item.addEventListener('click', function() {
+                    var idx = parseInt(item.getAttribute('data-case-index'), 10);
+                    if (!isNaN(idx) && window.openModalAt) {
+                        window.openModalAt(idx);
+                        return;
+                    }
                     var img = item.querySelector('img');
-                    if (img) {
+                    if (img && window.openCaseModal) {
                         window.openCaseModal({
                             title: img.alt || '제작사례',
                             categoryLabel: '제작사례',
@@ -629,6 +649,28 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    function openGalleryItem(item) {
+        if (!item) return;
+        var idx = parseInt(item.getAttribute('data-case-index'), 10);
+        if (!isNaN(idx) && window.openModalAt) {
+            window.openModalAt(idx);
+            return;
+        }
+        var img = item.querySelector('img');
+        var galleryJson = item.getAttribute('data-case-gallery');
+        var gallery = galleryJson ? (function() { try { return JSON.parse(galleryJson.replace(/&quot;/g, '"')); } catch (err) { return []; } })() : (img ? [{ image: img.src }] : []);
+        var data = {
+            title: item.getAttribute('data-case-title') || (img ? img.alt : ''),
+            image: img ? img.src : '',
+            gallery: gallery,
+            date: item.getAttribute('data-case-date') || '',
+            description: item.getAttribute('data-case-body') || '',
+            body: item.getAttribute('data-case-body') || '',
+            categoryLabel: item.getAttribute('data-case-category') || ''
+        };
+        if (window.openCaseModal) window.openCaseModal(data);
+    }
+
     function renderGallery(list) {
         if (!caseGallery) return;
         var items = list || [];
@@ -639,8 +681,14 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!thumbSrc) return;
             var categoryNorm = Array.isArray(item.category) ? item.category.map(function(c) { return norm(String(c)); }).join(',') : norm(String(item.category || ''));
             var thumbPath = thumbSrc.indexOf('/') === 0 ? thumbSrc : '/' + thumbSrc;
-            jsonHtml += '<div class="gallery-item" data-category="' + (item.slug || '') + '" data-category-norm="' + categoryNorm + '" data-case-index="' + i + '" data-case-gallery="' + (JSON.stringify(gallery).replace(/"/g, '&quot;')) + '">';
-            jsonHtml += '<img src="' + thumbPath + '" alt="' + (item.title || '').replace(/"/g, '&quot;') + '" loading="lazy">';
+            var caseId = (item._filename || item.slug || String(i)).replace(/"/g, '');
+            var titleEsc = (item.title || '').replace(/"/g, '&quot;');
+            jsonHtml += '<div class="gallery-item" role="button" tabindex="0" aria-label="' + titleEsc + ' 상세 보기"';
+            jsonHtml += ' data-case-id="' + caseId + '" data-category="' + caseId + '" data-category-norm="' + categoryNorm + '" data-case-index="' + i + '"';
+            jsonHtml += ' data-case-title="' + titleEsc + '" data-case-category="' + (item.categoryLabel || item.category || '').replace(/"/g, '&quot;') + '"';
+            jsonHtml += ' data-case-date="' + (item.date || '').replace(/"/g, '&quot;') + '"';
+            jsonHtml += ' data-case-gallery="' + (JSON.stringify(gallery).replace(/"/g, '&quot;')) + '">';
+            jsonHtml += '<img src="' + thumbPath + '" alt="' + titleEsc + '" loading="lazy" draggable="false">';
             jsonHtml += '</div>';
         });
         if (!jsonHtml) jsonHtml = '<p class="gallery-empty-msg">등록된 제작사례가 없습니다. Admin(CMS)에서 제작사례를 추가하고 이미지 갤러리에 표시할 사진을 선택해 주세요.</p>';
@@ -661,30 +709,24 @@ document.addEventListener('DOMContentLoaded', () => {
         filterGallery('all');
     }
 
-    // 갤러리 이미지 클릭 → 상세 모달 열기 (allCasesData 또는 data-case-gallery)
+    // 갤러리 카드 클릭/키보드 → 상세 모달 (이벤트 위임)
     function setupGalleryClicks() {
-        if (!caseGallery) return;
+        if (!caseGallery || caseGallery.dataset.clickBound === '1') return;
+        caseGallery.dataset.clickBound = '1';
+
         caseGallery.addEventListener('click', function(e) {
             var item = e.target.closest('.gallery-item');
-            if (!item) return;
-            var idx = parseInt(item.getAttribute('data-case-index'), 10);
-            if (!isNaN(idx) && window.openModalAt) {
-                window.openModalAt(idx);
-                return;
-            }
-            var img = item.querySelector('img');
-            var galleryJson = item.getAttribute('data-case-gallery');
-            var gallery = galleryJson ? (function() { try { return JSON.parse(galleryJson.replace(/&quot;/g, '"')); } catch (err) { return []; } })() : (img ? [{ image: img.src }] : []);
-            var data = {
-                title: item.getAttribute('data-case-title') || (img ? img.alt : ''),
-                image: img ? img.src : '',
-                gallery: gallery,
-                date: '',
-                description: item.getAttribute('data-case-body') || '',
-                body: item.getAttribute('data-case-body') || '',
-                categoryLabel: item.getAttribute('data-case-category') || ''
-            };
-            if (window.openCaseModal) window.openCaseModal(data);
+            if (!item || item.classList.contains('hidden')) return;
+            e.preventDefault();
+            openGalleryItem(item);
+        });
+
+        caseGallery.addEventListener('keydown', function(e) {
+            if (e.key !== 'Enter' && e.key !== ' ') return;
+            var item = e.target.closest('.gallery-item');
+            if (!item || item.classList.contains('hidden')) return;
+            e.preventDefault();
+            openGalleryItem(item);
         });
     }
 
