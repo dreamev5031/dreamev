@@ -17,6 +17,7 @@ import {
   validateImages,
 } from '../lib/case-content.js';
 import { commitFiles, commitUrl, listExistingMdNames, pathExists } from '../lib/github.js';
+import { buildUploadSuccessMessage, triggerPagesDeploy } from '../lib/deploy.js';
 import { requireGithubConfig, requireUploadAuth } from '../lib/session.js';
 
 const CONTENT_DIRS = {
@@ -282,6 +283,8 @@ export async function onRequestPost(context) {
 
     const commitSha = await commitFiles(env, files, commitMessage);
 
+    const deployResult = await triggerPagesDeploy(env);
+
     return successResponse({
       commitSha,
       mdPath,
@@ -291,7 +294,10 @@ export async function onRequestPost(context) {
       galleryPaths: finalImageNames.map((n) => galleryPath(n)),
       caseUrl,
       githubCommitUrl: commitUrl(env, commitSha),
-      message: successMessage,
+      deploymentTriggered: deployResult.triggered,
+      deploymentSkipped: deployResult.skipped ?? false,
+      deploymentMessage: deployResult.message || deployResult.error || null,
+      message: buildUploadSuccessMessage(successMessage, deployResult),
     });
   } catch {
     return errorResponse('GITHUB_ERROR', 'GitHub 업로드 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.', 502);
