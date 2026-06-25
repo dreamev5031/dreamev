@@ -1,4 +1,4 @@
-import { errorResponse, handleOptions, successResponse } from '../../lib/http.js';
+import { errorResponse, handleOptions, successResponse } from '../lib/http.js';
 import {
   buildMarkdown,
   buildMdBaseName,
@@ -11,9 +11,9 @@ import {
   validateCategory,
   validateGalleryMatches,
   validateImages,
-} from '../../lib/case-content.js';
-import { commitFiles, commitUrl, listExistingMdNames, pathExists } from '../../lib/github.js';
-import { requireGithubConfig, requireUploadAuth } from '../../lib/session.js';
+} from '../lib/case-content.js';
+import { commitFiles, commitUrl, listExistingMdNames, pathExists } from '../lib/github.js';
+import { requireGithubConfig, requireUploadAuth } from '../lib/session.js';
 
 export async function onRequestOptions() {
   return handleOptions();
