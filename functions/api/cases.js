@@ -1,7 +1,5 @@
 import { listCases } from '../lib/case-manage.js';
 import { errorResponse, handleOptions, successResponse } from '../lib/http.js';
-import { triggerPagesDeploy } from '../lib/deploy.js';
-import { commitUrl } from '../lib/github.js';
 import { requireGithubConfig, requireUploadAuth } from '../lib/session.js';
 
 export async function onRequestOptions() {
