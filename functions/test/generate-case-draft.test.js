@@ -317,4 +317,8 @@ test('generate-case-draft handler returns 503 without API key', async () => {
     env: { UPLOAD_ADMIN_SECRET: 'secret' },
   });
   assert.equal(response.status, 503);
+  const body = await response.json();
+  assert.equal(body.code, 'OPENAI_CONFIG_MISSING');
+  assert.equal(body.success, false);
+  assert.ok(body.requestId);
 });

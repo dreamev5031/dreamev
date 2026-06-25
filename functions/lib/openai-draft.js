@@ -1,4 +1,5 @@
 const DEFAULT_MODEL = 'gpt-4.1-mini';
+const OPENAI_ENDPOINT = 'https://api.openai.com/v1/chat/completions';
 const OPENAI_TIMEOUT_MS = 45_000;
 const MAX_OUTPUT_TOKENS = 1_400;
 const MAX_RETRIES = 1;
@@ -468,6 +469,10 @@ function safeOpenAiErrorSummary(bodyText) {
   }
 }
 
+function openAiDetailMessage(openAiError, fallback) {
+  return openAiError?.message?.trim() || fallback;
+}
+
 function mapOpenAiHttpError(status, bodyText) {
   const openAiError = safeOpenAiErrorSummary(bodyText);
 
@@ -475,34 +480,73 @@ function mapOpenAiHttpError(status, bodyText) {
     const isSchema = openAiError.param === 'response_format' || /schema/i.test(openAiError.message);
     return {
       code: isSchema ? 'OPENAI_SCHEMA_ERROR' : 'OPENAI_BAD_REQUEST',
-      message: isSchema
-        ? 'AI 응답 형식 설정 오류가 발생했습니다.'
-        : 'AI 요청 형식이 올바르지 않습니다.',
+      message: openAiDetailMessage(
+        openAiError,
+        isSchema ? 'AI 응답 형식 설정 오류가 발생했습니다.' : 'AI 요청 형식에 오류가 있습니다.',
+      ),
       status: 502,
       openAiError,
     };
   }
   if (status === 401) {
-    return { code: 'OPENAI_AUTH_ERROR', message: 'AI 기능 설정을 확인해 주세요.', status: 502, openAiError };
+    return {
+      code: 'OPENAI_AUTH_ERROR',
+      message: openAiDetailMessage(openAiError, 'AI 기능 인증에 실패했습니다.'),
+      status: 502,
+      openAiError,
+    };
   }
   if (status === 429) {
-    return { code: 'OPENAI_RATE_LIMIT', message: '요청이 많습니다. 잠시 후 다시 시도해 주세요.', status: 429, openAiError };
+    return {
+      code: 'OPENAI_RATE_LIMIT',
+      message: openAiDetailMessage(openAiError, '요청이 많습니다. 잠시 후 다시 시도해 주세요.'),
+      status: 429,
+      openAiError,
+    };
   }
   if (status >= 500) {
-    return { code: 'OPENAI_SERVER_ERROR', message: 'AI 서버 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.', status: 502, openAiError };
+    return {
+      code: 'OPENAI_SERVER_ERROR',
+      message: openAiDetailMessage(openAiError, 'AI 서버 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.'),
+      status: 502,
+      openAiError,
+    };
   }
   return {
     code: 'OPENAI_BAD_REQUEST',
-    message: `AI 요청에 실패했습니다. (${status})`,
+    message: openAiDetailMessage(openAiError, `AI 요청에 실패했습니다. (${status})`),
     status: 502,
     openAiError,
   };
 }
 
+export function logOpenAiDraftFailure(details) {
+  console.warn('openai-draft failure', {
+    stage: details.stage || '',
+    model: details.model || '',
+    endpoint: OPENAI_ENDPOINT,
+    openAiHttpStatus: details.openAiHttpStatus ?? null,
+    openAiErrorType: details.openAiError?.type || '',
+    openAiErrorCode: details.openAiError?.code || '',
+    openAiErrorMessage: details.openAiError?.message || '',
+    openAiRequestId: details.openAiRequestId || '',
+    qualityReason: details.qualityReason || '',
+    contentType: details.contentType || '',
+    attempt: details.attempt ?? null,
+  });
+}
+
 async function requestOpenAi(env, input, fetchImpl) {
   const apiKey = (env.OPENAI_API_KEY || '').trim();
   if (!apiKey) {
-    return { ok: false, code: 'CONFIG_ERROR', message: 'AI 기능 설정을 확인해 주세요.', status: 503 };
+    return {
+      ok: false,
+      code: 'OPENAI_CONFIG_MISSING',
+      message: 'AI 기능 설정이 완료되지 않았습니다.',
+      status: 503,
+      stage: 'config_missing',
+      model: trimText(env.OPENAI_MODEL, 80) || DEFAULT_MODEL,
+    };
   }
 
   const model = trimText(env.OPENAI_MODEL, 80) || DEFAULT_MODEL;
@@ -513,7 +557,7 @@ async function requestOpenAi(env, input, fetchImpl) {
 
   let response;
   try {
-    response = await fetchImpl('https://api.openai.com/v1/chat/completions', {
+    response = await fetchImpl(OPENAI_ENDPOINT, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${apiKey}`,
@@ -536,15 +580,38 @@ async function requestOpenAi(env, input, fetchImpl) {
     });
   } catch (err) {
     if (err?.name === 'TimeoutError' || err?.name === 'AbortError') {
-      return { ok: false, code: 'OPENAI_TIMEOUT', message: 'AI 응답 시간이 초과되었습니다. 잠시 후 다시 시도해 주세요.', status: 504 };
+      return {
+        ok: false,
+        code: 'OPENAI_TIMEOUT',
+        message: 'AI 응답 시간이 초과되었습니다. 잠시 후 다시 시도해 주세요.',
+        status: 504,
+        stage: 'openai_fetch_timeout',
+        model,
+      };
     }
-    return { ok: false, code: 'OPENAI_NETWORK_ERROR', message: 'AI 서버에 연결하지 못했습니다.', status: 502 };
+    return {
+      ok: false,
+      code: 'OPENAI_NETWORK_ERROR',
+      message: 'AI 서버에 연결하지 못했습니다.',
+      status: 502,
+      stage: 'openai_fetch_error',
+      model,
+    };
   }
 
   const openAiStatus = response.status;
+  const openAiRequestId = response.headers?.get?.('x-request-id') || '';
   const bodyText = await response.text();
   if (!response.ok) {
-    return { ok: false, ...mapOpenAiHttpError(openAiStatus, bodyText), openAiStatus, model };
+    const mapped = mapOpenAiHttpError(openAiStatus, bodyText);
+    return {
+      ok: false,
+      ...mapped,
+      openAiStatus,
+      openAiRequestId,
+      model,
+      stage: 'openai_http_error',
+    };
   }
 
   let parsed;
@@ -554,10 +621,12 @@ async function requestOpenAi(env, input, fetchImpl) {
     return {
       ok: false,
       code: 'OPENAI_PARSE_ERROR',
-      message: 'AI 응답을 처리하지 못했습니다.',
+      message: 'OpenAI 응답 본문 JSON 파싱에 실패했습니다.',
       status: 502,
       openAiStatus,
+      openAiRequestId,
       model,
+      stage: 'openai_response_json_parse',
     };
   }
 
@@ -569,7 +638,9 @@ async function requestOpenAi(env, input, fetchImpl) {
       message: 'AI가 빈 초안을 반환했습니다.',
       status: 502,
       openAiStatus,
+      openAiRequestId,
       model,
+      stage: 'openai_empty_output',
     };
   }
 
@@ -580,14 +651,16 @@ async function requestOpenAi(env, input, fetchImpl) {
     return {
       ok: false,
       code: 'OPENAI_PARSE_ERROR',
-      message: 'AI 응답 JSON이 올바르지 않습니다.',
+      message: 'AI 응답 content JSON 파싱에 실패했습니다.',
       status: 502,
       openAiStatus,
+      openAiRequestId,
       model,
+      stage: 'openai_content_json_parse',
     };
   }
 
-  return { ok: true, draftJson, openAiStatus, model };
+  return { ok: true, draftJson, openAiStatus, openAiRequestId, model };
 }
 
 export async function callOpenAiDraft(env, input, fetchImpl = fetch) {
@@ -596,6 +669,15 @@ export async function callOpenAiDraft(env, input, fetchImpl = fetch) {
   for (let attempt = 0; attempt <= MAX_RETRIES; attempt += 1) {
     const response = await requestOpenAi(env, input, fetchImpl);
     if (!response.ok) {
+      logOpenAiDraftFailure({
+        stage: response.stage,
+        model: response.model,
+        openAiHttpStatus: response.openAiStatus,
+        openAiError: response.openAiError,
+        openAiRequestId: response.openAiRequestId,
+        contentType: input.contentType,
+        attempt,
+      });
       return response;
     }
 
@@ -605,15 +687,27 @@ export async function callOpenAiDraft(env, input, fetchImpl = fetch) {
       if (attempt < MAX_RETRIES) {
         continue;
       }
-      return {
+      const failure = {
         ok: false,
         code: 'OPENAI_PARSE_ERROR',
-        message: 'AI 응답 품질 검증에 실패했습니다. 다시 시도해 주세요.',
+        message: `AI 응답 품질 검증에 실패했습니다. (${lastQualityReason})`,
         status: 502,
         openAiStatus: response.openAiStatus,
+        openAiRequestId: response.openAiRequestId,
         model: response.model,
         qualityReason: lastQualityReason,
+        stage: 'quality_validation',
       };
+      logOpenAiDraftFailure({
+        stage: failure.stage,
+        model: failure.model,
+        openAiHttpStatus: failure.openAiStatus,
+        openAiRequestId: failure.openAiRequestId,
+        qualityReason: lastQualityReason,
+        contentType: input.contentType,
+        attempt,
+      });
+      return failure;
     }
 
     try {
@@ -623,6 +717,7 @@ export async function callOpenAiDraft(env, input, fetchImpl = fetch) {
         draft,
         model: response.model,
         openAiStatus: response.openAiStatus,
+        openAiRequestId: response.openAiRequestId,
         attempt,
       };
     } catch (err) {
@@ -630,15 +725,27 @@ export async function callOpenAiDraft(env, input, fetchImpl = fetch) {
       if (attempt < MAX_RETRIES) {
         continue;
       }
-      return {
+      const failure = {
         ok: false,
         code: err.code || 'OPENAI_PARSE_ERROR',
-        message: 'AI 응답을 처리하지 못했습니다.',
+        message: err.message || 'AI 응답을 처리하지 못했습니다.',
         status: 502,
         openAiStatus: response.openAiStatus,
+        openAiRequestId: response.openAiRequestId,
         model: response.model,
         qualityReason: lastQualityReason,
+        stage: 'sanitize_draft',
       };
+      logOpenAiDraftFailure({
+        stage: failure.stage,
+        model: failure.model,
+        openAiHttpStatus: failure.openAiStatus,
+        openAiRequestId: failure.openAiRequestId,
+        qualityReason: lastQualityReason,
+        contentType: input.contentType,
+        attempt,
+      });
+      return failure;
     }
   }
 
@@ -647,11 +754,13 @@ export async function callOpenAiDraft(env, input, fetchImpl = fetch) {
     code: 'OPENAI_PARSE_ERROR',
     message: 'AI 응답을 처리하지 못했습니다.',
     status: 502,
+    stage: 'quality_validation_exhausted',
   };
 }
 
 export const openAiDraftInternals = {
   DEFAULT_MODEL,
+  OPENAI_ENDPOINT,
   OPENAI_TIMEOUT_MS,
   REPAIR_JSON_SCHEMA,
   PRODUCTION_JSON_SCHEMA,

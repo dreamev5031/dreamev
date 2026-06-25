@@ -1,6 +1,7 @@
 import {
   callOpenAiDraft,
   normalizeDraftInput,
+  openAiDraftInternals,
   validateDraftInput,
 } from '../lib/openai-draft.js';
 import { createRequestId, errorResponse, handleOptions, readJsonBody, successResponse } from '../lib/http.js';
@@ -18,9 +19,15 @@ export async function onRequestPost(context) {
   if (!auth.ok) return auth.response;
 
   if (!env.OPENAI_API_KEY) {
+    console.warn('generate-case-draft failed', {
+      requestId,
+      stage: 'openai_config_missing',
+      model: (env.OPENAI_MODEL || openAiDraftInternals.DEFAULT_MODEL).trim(),
+      endpoint: openAiDraftInternals.OPENAI_ENDPOINT,
+    });
     return errorResponse(
-      'CONFIG_ERROR',
-      'AI 기능 설정을 확인해 주세요.',
+      'OPENAI_CONFIG_MISSING',
+      'AI 기능 설정이 완료되지 않았습니다.',
       503,
       { requestId },
     );
@@ -44,16 +51,22 @@ export async function onRequestPost(context) {
   if (!result.ok) {
     console.warn('generate-case-draft failed', {
       requestId,
+      stage: result.stage || 'openai_draft_failed',
       code: result.code,
       status: result.status,
-      openAiStatus: result.openAiStatus,
-      openAiErrorType: result.openAiError?.type,
-      openAiErrorParam: result.openAiError?.param,
+      model: result.model,
+      endpoint: openAiDraftInternals.OPENAI_ENDPOINT,
+      openAiHttpStatus: result.openAiStatus ?? null,
+      openAiErrorType: result.openAiError?.type || '',
+      openAiErrorCode: result.openAiError?.code || '',
+      openAiErrorMessage: result.openAiError?.message || '',
+      openAiRequestId: result.openAiRequestId || '',
       contentType: input.contentType,
       titleLength: input.userTitle.length,
       symptomCount: input.symptoms.length,
       diagnosisCount: input.diagnosis.length,
-      qualityReason: result.qualityReason,
+      selectedWorkItemCount: input.selectedWorkItems.length,
+      qualityReason: result.qualityReason || '',
       elapsedMs,
     });
     return errorResponse(result.code, result.message, result.status || 502, { requestId });
@@ -63,6 +76,7 @@ export async function onRequestPost(context) {
     requestId,
     contentType: input.contentType,
     model: result.model,
+    openAiRequestId: result.openAiRequestId || '',
     attempt: result.attempt,
     elapsedMs,
   });
