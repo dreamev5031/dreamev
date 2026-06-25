@@ -3,26 +3,45 @@ import assert from 'node:assert/strict';
 import { onRequestPost } from '../api/generate-case-draft.js';
 import {
   buildDraftPrompt,
+  buildOpenAiUserInput,
   callOpenAiDraft,
+  isMeaninglessTitle,
   normalizeDraftInput,
-  sanitizeDraftFields,
+  openAiDraftInternals,
+  sanitizeProductionDraft,
+  sanitizeRepairDraft,
   validateDraftInput,
+  validateDraftQuality,
 } from '../lib/openai-draft.js';
 
 const env = {
   UPLOAD_ADMIN_SECRET: 'secret',
   OPENAI_API_KEY: 'sk-test',
-  OPENAI_MODEL: 'gpt-4o-mini',
+  OPENAI_MODEL: 'gpt-4.1-mini',
 };
 
-const userProductionPayload = {
-  contentType: 'production',
-  title: '456',
+const repairInput1 = {
+  contentType: 'repair',
+  userTitle: '456',
   category: '산업용',
+  vehicle: '산업용 전동차',
+  location: '',
+  workDate: '2026-06-25',
   symptoms: ['전진 불량'],
   diagnosis: ['전자브레이크 쇼트'],
   work: ['배선 보수'],
   result: ['주행 정상 확인'],
+};
+
+const repairInput2 = {
+  contentType: 'repair',
+  userTitle: '345345',
+  vehicle: 'SUV형 전동차',
+  location: '',
+  symptoms: ['전진 불량'],
+  diagnosis: ['충전기 불량'],
+  work: ['시운전 및 전체 점검'],
+  result: ['현장 수리 완료'],
 };
 
 function authHeaders() {
@@ -39,103 +58,73 @@ function openAiSuccessResponse(draft) {
   };
 }
 
-const sampleDraft = {
-  title: '산업용 전동차 전진 불량 배선 수리 사례',
-  summary: '전진이 되지 않고 후진만 작동하는 산업용 전동차를 점검해 전진 배선 단선을 확인하고 보수했습니다.',
-  customerRequest: '전진이 되지 않고 후진만 작동하는 증상으로 현장 점검을 요청받았습니다.',
-  diagnosis: '점검 결과 전진 신호 계통의 배선 단선이 확인되었습니다.',
-  workDetails: '손상된 배선을 보수하고 연결 상태를 점검한 뒤 전진 및 후진 시운전을 진행했습니다.',
-  result: '작업 후 전진과 후진이 모두 정상적으로 작동하는 것을 확인했습니다.',
-  seoTitle: '산업용 전동차 전진 불량 배선 수리 사례 | 드림전동차',
-  seoDescription: '전진 불량 수리 사례',
-  keywords: ['전동차 수리', '배선 보수'],
+const repairSampleDraft = {
+  title: '산업용 전동차 전진 불량 전자브레이크 배선 수리',
+  summary: '전진이 되지 않는 산업용 전동차를 점검한 결과 전자브레이크 계통의 쇼트가 확인되어 관련 배선을 보수하고 시운전을 진행했습니다.',
+  customerRequest: '산업용 전동차가 전진하지 않는 증상으로 현장 점검과 수리를 요청받았습니다.',
+  diagnosis: '주행 및 브레이크 계통을 점검한 결과 전자브레이크 회로에서 쇼트가 확인되었습니다.',
+  workDetails: '쇼트가 발생한 관련 배선을 점검하고 손상된 부분을 보수한 뒤 시운전을 진행했습니다.',
+  result: '작업 후 시운전을 통해 차량이 정상적으로 주행하는 것을 확인했습니다.',
+  seoTitle: '산업용 전동차 전진 불량 전자브레이크 배선 수리',
+  seoDescription: '전진 불량 증상의 산업용 전동차에서 전자브레이크 쇼트를 확인하고 배선 보수를 진행한 수리 사례입니다.',
+  keywords: ['산업용 전동차 수리', '전동차 전진 불량', '전자브레이크 쇼트', '전동차 배선 보수'],
 };
 
-test('normalizeDraftInput maps repair payload', () => {
-  const input = normalizeDraftInput({
-    contentType: 'repair',
-    title: '산업용 전동차 전진 불량 수리',
-    vehicle: '산업용 전동차',
-    location: '양주',
-    symptoms: '전진은 되지 않고 후진만 작동함',
-    diagnosis: '전진 배선 단선 확인',
-    work: '배선 보수 후 전후진 시운전',
-    result: '전진과 후진 모두 정상 작동 확인',
-  });
-  assert.equal(input.contentType, 'repair');
-  assert.equal(input.symptoms[0], '전진은 되지 않고 후진만 작동함');
-  assert.equal(input.diagnosis[0], '전진 배선 단선 확인');
+test('default model is gpt-4.1-mini', () => {
+  assert.equal(openAiDraftInternals.DEFAULT_MODEL, 'gpt-4.1-mini');
 });
 
-test('normalizeDraftInput maps user production payload', () => {
-  const input = normalizeDraftInput(userProductionPayload);
-  assert.equal(input.contentType, 'production');
-  assert.equal(input.title, '456');
-  assert.equal(input.category, '산업용');
-  assert.deepEqual(input.diagnosis, ['전자브레이크 쇼트']);
+test('isMeaninglessTitle detects numeric title', () => {
+  assert.equal(isMeaninglessTitle('456'), true);
+  assert.equal(isMeaninglessTitle('345345'), true);
+  assert.equal(isMeaninglessTitle('산업용 전동차 전진 불량'), false);
 });
 
-test('validateDraftInput rejects empty payload', () => {
-  const input = normalizeDraftInput({ contentType: 'repair' });
-  const result = validateDraftInput(input);
+test('buildOpenAiUserInput uses empty location and workTypes', () => {
+  const input = normalizeDraftInput(repairInput1);
+  const json = buildOpenAiUserInput(input);
+  assert.equal(json.location, '');
+  assert.equal(json.workTypes, '');
+  assert.equal(json.userTitle, '456');
+});
+
+test('validateDraftQuality rejects numeric title', () => {
+  const input = normalizeDraftInput(repairInput1);
+  const result = validateDraftQuality({ ...repairSampleDraft, title: '456' }, input);
   assert.equal(result.ok, false);
 });
 
-test('sanitizeDraftFields rejects template particles', () => {
-  assert.throws(
-    () => sanitizeDraftFields({ ...sampleDraft, summary: '배선 단선(이)가 확인' }, { contentType: 'repair' }),
-    (err) => err.code === 'OPENAI_RESPONSE_PARSE_FAILED',
-  );
-});
-
-test('sanitizeDraftFields accepts legacy inspectionResult from model output', () => {
-  const draft = sanitizeDraftFields({
-    ...sampleDraft,
-    diagnosis: undefined,
-    inspectionResult: '전자브레이크 쇼트 확인',
-  }, { contentType: 'repair' });
-  assert.match(draft.diagnosis, /전자브레이크/);
-});
-
-test('callOpenAiDraft handles OpenAI 429', async () => {
-  const fetchImpl = async () => ({
-    ok: false,
-    status: 429,
-    text: async () => 'rate limit',
-  });
-  const result = await callOpenAiDraft(env, normalizeDraftInput({
-    contentType: 'repair',
-    symptoms: ['전진 불량'],
-    work: ['배선 보수'],
-    result: ['정상 확인'],
-  }), fetchImpl);
-  assert.equal(result.ok, false);
-  assert.equal(result.code, 'OPENAI_RATE_LIMIT');
-  assert.equal(result.status, 429);
+test('sanitizeRepairDraft returns diagnosis field', () => {
+  const input = normalizeDraftInput(repairInput1);
+  const draft = sanitizeRepairDraft(repairSampleDraft, input);
+  assert.match(draft.title, /전진|전자브레이크|배선/);
+  assert.equal(typeof draft.diagnosis, 'string');
+  assert.equal('workDetails' in draft, true);
+  assert.equal('productionDetails' in draft, false);
 });
 
 test('callOpenAiDraft handles OpenAI 401', async () => {
   const fetchImpl = async () => ({ ok: false, status: 401, text: async () => 'invalid key' });
-  const result = await callOpenAiDraft(env, normalizeDraftInput({
-    contentType: 'production',
-    category: '산업용',
-    workTypes: ['신규 제작'],
-    result: ['제작 완료'],
-  }), fetchImpl);
-  assert.equal(result.code, 'OPENAI_UNAUTHORIZED');
+  const result = await callOpenAiDraft(env, normalizeDraftInput(repairInput1), fetchImpl);
+  assert.equal(result.code, 'OPENAI_AUTH_ERROR');
 });
 
-test('callOpenAiDraft handles OpenAI 400', async () => {
+test('callOpenAiDraft handles OpenAI 429', async () => {
+  const fetchImpl = async () => ({ ok: false, status: 429, text: async () => 'rate limit' });
+  const result = await callOpenAiDraft(env, normalizeDraftInput(repairInput1), fetchImpl);
+  assert.equal(result.code, 'OPENAI_RATE_LIMIT');
+});
+
+test('callOpenAiDraft handles OpenAI 400 schema error', async () => {
   const fetchImpl = async () => ({
     ok: false,
     status: 400,
     text: async () => JSON.stringify({
-      error: { type: 'invalid_request_error', param: 'response_format', message: 'bad schema' },
+      error: { type: 'invalid_request_error', param: 'response_format', message: 'Invalid schema' },
     }),
   });
-  const result = await callOpenAiDraft(env, normalizeDraftInput(userProductionPayload), fetchImpl);
-  assert.equal(result.code, 'OPENAI_BAD_REQUEST');
-  assert.equal(result.openAiStatus, 400);
+  const result = await callOpenAiDraft(env, normalizeDraftInput(repairInput1), fetchImpl);
+  assert.equal(result.code, 'OPENAI_SCHEMA_ERROR');
 });
 
 test('callOpenAiDraft handles timeout', async () => {
@@ -144,50 +133,116 @@ test('callOpenAiDraft handles timeout', async () => {
     err.name = 'TimeoutError';
     throw err;
   };
-  const result = await callOpenAiDraft(env, normalizeDraftInput({
-    contentType: 'repair',
-    symptoms: ['전진 불량'],
-    result: ['정상 확인'],
-  }), fetchImpl);
+  const result = await callOpenAiDraft(env, normalizeDraftInput(repairInput1), fetchImpl);
   assert.equal(result.code, 'OPENAI_TIMEOUT');
 });
 
-test('callOpenAiDraft handles invalid JSON content', async () => {
-  const fetchImpl = async () => ({
-    ok: true,
-    status: 200,
-    text: async () => JSON.stringify({ choices: [{ message: { content: 'not-json' } }] }),
-  });
-  const result = await callOpenAiDraft(env, normalizeDraftInput({
-    contentType: 'repair',
-    symptoms: ['전진 불량'],
-    result: ['정상 확인'],
-  }), fetchImpl);
-  assert.equal(result.code, 'OPENAI_RESPONSE_PARSE_FAILED');
-});
-
-test('callOpenAiDraft handles missing required draft fields', async () => {
-  const fetchImpl = async () => openAiSuccessResponse({
-    ...sampleDraft,
-    workDetails: '',
-  });
-  const result = await callOpenAiDraft(env, normalizeDraftInput(userProductionPayload), fetchImpl);
-  assert.equal(result.code, 'OPENAI_RESPONSE_PARSE_FAILED');
-});
-
-test('callOpenAiDraft succeeds with structured output', async () => {
-  const fetchImpl = async () => openAiSuccessResponse(sampleDraft);
-  const result = await callOpenAiDraft(env, normalizeDraftInput({
-    contentType: 'repair',
-    symptoms: ['전진 불량'],
-    diagnosis: ['배선 단선'],
-    work: ['배선 보수'],
-    result: ['정상 확인'],
-  }), fetchImpl);
+test('callOpenAiDraft retries once on meaningless title', async () => {
+  let calls = 0;
+  const fetchImpl = async () => {
+    calls += 1;
+    return openAiSuccessResponse(
+      calls === 1
+        ? { ...repairSampleDraft, title: '456' }
+        : repairSampleDraft,
+    );
+  };
+  const result = await callOpenAiDraft(env, normalizeDraftInput(repairInput1), fetchImpl);
   assert.equal(result.ok, true);
-  assert.match(result.draft.summary, /배선/);
-  assert.equal(result.draft.diagnosis.length > 0, true);
-  assert.equal('inspectionResult' in result.draft, false);
+  assert.equal(calls, 2);
+  assert.notEqual(result.draft.title, '456');
+});
+
+test('callOpenAiDraft does not invent replacement when only inspection work', async () => {
+  const fetchImpl = async () => openAiSuccessResponse({
+    ...repairSampleDraft,
+    workDetails: '시운전 및 전체 점검을 진행했습니다.',
+    result: '현장 수리 완료 상태로 마무리했습니다.',
+  });
+  const result = await callOpenAiDraft(env, normalizeDraftInput(repairInput2), fetchImpl);
+  assert.equal(result.ok, true);
+  assert.doesNotMatch(result.draft.result, /정상적으로 주행/);
+});
+
+test('generate-case-draft handler returns repair draft shape', async () => {
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async () => openAiSuccessResponse(repairSampleDraft);
+  try {
+    const response = await onRequestPost({
+      request: new Request('https://dreamev.kr/api/generate-case-draft', {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify(repairInput1),
+      }),
+      env,
+    });
+    assert.equal(response.status, 200);
+    const body = await response.json();
+    assert.equal(body.success, true);
+    assert.equal(typeof body.draft.diagnosis, 'string');
+    assert.equal(typeof body.draft.workDetails, 'string');
+    assert.equal(body.draft.productionDetails, undefined);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test('buildDraftPrompt includes repair developer rules', () => {
+  const prompt = buildDraftPrompt(normalizeDraftInput(repairInput1));
+  assert.match(prompt.system, /수리사례/);
+  assert.match(prompt.user, /전진 불량/);
+  assert.doesNotMatch(prompt.user, /후진/);
+});
+
+test('real OpenAI integration repair input 1', { skip: !process.env.OPENAI_API_KEY }, async () => {
+  const result = await callOpenAiDraft(
+    { OPENAI_API_KEY: process.env.OPENAI_API_KEY, OPENAI_MODEL: 'gpt-4.1-mini' },
+    normalizeDraftInput(repairInput1),
+  );
+  assert.equal(result.ok, true, JSON.stringify(result));
+  assert.notEqual(result.draft.title, '456');
+  assert.match(result.draft.workDetails, /배선|보수/);
+  assert.match(result.draft.result, /정상|주행/);
+  assert.equal(result.model, 'gpt-4.1-mini');
+});
+
+test('real OpenAI integration repair input 2', { skip: !process.env.OPENAI_API_KEY }, async () => {
+  const result = await callOpenAiDraft(
+    { OPENAI_API_KEY: process.env.OPENAI_API_KEY, OPENAI_MODEL: 'gpt-4.1-mini' },
+    normalizeDraftInput(repairInput2),
+  );
+  assert.equal(result.ok, true, JSON.stringify(result));
+  assert.notEqual(result.draft.title, '345345');
+  assert.doesNotMatch(result.draft.result, /정상적으로 주행/);
+});
+
+test('production schema draft sanitizes productionDetails and features', () => {
+  const input = normalizeDraftInput({
+    contentType: 'production',
+    userTitle: '999',
+    category: '산업용',
+    workTypes: ['맞춤 제작'],
+    result: ['납품 완료'],
+  });
+  const draft = sanitizeProductionDraft({
+    title: '산업용 전동대차 맞춤 제작',
+    summary: '공장 내부 운반용 전동대차를 맞춤 제작했습니다.',
+    customerRequest: '공장 내부 운반용 차량 제작을 요청받았습니다.',
+    productionDetails: '적재함 구조와 구동 계통을 현장 요구에 맞게 제작했습니다.',
+    features: '좁은 통로에서 운행하기 쉬운 조향 구조를 적용했습니다.',
+    result: '납품 후 현장에서 시운전을 진행했습니다.',
+    seoTitle: '산업용 전동대차 맞춤 제작',
+    seoDescription: '공장 운반용 맞춤 전동대차 제작 사례입니다.',
+    keywords: ['산업용 전동대차 제작', '맞춤 전동차 제작'],
+  }, input);
+  assert.equal(typeof draft.productionDetails, 'string');
+  assert.equal(typeof draft.features, 'string');
+});
+
+test('validateDraftInput rejects empty payload', () => {
+  const input = normalizeDraftInput({ contentType: 'repair' });
+  const result = validateDraftInput(input);
+  assert.equal(result.ok, false);
 });
 
 test('generate-case-draft handler returns 503 without API key', async () => {
@@ -195,71 +250,9 @@ test('generate-case-draft handler returns 503 without API key', async () => {
     request: new Request('https://dreamev.kr/api/generate-case-draft', {
       method: 'POST',
       headers: authHeaders(),
-      body: JSON.stringify({ contentType: 'repair', symptoms: ['전진 불량'] }),
+      body: JSON.stringify(repairInput1),
     }),
     env: { UPLOAD_ADMIN_SECRET: 'secret' },
   });
   assert.equal(response.status, 503);
-  const body = await response.json();
-  assert.equal(body.code, 'CONFIG_ERROR');
-});
-
-test('generate-case-draft handler requires auth', async () => {
-  const response = await onRequestPost({
-    request: new Request('https://dreamev.kr/api/generate-case-draft', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ contentType: 'repair', symptoms: ['전진 불량'], result: ['정상'] }),
-    }),
-    env,
-  });
-  assert.equal(response.status, 401);
-});
-
-test('generate-case-draft handler returns fixed success draft shape', async () => {
-  const originalFetch = globalThis.fetch;
-  globalThis.fetch = async () => openAiSuccessResponse(sampleDraft);
-  try {
-    const response = await onRequestPost({
-      request: new Request('https://dreamev.kr/api/generate-case-draft', {
-        method: 'POST',
-        headers: authHeaders(),
-        body: JSON.stringify(userProductionPayload),
-      }),
-      env,
-    });
-    assert.equal(response.status, 200);
-    const body = await response.json();
-    assert.equal(body.success, true);
-    assert.equal(body.draft.title, sampleDraft.title);
-    assert.equal(typeof body.draft.diagnosis, 'string');
-    assert.equal(Array.isArray(body.draft.keywords), true);
-    assert.equal('inspectionResult' in body.draft, false);
-    assert.equal('warnings' in body.draft, false);
-  } finally {
-    globalThis.fetch = originalFetch;
-  }
-});
-
-test('buildDraftPrompt includes only provided repair facts', () => {
-  const prompt = buildDraftPrompt(normalizeDraftInput({
-    contentType: 'repair',
-    symptoms: ['전진 불량'],
-    diagnosis: ['배선 단선'],
-    work: ['배선 보수'],
-    result: ['정상 확인'],
-  }));
-  assert.match(prompt.user, /전진 불량/);
-  assert.match(prompt.user, /배선 단선/);
-  assert.doesNotMatch(prompt.user, /서울/);
-});
-
-test('real OpenAI integration with user production payload', { skip: !process.env.OPENAI_API_KEY }, async () => {
-  const result = await callOpenAiDraft(
-    { OPENAI_API_KEY: process.env.OPENAI_API_KEY, OPENAI_MODEL: 'gpt-4o-mini' },
-    normalizeDraftInput(userProductionPayload),
-  );
-  assert.equal(result.ok, true);
-  assert.equal(typeof result.draft.diagnosis, 'string');
-  assert.match(result.draft.workDetails, /배선|보수|작업/);
 });

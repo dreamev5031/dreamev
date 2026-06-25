@@ -50,9 +50,10 @@ export async function onRequestPost(context) {
       openAiErrorType: result.openAiError?.type,
       openAiErrorParam: result.openAiError?.param,
       contentType: input.contentType,
-      titleLength: input.title.length,
+      titleLength: input.userTitle.length,
       symptomCount: input.symptoms.length,
       diagnosisCount: input.diagnosis.length,
+      qualityReason: result.qualityReason,
       elapsedMs,
     });
     return errorResponse(result.code, result.message, result.status || 502, { requestId });
@@ -62,6 +63,7 @@ export async function onRequestPost(context) {
     requestId,
     contentType: input.contentType,
     model: result.model,
+    attempt: result.attempt,
     elapsedMs,
   });
 
