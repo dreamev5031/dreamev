@@ -25,16 +25,38 @@ export async function pathExists(env, path) {
 }
 
 export async function listExistingMdNames(env, contentDir = 'public/content/cases') {
+  const names = await listMdFilesInDir(env, contentDir);
+  return new Set(names);
+}
+
+export async function listMdFilesInDir(env, contentDir) {
   const { owner, repo } = repoBase(env);
   const token = env.GITHUB_TOKEN;
   const res = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${contentDir}`, {
     headers: githubHeaders(token),
   });
-  if (res.status === 404) return new Set();
+  if (res.status === 404) return [];
   if (!res.ok) throw new Error(`GitHub list ${contentDir} failed: ${res.status}`);
   const data = await res.json();
-  if (!Array.isArray(data)) return new Set();
-  return new Set(data.filter((f) => f.type === 'file' && f.name.endsWith('.md')).map((f) => f.name));
+  if (!Array.isArray(data)) return [];
+  return data.filter((f) => f.type === 'file' && f.name.endsWith('.md')).map((f) => f.name);
+}
+
+export async function getFile(env, path) {
+  const { owner, repo } = repoBase(env);
+  const token = env.GITHUB_TOKEN;
+  const encodedPath = path.split('/').map(encodeURIComponent).join('/');
+  const res = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${encodedPath}`, {
+    headers: githubHeaders(token),
+  });
+  if (res.status === 404) return null;
+  if (!res.ok) throw new Error(`GitHub get file failed: ${res.status}`);
+  const data = await res.json();
+  if (!data.content || !data.sha) return null;
+  const binary = atob(data.content.replace(/\n/g, ''));
+  const bytes = Uint8Array.from(binary, (c) => c.charCodeAt(0));
+  const content = new TextDecoder().decode(bytes);
+  return { path, sha: data.sha, content };
 }
 
 async function getBranchState(env) {
@@ -80,6 +102,14 @@ function bytesToBase64(bytes) {
 }
 
 export async function commitFiles(env, files, message) {
+  const upserts = files.map((file) => {
+    if (file.binary) return { path: file.path, binary: file.binary };
+    return { path: file.path, content: file.content };
+  });
+  return commitChanges(env, { upserts, deletes: [] }, message);
+}
+
+export async function commitChanges(env, { upserts = [], deletes = [] }, message) {
   const { owner, repo, branch } = repoBase(env);
   const token = env.GITHUB_TOKEN;
   if (!token) throw new Error('GITHUB_TOKEN missing');
@@ -87,11 +117,11 @@ export async function commitFiles(env, files, message) {
   const attempt = async () => {
     const { commitSha, treeSha } = await getBranchState(env);
     const treeItems = [];
-    for (const file of files) {
+
+    for (const file of upserts) {
       let blobSha;
       if (file.binary) {
-        const base64 = bytesToBase64(file.binary);
-        blobSha = await createBlob(env, base64, 'base64');
+        blobSha = await createBlob(env, bytesToBase64(file.binary), 'base64');
       } else {
         blobSha = await createBlob(env, textToBase64(file.content), 'base64');
       }
@@ -100,6 +130,15 @@ export async function commitFiles(env, files, message) {
         mode: '100644',
         type: 'blob',
         sha: blobSha,
+      });
+    }
+
+    for (const del of deletes) {
+      treeItems.push({
+        path: del.path,
+        mode: '100644',
+        type: 'blob',
+        sha: null,
       });
     }
 
@@ -139,7 +178,11 @@ export async function commitFiles(env, files, message) {
   const first = await attempt();
   if (first.conflict) {
     const second = await attempt();
-    if (second.conflict) throw new Error('GitHub ref conflict after retry');
+    if (second.conflict) {
+      const err = new Error('GitHub ref conflict after retry');
+      err.code = 'CONFLICT';
+      throw err;
+    }
     return second.commitSha;
   }
   return first.commitSha;
