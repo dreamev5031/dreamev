@@ -31,7 +31,7 @@ const DRAFT_JSON_SCHEMA = {
       title: { type: 'string' },
       summary: { type: 'string' },
       customerRequest: { type: 'string' },
-      inspectionResult: { type: 'string' },
+      diagnosis: { type: 'string' },
       workDetails: { type: 'string' },
       result: { type: 'string' },
       seoTitle: { type: 'string' },
@@ -45,7 +45,7 @@ const DRAFT_JSON_SCHEMA = {
       'title',
       'summary',
       'customerRequest',
-      'inspectionResult',
+      'diagnosis',
       'workDetails',
       'result',
       'seoTitle',
@@ -142,12 +142,12 @@ export function buildDraftPrompt(input) {
   ].filter(Boolean);
 
   const structure = input.contentType === 'repair'
-    ? '수리사례: customerRequest(고객 요청), inspectionResult(점검 결과), workDetails(수리 및 작업 내용), result(작업 결과)'
-    : '제작사례: customerRequest(고객 요청/목적), workDetails(제작 내용), result(납품·활용 결과). inspectionResult는 제작사례에서 빈 문자열 가능';
+    ? '수리사례: customerRequest(고객 요청), diagnosis(점검 결과), workDetails(수리 및 작업 내용), result(작업 결과)'
+    : '제작사례: customerRequest(고객 요청/목적), workDetails(제작 내용), result(납품·활용 결과). diagnosis는 제작사례에서 빈 문자열로 둘 수 있음';
 
   return {
     system: [
-      '당신은 드림전동차(DREAM EV) 작업사례 초안 작성 도우미입니다.',
+      '당신은 드림전동차 작업사례 초안 작성 도우미입니다.',
       '입력에 없는 사실, 부품, 지역, 원인, 성능, 보증, 안전 단정을 절대 추가하지 마세요.',
       '한국어로 자연스럽고 간결하게 작성하세요.',
       '조사 템플릿 "(이)가", "(을)를", "(은)는" 형태를 출력하지 마세요.',
@@ -168,14 +168,14 @@ export function sanitizeDraftFields(draft, input) {
   const title = clean(draft.title) || input.title || '작업 사례';
   const summary = clean(draft.summary);
   const customerRequest = clean(draft.customerRequest);
-  const inspectionResult = clean(draft.inspectionResult);
+  const diagnosis = clean(draft.diagnosis ?? draft.inspectionResult);
   const workDetails = clean(draft.workDetails);
   const result = clean(draft.result);
 
-  for (const text of [title, summary, customerRequest, inspectionResult, workDetails, result]) {
+  for (const text of [title, summary, customerRequest, diagnosis, workDetails, result]) {
     if (FORBIDDEN_PATTERNS.some((pattern) => pattern.test(text))) {
       const err = new Error('Draft contains forbidden template text');
-      err.code = 'OPENAI_INVALID_RESPONSE';
+      err.code = 'OPENAI_RESPONSE_PARSE_FAILED';
       throw err;
     }
   }
@@ -189,7 +189,7 @@ export function sanitizeDraftFields(draft, input) {
 
   if (!summary || !customerRequest || !workDetails || !result) {
     const err = new Error('Draft missing required fields');
-    err.code = 'OPENAI_INVALID_RESPONSE';
+    err.code = 'OPENAI_RESPONSE_PARSE_FAILED';
     throw err;
   }
 
@@ -197,31 +197,54 @@ export function sanitizeDraftFields(draft, input) {
     title,
     summary,
     customerRequest,
-    inspectionResult: input.contentType === 'repair' ? inspectionResult : '',
+    diagnosis: input.contentType === 'repair' ? diagnosis : '',
     workDetails,
     result,
     seoTitle,
     seoDescription,
     keywords,
-    warnings: ['입력된 정보만 반영한 AI 초안입니다. 게시 전 내용을 확인해 주세요.'],
   };
 }
 
+function safeOpenAiErrorSummary(bodyText) {
+  try {
+    const parsed = JSON.parse(bodyText);
+    return {
+      type: parsed?.error?.type || '',
+      param: parsed?.error?.param || '',
+      code: parsed?.error?.code || '',
+      message: String(parsed?.error?.message || '').slice(0, 300),
+    };
+  } catch {
+    return { message: String(bodyText || '').slice(0, 300) };
+  }
+}
+
 function mapOpenAiHttpError(status, bodyText) {
+  const openAiError = safeOpenAiErrorSummary(bodyText);
+
+  if (status === 400) {
+    return {
+      code: 'OPENAI_BAD_REQUEST',
+      message: 'AI 응답 형식 요청이 올바르지 않습니다. 관리자에게 문의해 주세요.',
+      status: 502,
+      openAiError,
+    };
+  }
   if (status === 401) {
-    return { code: 'OPENAI_UNAUTHORIZED', message: 'AI 기능 설정을 확인해 주세요.', status: 502 };
+    return { code: 'OPENAI_UNAUTHORIZED', message: 'AI 기능 설정을 확인해 주세요.', status: 502, openAiError };
   }
   if (status === 429) {
-    return { code: 'OPENAI_RATE_LIMIT', message: '요청이 많습니다. 잠시 후 다시 시도해 주세요.', status: 429 };
+    return { code: 'OPENAI_RATE_LIMIT', message: '요청이 많습니다. 잠시 후 다시 시도해 주세요.', status: 429, openAiError };
   }
   if (status >= 500) {
-    return { code: 'OPENAI_SERVER_ERROR', message: 'AI 서버 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.', status: 502 };
+    return { code: 'OPENAI_SERVER_ERROR', message: 'AI 서버 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.', status: 502, openAiError };
   }
   return {
     code: 'OPENAI_ERROR',
     message: `AI 요청에 실패했습니다. (${status})`,
     status: 502,
-    detail: bodyText?.slice(0, 200) || '',
+    openAiError,
   };
 }
 
@@ -264,40 +287,60 @@ export async function callOpenAiDraft(env, input, fetchImpl = fetch) {
     return { ok: false, code: 'OPENAI_NETWORK_ERROR', message: 'AI 서버에 연결하지 못했습니다.', status: 502 };
   }
 
+  const openAiStatus = response.status;
   const bodyText = await response.text();
   if (!response.ok) {
-    const mapped = mapOpenAiHttpError(response.status, bodyText);
-    return { ok: false, ...mapped };
+    const mapped = mapOpenAiHttpError(openAiStatus, bodyText);
+    return { ok: false, ...mapped, openAiStatus };
   }
 
   let parsed;
   try {
     parsed = JSON.parse(bodyText);
   } catch {
-    return { ok: false, code: 'OPENAI_INVALID_RESPONSE', message: 'AI 응답을 해석하지 못했습니다.', status: 502 };
+    return {
+      ok: false,
+      code: 'OPENAI_RESPONSE_PARSE_FAILED',
+      message: 'AI 응답을 처리하지 못했습니다.',
+      status: 502,
+      openAiStatus,
+    };
   }
 
   const content = parsed?.choices?.[0]?.message?.content;
   if (!content || typeof content !== 'string') {
-    return { ok: false, code: 'OPENAI_INVALID_RESPONSE', message: 'AI가 빈 초안을 반환했습니다.', status: 502 };
+    return {
+      ok: false,
+      code: 'OPENAI_RESPONSE_PARSE_FAILED',
+      message: 'AI가 빈 초안을 반환했습니다.',
+      status: 502,
+      openAiStatus,
+    };
   }
 
   let draftJson;
   try {
     draftJson = JSON.parse(content);
   } catch {
-    return { ok: false, code: 'OPENAI_INVALID_RESPONSE', message: 'AI 응답 JSON이 올바르지 않습니다.', status: 502 };
+    return {
+      ok: false,
+      code: 'OPENAI_RESPONSE_PARSE_FAILED',
+      message: 'AI 응답 JSON이 올바르지 않습니다.',
+      status: 502,
+      openAiStatus,
+    };
   }
 
   try {
     const draft = sanitizeDraftFields(draftJson, input);
-    return { ok: true, draft, model };
+    return { ok: true, draft, model, openAiStatus };
   } catch (err) {
     return {
       ok: false,
-      code: err.code || 'OPENAI_INVALID_RESPONSE',
-      message: 'AI 초안 품질 검증에 실패했습니다. 다시 시도해 주세요.',
+      code: err.code || 'OPENAI_RESPONSE_PARSE_FAILED',
+      message: 'AI 응답을 처리하지 못했습니다.',
       status: 502,
+      openAiStatus,
     };
   }
 }

@@ -46,7 +46,13 @@ export async function onRequestPost(context) {
       requestId,
       code: result.code,
       status: result.status,
+      openAiStatus: result.openAiStatus,
+      openAiErrorType: result.openAiError?.type,
+      openAiErrorParam: result.openAiError?.param,
       contentType: input.contentType,
+      titleLength: input.title.length,
+      symptomCount: input.symptoms.length,
+      diagnosisCount: input.diagnosis.length,
       elapsedMs,
     });
     return errorResponse(result.code, result.message, result.status || 502, { requestId });
