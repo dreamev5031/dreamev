@@ -5764,17 +5764,32 @@ header nav a.active {
     padding: 0 20px 80px !important;
     text-align: center !important;
     overflow: visible !important;
+    position: relative;
+    z-index: auto;
 }
 
-/* === 제작사례 갤러리형 헤더 (서브 히어로) === */
-.case-page-hero.gallery-header {
-    margin-bottom: var(--hero-gap-after);
-    background-color: #1a202c;
+/* === 제작사례 갤러리형 헤더 (서브 히어로) — 콘텐츠 높이, 문서 흐름 유지 === */
+.case-page-section .case-page-hero.gallery-header {
+    position: relative;
+    display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    min-height: 0;
+    max-height: none;
+    margin: 0 auto var(--hero-gap-after);
+    padding: 1.25rem 0 0.5rem;
+    overflow: visible;
+    isolation: auto;
+    z-index: auto;
+    transform: none;
+    background-color: #1a202c;
     text-align: center;
     gap: 0;
+    box-sizing: border-box;
 }
 
 .case-page-hero .header-text-box h2 {
@@ -5789,6 +5804,20 @@ header nav a.active {
 
 .case-page-hero .header-text-box h3 {
     margin-bottom: 0;
+    color: #fff;
+    font-size: clamp(22px, 5.5vw, 40px);
+    font-weight: 800;
+    line-height: 1.35;
+    word-break: keep-all;
+}
+
+.case-page-hero .header-text-box p {
+    margin: 12px auto 0;
+    max-width: 36rem;
+    color: rgba(255, 255, 255, 0.92);
+    font-size: clamp(15px, 3.8vw, 18px);
+    line-height: 1.65;
+    word-break: keep-all;
 }
 
 .case-page-hero .btn-all-cases {
@@ -5906,7 +5935,9 @@ header nav a.active {
 }
 
 /* 1x4 가로 배치 (모바일은 2x2) */
-.case-grid-container {
+.case-page-section .case-grid-container {
+    position: relative;
+    z-index: auto;
     display: grid !important;
     grid-template-columns: repeat(2, 1fr) !important;
     gap: 16px !important;
@@ -5984,7 +6015,9 @@ header nav a.active {
 }
 
 /* 갤러리 영역 */
-.case-gallery-wrap {
+.case-page-section .case-gallery-wrap {
+    position: relative;
+    z-index: auto;
     max-width: 1200px;
     margin: 0 auto;
     overflow: visible;
