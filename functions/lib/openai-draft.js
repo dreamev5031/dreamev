@@ -65,6 +65,9 @@ ${POLITE_STYLE_RULE}
 * 제목이 숫자, 임의 문자열, DREAMEV, test, SSSS처럼 의미 없는 값이면 해당 제목을 사용하지 말고 작업 내용을 바탕으로 새 제목을 만듭니다.
 * 차량 명칭이 애매하면 사용자가 입력한 표현을 그대로 유지합니다.
 * 문장은 짧고 명확하게 작성하되 지나치게 단문만 나열하지 않습니다.
+* 항목끼리 같은 사실을 반복하지 말고, 전체 글이 하나의 수리 흐름(요청→점검→작업→결과)으로 자연스럽게 이어지게 작성합니다.
+* "점검했습니다", "확인했습니다"만 반복하지 말고 표현을 자연스럽게 변형합니다.
+* 입력이 짧은 키워드(예: "주행 정상 확인", "컨트롤러 교체")여도 그대로 출력하지 말고 반드시 완전한 존댓말 문장으로 확장합니다.
 * Markdown 기호는 출력하지 않습니다.
 * JSON 외의 설명은 출력하지 않습니다.`;
 
@@ -72,17 +75,43 @@ const REPAIR_DEVELOPER_PROMPT = `contentType이 repair인 수리사례를 작성
 
 작성 목적:
 고객이 어떤 증상으로 요청했고, 무엇을 점검했으며, 어떤 작업을 했고, 결과가 어땠는지를 명확히 보여주는 수리사례를 작성합니다.
+현장 작업자가 정리한 기술 보고서처럼 신뢰감 있게, 입력 사실만으로 자연스럽게 확장된 문장을 작성합니다.
 
 출력 항목: title, summary, customerRequest, diagnosis, workDetails, result, seoTitle, seoDescription, keywords
 
 문체: summary, customerRequest, diagnosis, workDetails, result, seoDescription은 모두 존댓말(~했습니다, ~되었습니다)로 작성합니다. 해라체(~했다, ~한다) 금지.
 
+작성 품질 규칙:
+* 입력 문장·키워드를 그대로 복사하지 말고, 의미를 유지한 채 전문적인 사례 문장으로 다시 작성합니다.
+* 각 본문 항목은 최소 1문장, 권장 2문장입니다. summary와 workDetails는 2~3문장까지 허용합니다.
+* 항목끼리 연결되도록 작성하되, 같은 표현을 반복하지 않습니다.
+* 사실 확장은 금지합니다. 입력에 없는 부품·원인·작업·시운전·배선 점검 등을 임의로 추가하지 않습니다.
+* 광고 문구나 과장 표현은 넣지 않습니다.
+
+금지 예 (너무 짧거나 기계적인 출력):
+* "주행 정상 확인", "현장 수리 완료", "점검 진행", "컨트롤러 교체", "충전기 확인"처럼 입력을 그대로 적는 것
+* "점검을 진행했습니다."만 있고 무엇을 확인했는지 없는 diagnosis
+* 증상·작업·결과를 한 줄 키워드로만 나열하는 것
+
+입력 확장 예 (사실은 동일, 표현만 문장화):
+* "주행 정상 확인" → "작업 후 시운전을 진행했으며 차량이 정상적으로 주행하는 것을 확인했습니다." (시운전이 입력된 경우에만 시운전 언급)
+* "컨트롤러 교체" → "이상이 확인된 컨트롤러를 교체하고 관련 계통의 상태를 함께 확인했습니다." (입력에 배선·계통 점검이 없으면 배선·계통은 쓰지 말 것)
+* "충전기 점검" → "충전기의 작동 상태와 연결 상태를 점검해 추가 이상 여부를 확인했습니다."
+
+참고 출력 수준 (입력: 산업용 SUV, 주행 불가, 컨트롤러 이상, 컨트롤러 교체, 충전기 점검, 주행 정상 확인):
+summary: "산업용 SUV 전동차에서 주행 불가 증상이 발생해 현장 점검을 진행했습니다. 점검 결과 컨트롤러 이상이 확인되어 교체 작업을 진행했으며, 충전기 상태도 함께 확인했습니다."
+customerRequest: "산업용 SUV 전동차가 주행되지 않는 증상으로 점검과 수리를 요청받았습니다."
+diagnosis: "차량의 주행 계통과 전원 상태를 점검한 결과 컨트롤러 이상이 확인되었습니다. 충전기 상태도 함께 확인해 추가 이상 여부를 점검했습니다."
+workDetails: "이상이 확인된 컨트롤러를 교체했습니다. 이후 충전기 작동 상태를 점검하고 차량의 주행 상태를 확인하기 위해 시운전을 진행했습니다." (시운전이 입력된 경우에만)
+result: "작업 후 시운전을 통해 차량이 정상적으로 주행하는 것을 확인했습니다."
+
+필드별 길이·구성:
 title: 차량 종류 + 핵심 증상 + 주요 점검 또는 수리 내용, 22~45자 권장, 의미 없는 userTitle 무시, 지역은 입력된 경우에만, 명사형 제목
-summary: 60~130자, 증상·점검 결과·주요 작업 포함, 존댓말
-customerRequest: 입력 증상만, 1~2문장, 존댓말 (예: "점검을 요청받았습니다.")
-diagnosis: 입력된 점검 결과·원인만, 없으면 점검 진행 수준, 1~2문장, 존댓말
-workDetails: 입력된 수리·보수·점검·교체·시운전만, 1~3문장, 존댓말 (예: "교체하고 점검했습니다.")
-result: 입력 결과만, "주행 정상 확인"이 있을 때만 정상 주행 확인 표현 가능, "현장 수리 완료"만 있으면 정상 작동 추가 금지, 존댓말
+summary: 2문장, 증상·핵심 원인 또는 확인 사항·주요 작업·결과를 자연스럽게 요약, 80~160자 권장, 존댓말
+customerRequest: 1~2문장, 고객이 어떤 증상으로 점검 또는 수리를 요청했는지, 40~100자 권장, 존댓말
+diagnosis: 1~2문장, 입력된 점검 결과·원인만 사용, 무엇을 확인했는지 구체적으로, 40~120자 권장, 존댓말
+workDetails: 2~3문장, 교체·보수·점검·시운전을 순서대로, selectedWorkItems와 work를 자연스럽게 합침, 70~180자 권장, 존댓말
+result: 1~2문장, 입력 결과만, 40~100자 권장, 존댓말. "주행 정상 확인" 입력 시 시운전 후 정상 주행 확인으로 문장화
 seoTitle: 30~55자, 회사명 불필요 시 생략, 명사형 제목
 seoDescription: 70~140자, 키워드 나열 금지, 존댓말
 keywords: 4~7개 문자열 배열, 구체적 조합, 입력 없는 지역·부품 금지
@@ -309,7 +338,10 @@ export function buildDraftPrompt(input) {
 
   return {
     system: `${COMMON_SYSTEM_PROMPT}\n\n${developer}`,
-    user: `아래 JSON 입력만 사용해 사례 초안 JSON을 작성하세요. 빈 문자열은 정보 없음입니다.\n\n${JSON.stringify(buildOpenAiUserInput(input))}`,
+    user: `아래 JSON 입력만 사용해 사례 초안 JSON을 작성하세요. 빈 문자열은 정보 없음입니다.
+입력 문장·키워드를 그대로 복사하지 말고, 각 항목을 자연스러운 기술 사례 문장으로 확장하세요. 사실은 추가하지 마세요.
+
+${JSON.stringify(buildOpenAiUserInput(input))}`,
   };
 }
 
@@ -383,6 +415,125 @@ export function findDraftInformalSpeechViolations(draft, input) {
   return violations;
 }
 
+const BRIEF_LITERAL_PHRASES = [
+  '주행 정상 확인',
+  '현장 수리 완료',
+  '점검 진행',
+  '컨트롤러 교체',
+  '충전기 확인',
+  '충전기 점검',
+];
+
+const GENERIC_DIAGNOSIS_PATTERNS = [
+  /^[^.]{0,60}점검(?:을)?\s*진행했습니다\.?$/,
+  /^[^.]{0,40}점검했습니다\.?$/,
+  /^[^.]{0,60}증상에\s*대해\s*점검(?:을)?\s*진행했습니다\.?$/,
+  /^[^.]{0,60}에\s*대해\s*점검(?:을)?\s*진행했습니다\.?$/,
+];
+
+function normalizeCompareText(text) {
+  return cleanField(text).replace(/\s+/g, '').replace(/[.,!?~]/g, '');
+}
+
+export function countSentences(text) {
+  const normalized = cleanField(text);
+  if (!normalized) return 0;
+  return normalized.split(/[.!?]+/).map((part) => part.trim()).filter(Boolean).length;
+}
+
+export function isExactInputCopy(fieldText, inputItems) {
+  const normalized = normalizeCompareText(fieldText);
+  if (!normalized || !inputItems?.length) return false;
+  return inputItems.some((item) => normalizeCompareText(item) === normalized);
+}
+
+export function isResultTooBrief(resultText) {
+  const text = cleanField(resultText);
+  if (!text) return true;
+  if (text.length <= 15) return true;
+  return BRIEF_LITERAL_PHRASES.some((phrase) => normalizeCompareText(text) === normalizeCompareText(phrase));
+}
+
+function diagnosisMentionsInput(diagnosisText, inputDiagnosis) {
+  const text = normalizeCompareText(diagnosisText);
+  return inputDiagnosis.some((item) => {
+    const norm = normalizeCompareText(item);
+    if (norm.length >= 2 && text.includes(norm)) return true;
+    const tokens = item.split(/\s+/).map((t) => normalizeCompareText(t)).filter((t) => t.length >= 2);
+    return tokens.some((token) => text.includes(token));
+  });
+}
+
+export function isGenericDiagnosis(diagnosisText, input) {
+  const text = cleanField(diagnosisText);
+  if (!text) return false;
+
+  if (GENERIC_DIAGNOSIS_PATTERNS.some((pattern) => pattern.test(text))) {
+    return true;
+  }
+
+  if (input.diagnosis.length > 0 && !diagnosisMentionsInput(text, input.diagnosis)) {
+    return true;
+  }
+
+  if (text.length < 25 && input.diagnosis.length > 0) {
+    return true;
+  }
+
+  return false;
+}
+
+export function isSummaryInsufficient(summaryText) {
+  const text = cleanField(summaryText);
+  if (!text) return true;
+  if (text.length < 50) return true;
+  const sentences = countSentences(text);
+  return sentences === 1 && text.length < 70;
+}
+
+export function findDraftExpansionViolations(draft, input) {
+  if (!draft || input.contentType !== 'repair') return [];
+
+  const violations = [];
+  const result = cleanField(draft.result);
+  const diagnosis = cleanField(draft.diagnosis ?? draft.inspectionResult);
+  const customerRequest = cleanField(draft.customerRequest);
+  const workDetails = cleanField(draft.workDetails);
+  const summary = cleanField(draft.summary);
+  const workInputs = [...input.selectedWorkItems, ...input.work];
+
+  if (isResultTooBrief(result)) {
+    violations.push({ field: 'result', issue: 'too_brief', excerpt: result });
+  }
+
+  if (diagnosis && isGenericDiagnosis(diagnosis, input)) {
+    violations.push({ field: 'diagnosis', issue: 'generic', excerpt: diagnosis.slice(0, 80) });
+  }
+
+  if (customerRequest && isExactInputCopy(customerRequest, input.symptoms)) {
+    violations.push({ field: 'customerRequest', issue: 'literal_copy' });
+  }
+
+  if (diagnosis && isExactInputCopy(diagnosis, input.diagnosis)) {
+    violations.push({ field: 'diagnosis', issue: 'literal_copy' });
+  }
+
+  if (workDetails && (isExactInputCopy(workDetails, workInputs)
+    || BRIEF_LITERAL_PHRASES.some((phrase) => normalizeCompareText(workDetails) === normalizeCompareText(phrase)))) {
+    violations.push({ field: 'workDetails', issue: 'literal_copy', excerpt: workDetails.slice(0, 80) });
+  }
+
+  if (result && isExactInputCopy(result, input.result)) {
+    violations.push({ field: 'result', issue: 'literal_copy' });
+  }
+
+  if (isSummaryInsufficient(summary)) {
+    violations.push({ field: 'summary', issue: 'too_short', excerpt: summary.slice(0, 80) });
+  }
+
+  return violations;
+}
+
 export function validateDraftQuality(draft, input) {
   if (!draft || typeof draft !== 'object') {
     return { ok: false, reason: 'missing_draft' };
@@ -445,6 +596,15 @@ export function validateDraftQuality(draft, input) {
     const unselectedMentions = findUnselectedWorkMentions(cleanField(draft.workDetails), input.selectedWorkItems);
     if (unselectedMentions.length > 0) {
       return { ok: false, reason: 'unselected_work_mention' };
+    }
+
+    const expansionViolations = findDraftExpansionViolations(draft, input);
+    if (expansionViolations.length > 0) {
+      return {
+        ok: false,
+        reason: 'insufficient_expansion',
+        expansionViolations,
+      };
     }
   } else {
     if (!cleanField(draft.productionDetails) && (input.work.length || input.workTypes.length)) {
@@ -777,13 +937,16 @@ export async function callOpenAiDraft(env, input, fetchImpl = fetch) {
         code: 'OPENAI_PARSE_ERROR',
         message: lastQualityReason === 'informal_speech'
           ? 'AI 초안 문체가 존댓말 규칙에 맞지 않습니다. 다시 시도해 주세요.'
-          : `AI 응답 품질 검증에 실패했습니다. (${lastQualityReason})`,
+          : lastQualityReason === 'insufficient_expansion'
+            ? 'AI 초안이 입력 내용을 충분히 확장하지 못했습니다. 다시 시도해 주세요.'
+            : `AI 응답 품질 검증에 실패했습니다. (${lastQualityReason})`,
         status: 502,
         openAiStatus: response.openAiStatus,
         openAiRequestId: response.openAiRequestId,
         model: response.model,
         qualityReason: lastQualityReason,
         informalViolations: quality.informalViolations,
+        expansionViolations: quality.expansionViolations,
         stage: 'quality_validation',
       };
       logOpenAiDraftFailure({

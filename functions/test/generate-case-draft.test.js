@@ -17,6 +17,11 @@ import {
   findInformalSpeechInText,
   findDraftInformalSpeechViolations,
   resolveOpenAiModel,
+  countSentences,
+  isResultTooBrief,
+  isGenericDiagnosis,
+  isSummaryInsufficient,
+  findDraftExpansionViolations,
 } from '../lib/openai-draft.js';
 
 const env = {
@@ -49,6 +54,16 @@ const repairInput2 = {
   result: ['현장 수리 완료'],
 };
 
+const repairInputSuv = {
+  contentType: 'repair',
+  vehicle: '산업용 SUV',
+  symptoms: ['주행 불가'],
+  diagnosis: ['컨트롤러 이상'],
+  selectedWorkItems: ['컨트롤러 교체'],
+  work: ['충전기 점검'],
+  result: ['주행 정상 확인'],
+};
+
 function authHeaders() {
   return { Authorization: 'Bearer secret', 'Content-Type': 'application/json' };
 }
@@ -65,7 +80,7 @@ function openAiSuccessResponse(draft) {
 
 const repairSampleDraft = {
   title: '산업용 전동차 전진 불량 전자브레이크 배선 수리',
-  summary: '전진이 되지 않는 산업용 전동차를 점검한 결과 전자브레이크 계통의 쇼트가 확인되어 관련 배선을 보수하고 시운전을 진행했습니다.',
+  summary: '산업용 전동차에서 전진 불량 증상이 발생해 현장 점검을 진행했습니다. 점검 결과 전자브레이크 계통 쇼트가 확인되어 관련 배선을 보수하고 시운전을 진행했습니다.',
   customerRequest: '산업용 전동차가 전진하지 않는 증상으로 현장 점검과 수리를 요청받았습니다.',
   diagnosis: '주행 및 브레이크 계통을 점검한 결과 전자브레이크 회로에서 쇼트가 확인되었습니다.',
   workDetails: '쇼트가 발생한 관련 배선을 점검하고 손상된 부분을 보수한 뒤 시운전을 진행했습니다.',
@@ -73,6 +88,42 @@ const repairSampleDraft = {
   seoTitle: '산업용 전동차 전진 불량 전자브레이크 배선 수리',
   seoDescription: '전진 불량 증상의 산업용 전동차에서 전자브레이크 쇼트를 확인하고 배선 보수를 진행한 수리 사례입니다.',
   keywords: ['산업용 전동차 수리', '전동차 전진 불량', '전자브레이크 쇼트', '전동차 배선 보수'],
+};
+
+const repairSampleDraft2 = {
+  title: 'SUV형 전동차 전진 불량 충전기 점검',
+  summary: 'SUV형 전동차에서 전진 불량 증상이 발생해 현장 점검을 진행했습니다. 점검 결과 충전기 불량이 확인되어 시운전과 전체 점검을 실시했습니다.',
+  customerRequest: 'SUV형 전동차가 전진하지 않는 증상으로 점검을 요청받았습니다.',
+  diagnosis: '전원 및 충전 계통을 점검한 결과 충전기 불량 상태가 확인되었습니다.',
+  workDetails: '충전기 상태를 점검하고 시운전과 전체 점검을 실시하여 차량 상태를 종합적으로 확인했습니다.',
+  result: '현장에서 수리 작업을 완료하고 차량을 인계했습니다.',
+  seoTitle: 'SUV형 전동차 전진 불량 충전기 점검',
+  seoDescription: 'SUV형 전동차 전진 불량 증상에서 충전기 상태를 점검하고 시운전 및 전체 점검을 실시한 수리 사례입니다.',
+  keywords: ['SUV형 전동차 수리', '전동차 전진 불량', '충전기 점검', '전동차 시운전'],
+};
+
+const repairSampleDraftSuv = {
+  title: '산업용 SUV 주행 불가 컨트롤러 교체',
+  summary: '산업용 SUV 전동차에서 주행 불가 증상이 발생해 현장 점검을 진행했습니다. 점검 결과 컨트롤러 이상이 확인되어 교체 작업을 진행했으며, 충전기 상태도 함께 확인했습니다.',
+  customerRequest: '산업용 SUV 전동차가 주행되지 않는 증상으로 점검과 수리를 요청받았습니다.',
+  diagnosis: '차량의 주행 계통과 전원 상태를 점검한 결과 컨트롤러 이상이 확인되었습니다. 충전기 상태도 함께 확인해 추가 이상 여부를 점검했습니다.',
+  workDetails: '이상이 확인된 컨트롤러를 교체했습니다. 이후 충전기 작동 상태를 점검하고 차량의 주행 상태를 확인했습니다.',
+  result: '작업 후 차량이 정상적으로 주행하는 것을 확인했습니다.',
+  seoTitle: '산업용 SUV 주행 불가 컨트롤러 교체',
+  seoDescription: '산업용 SUV 전동차 주행 불가 증상에서 컨트롤러 이상을 확인하고 교체 및 충전기 점검을 진행한 수리 사례입니다.',
+  keywords: ['산업용 SUV 수리', '전동차 주행 불가', '컨트롤러 교체', '충전기 점검'],
+};
+
+const repairSampleDraftController = {
+  title: '산업용 전동차 주행 불량 컨트롤러 배선 교체',
+  summary: '산업용 전동차에서 주행 불량 증상이 발생해 현장 점검을 진행했습니다. 점검 결과 컨트롤러 출력 이상이 확인되어 컨트롤러와 배선을 교체하고 주행 테스트를 진행했습니다.',
+  customerRequest: '산업용 전동차가 주행 불량 증상으로 점검과 수리를 요청받았습니다.',
+  diagnosis: '주행 계통을 점검한 결과 컨트롤러 출력 이상이 확인되었습니다.',
+  workDetails: '점검 결과에 따라 컨트롤러를 교체하고 관련 배선을 정비한 뒤 주행 상태를 확인했습니다.',
+  result: '작업 후 주행 테스트를 통해 차량이 정상적으로 주행하는 것을 확인했습니다.',
+  seoTitle: '산업용 전동차 주행 불량 컨트롤러 배선 교체',
+  seoDescription: '산업용 전동차 주행 불량 증상에서 컨트롤러 출력 이상을 확인하고 컨트롤러·배선 교체를 진행한 수리 사례입니다.',
+  keywords: ['산업용 전동차 수리', '컨트롤러 교체', '배선 교체', '주행 불량'],
 };
 
 test('findInformalSpeechInText detects haera-che sentence endings only', () => {
@@ -114,7 +165,7 @@ test('callOpenAiDraft retries once when informal speech detected', async () => {
     }
     return openAiSuccessResponse(repairSampleDraft);
   };
-  const result = await callOpenAiDraft(env, normalizeDraftInput(repairInput2), fetchImpl);
+  const result = await callOpenAiDraft(env, normalizeDraftInput(repairInput1), fetchImpl);
   assert.equal(result.ok, true);
   assert.equal(calls, 2);
 });
@@ -124,10 +175,56 @@ test('callOpenAiDraft fails without auto-replace when informal speech persists',
     ...repairSampleDraft,
     result: '작업 후 정상 주행을 확인했다.',
   });
-  const result = await callOpenAiDraft(env, normalizeDraftInput(repairInput2), fetchImpl);
+  const result = await callOpenAiDraft(env, normalizeDraftInput(repairInput1), fetchImpl);
   assert.equal(result.ok, false);
   assert.equal(result.qualityReason, 'informal_speech');
   assert.match(result.message, /존댓말/);
+});
+
+test('isResultTooBrief rejects short literal result phrases', () => {
+  assert.equal(isResultTooBrief('주행 정상 확인'), true);
+  assert.equal(isResultTooBrief('현장 수리 완료'), true);
+  assert.equal(isResultTooBrief('작업 후 시운전을 통해 차량이 정상적으로 주행하는 것을 확인했습니다.'), false);
+});
+
+test('isGenericDiagnosis rejects inspection-only diagnosis', () => {
+  const input = normalizeDraftInput(repairInputSuv);
+  assert.equal(isGenericDiagnosis('주행 불가 증상에 대해 점검을 진행했습니다.', input), true);
+  assert.equal(
+    isGenericDiagnosis('차량의 주행 계통을 점검한 결과 컨트롤러 이상이 확인되었습니다.', input),
+    false,
+  );
+});
+
+test('validateDraftQuality rejects insufficient expansion', () => {
+  const input = normalizeDraftInput(repairInputSuv);
+  const result = validateDraftQuality({
+    ...repairSampleDraft,
+    summary: '주행 불가 점검을 진행했습니다.',
+    diagnosis: '증상에 대해 점검을 진행했습니다.',
+    workDetails: '컨트롤러 교체',
+    result: '주행 정상 확인',
+  }, input);
+  assert.equal(result.ok, false);
+  assert.equal(result.reason, 'insufficient_expansion');
+  assert.ok(result.expansionViolations.length >= 3);
+});
+
+test('callOpenAiDraft retries once when expansion quality fails', async () => {
+  let calls = 0;
+  const fetchImpl = async () => {
+    calls += 1;
+    if (calls === 1) {
+      return openAiSuccessResponse({
+        ...repairSampleDraft,
+        result: '주행 정상 확인',
+      });
+    }
+    return openAiSuccessResponse(repairSampleDraftSuv);
+  };
+  const result = await callOpenAiDraft(env, normalizeDraftInput(repairInputSuv), fetchImpl);
+  assert.equal(result.ok, true);
+  assert.equal(calls, 2);
 });
 
 test('normalizeRepairWorkItemLabel normalizes spacing and brush spelling', () => {
@@ -175,7 +272,7 @@ test('findUnselectedWorkMentions ignores selected items', () => {
 
 test('callOpenAiDraft succeeds with selectedWorkItems in prompt', async () => {
   const fetchImpl = async () => openAiSuccessResponse({
-    ...repairSampleDraft,
+    ...repairSampleDraftController,
     workDetails: '점검 결과에 따라 컨트롤러를 교체하고 관련 배선을 정비한 뒤 주행 상태를 확인했습니다.',
   });
   const result = await callOpenAiDraft(env, normalizeDraftInput({
@@ -208,7 +305,7 @@ test('callOpenAiDraft sends OPENAI_MODEL to OpenAI API', async () => {
   };
   const result = await callOpenAiDraft(
     { ...env, OPENAI_MODEL: 'gpt-4.1-mini' },
-    normalizeDraftInput(repairInput2),
+    normalizeDraftInput(repairInput1),
     fetchImpl,
   );
   assert.equal(result.ok, true);
@@ -296,9 +393,9 @@ test('callOpenAiDraft retries once on meaningless title', async () => {
 
 test('callOpenAiDraft does not invent replacement when only inspection work', async () => {
   const fetchImpl = async () => openAiSuccessResponse({
-    ...repairSampleDraft,
-    workDetails: '시운전 및 전체 점검을 진행했습니다.',
-    result: '현장 수리 완료 상태로 마무리했습니다.',
+    ...repairSampleDraft2,
+    workDetails: '시운전과 전체 점검을 진행하여 차량의 전반적인 상태를 확인했습니다.',
+    result: '현장 수리 완료 상태로 작업을 마무리했습니다.',
   });
   const result = await callOpenAiDraft(env, normalizeDraftInput(repairInput2), fetchImpl);
   assert.equal(result.ok, true);
