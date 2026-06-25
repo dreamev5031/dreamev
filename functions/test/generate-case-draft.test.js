@@ -12,6 +12,8 @@ import {
   sanitizeRepairDraft,
   validateDraftInput,
   validateDraftQuality,
+  normalizeRepairWorkItemLabel,
+  findUnselectedWorkMentions,
 } from '../lib/openai-draft.js';
 
 const env = {
@@ -69,6 +71,66 @@ const repairSampleDraft = {
   seoDescription: '전진 불량 증상의 산업용 전동차에서 전자브레이크 쇼트를 확인하고 배선 보수를 진행한 수리 사례입니다.',
   keywords: ['산업용 전동차 수리', '전동차 전진 불량', '전자브레이크 쇼트', '전동차 배선 보수'],
 };
+
+test('normalizeRepairWorkItemLabel normalizes spacing and brush spelling', () => {
+  assert.equal(normalizeRepairWorkItemLabel('배선교체'), '배선 교체');
+  assert.equal(normalizeRepairWorkItemLabel('카본브러쉬 교체'), '카본브러시 교체');
+});
+
+test('normalizeDraftInput maps selectedWorkItems', () => {
+  const input = normalizeDraftInput({
+    contentType: 'repair',
+    vehicle: '산업용 전동차',
+    symptoms: ['주행 불량'],
+    diagnosis: ['컨트롤러 출력 이상'],
+    selectedWorkItems: ['컨트롤러 교체', '배선교체'],
+    work: ['교체 후 주행 테스트 진행'],
+    result: ['주행 정상 확인'],
+  });
+  assert.deepEqual(input.selectedWorkItems, ['컨트롤러 교체', '배선 교체']);
+});
+
+test('validateDraftQuality rejects unselected work mention', () => {
+  const input = normalizeDraftInput({
+    contentType: 'repair',
+    vehicle: '산업용 전동차',
+    symptoms: ['주행 불량'],
+    selectedWorkItems: ['컨트롤러 교체'],
+    work: ['주행 테스트'],
+    result: ['주행 정상 확인'],
+  });
+  const result = validateDraftQuality({
+    ...repairSampleDraft,
+    workDetails: '컨트롤러를 교체하고 타이어 교체를 진행했습니다.',
+  }, input);
+  assert.equal(result.ok, false);
+  assert.equal(result.reason, 'unselected_work_mention');
+});
+
+test('findUnselectedWorkMentions ignores selected items', () => {
+  const mentions = findUnselectedWorkMentions(
+    '컨트롤러 교체와 배선 교체를 진행했습니다.',
+    ['컨트롤러 교체', '배선 교체'],
+  );
+  assert.deepEqual(mentions, []);
+});
+
+test('callOpenAiDraft succeeds with selectedWorkItems in prompt', async () => {
+  const fetchImpl = async () => openAiSuccessResponse({
+    ...repairSampleDraft,
+    workDetails: '점검 결과에 따라 컨트롤러를 교체하고 관련 배선을 정비한 뒤 주행 상태를 확인했습니다.',
+  });
+  const result = await callOpenAiDraft(env, normalizeDraftInput({
+    contentType: 'repair',
+    vehicle: '산업용 전동차',
+    symptoms: ['주행 불량'],
+    diagnosis: ['컨트롤러 출력 이상'],
+    selectedWorkItems: ['컨트롤러 교체', '배선 교체'],
+    work: ['교체 후 주행 테스트 진행'],
+    result: ['주행 정상 확인'],
+  }), fetchImpl);
+  assert.equal(result.ok, true);
+});
 
 test('default model is gpt-4.1-mini', () => {
   assert.equal(openAiDraftInternals.DEFAULT_MODEL, 'gpt-4.1-mini');

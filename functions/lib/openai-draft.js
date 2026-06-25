@@ -71,7 +71,17 @@ workDetails: 입력된 수리·보수·점검·교체·시운전만, 1~3문장
 result: 입력 결과만, "주행 정상 확인"이 있을 때만 정상 주행 확인 표현 가능, "현장 수리 완료"만 있으면 정상 작동 추가 금지
 seoTitle: 30~55자, 회사명 불필요 시 생략
 seoDescription: 70~140자, 키워드 나열 금지
-keywords: 4~7개 문자열 배열, 구체적 조합, 입력 없는 지역·부품 금지`;
+keywords: 4~7개 문자열 배열, 구체적 조합, 입력 없는 지역·부품 금지
+
+selectedWorkItems 규칙:
+* selectedWorkItems는 사용자가 선택한 실제 작업 사실이다.
+* 선택된 항목만 workDetails와 keywords에 반영한다.
+* 선택하지 않은 부품 교체나 작업을 새로 만들지 말 것.
+* work는 사용자가 자유 입력한 작업 설명이다. selectedWorkItems와 자연스럽게 합치되 같은 내용을 반복하지 말 것.
+* EM브레이크는 전자브레이크로 바꾸지 말고 입력 명칭을 우선 유지한다.
+* ET126 쓰로틀 교체는 "ET126 쓰로틀" 또는 "ET126 가속 레버" 중 자연스러운 표현을 사용한다.
+* 프레임 관련 작업은 구체 내용이 없으면 용접, 보강, 절단 등을 임의로 추가하지 말 것.
+* 배선 교체, 카본브러시 교체 표기는 띄어쓰기를 유지한다.`;
 
 const PRODUCTION_DEVELOPER_PROMPT = `contentType이 production인 제작사례를 작성한다.
 
@@ -159,6 +169,49 @@ function normalizeStringList(value, maxItems = LIMITS.listCount, maxItemLen = LI
     .slice(0, maxItems);
 }
 
+export const REPAIR_WORK_ITEM_CANONICAL = [
+  '배터리 교체',
+  '비상스위치 교체',
+  '브레이크 스위치 교체',
+  'EM브레이크 교체',
+  '컨트롤러 교체',
+  'ET126 쓰로틀 교체',
+  '프레임 관련 작업',
+  '타이어 교체',
+  '가변저항 교체',
+  '배선 교체',
+  '모터 교체',
+  '카본브러시 교체',
+  '충전기 교체',
+];
+
+const REPAIR_WORK_ITEM_ALIASES = {
+  '배선교체': '배선 교체',
+  '배선 교체': '배선 교체',
+  '카본브러쉬 교체': '카본브러시 교체',
+  '카본브러시 교체': '카본브러시 교체',
+  'ET126(쓰로틀) 교체': 'ET126 쓰로틀 교체',
+};
+
+export function normalizeRepairWorkItemLabel(item) {
+  const text = trimText(item, LIMITS.listItem);
+  if (!text || text === '기타 직접 입력') return '';
+  return REPAIR_WORK_ITEM_ALIASES[text] || text;
+}
+
+export function normalizeRepairWorkItems(items) {
+  return normalizeStringList(items)
+    .map((item) => normalizeRepairWorkItemLabel(item))
+    .filter(Boolean)
+    .slice(0, LIMITS.listCount);
+}
+
+export function findUnselectedWorkMentions(workDetails, selectedWorkItems) {
+  const selected = new Set(selectedWorkItems.map((item) => normalizeRepairWorkItemLabel(item)));
+  const text = trimText(workDetails, LIMITS.singleField).replace(/\s+/g, ' ').trim();
+  return REPAIR_WORK_ITEM_CANONICAL.filter((item) => !selected.has(item) && text.includes(item));
+}
+
 export function normalizeDraftInput(payload) {
   const contentType = trimText(payload?.contentType, 20).toLowerCase() === 'repair'
     ? 'repair'
@@ -177,6 +230,7 @@ export function normalizeDraftInput(payload) {
     workTypes: normalizeStringList(payload?.workTypes),
     symptoms: normalizeStringList(payload?.symptoms),
     diagnosis: normalizeStringList(payload?.diagnosis ?? payload?.confirmedCauses),
+    selectedWorkItems: normalizeRepairWorkItems(payload?.selectedWorkItems),
     work: normalizeStringList(payload?.work ?? payload?.actions),
     result: normalizeStringList(payload?.result ?? payload?.results),
     additionalNote: trimText(payload?.additionalNote, LIMITS.additionalNote),
@@ -194,7 +248,7 @@ export function normalizeDraftInput(payload) {
 export function validateDraftInput(input) {
   if (!input.userTitle && !input.symptoms.length && !input.work.length
     && !input.diagnosis.length && !input.result.length && !input.additionalNote
-    && !input.workTypes.length) {
+    && !input.workTypes.length && !input.selectedWorkItems.length) {
     return { ok: false, code: 'VALIDATION_ERROR', message: '초안 생성에 필요한 입력 정보가 없습니다.' };
   }
 
@@ -220,6 +274,7 @@ export function buildOpenAiUserInput(input) {
     workTypes: joinInputList(input.workTypes),
     symptoms: joinInputList(input.symptoms),
     diagnosis: joinInputList(input.diagnosis),
+    selectedWorkItems: input.selectedWorkItems,
     work: joinInputList(input.work),
     result: joinInputList(input.result),
     additionalNote: emptyAsBlank(input.additionalNote),
@@ -308,11 +363,15 @@ export function validateDraftQuality(draft, input) {
   }
 
   if (input.contentType === 'repair') {
-    if (!cleanField(draft.workDetails) && input.work.length) {
+    if (!cleanField(draft.workDetails) && (input.work.length || input.selectedWorkItems.length)) {
       return { ok: false, reason: 'missing_work_details' };
     }
     if (!cleanField(draft.customerRequest) && input.symptoms.length) {
       return { ok: false, reason: 'missing_customer_request' };
+    }
+    const unselectedMentions = findUnselectedWorkMentions(cleanField(draft.workDetails), input.selectedWorkItems);
+    if (unselectedMentions.length > 0) {
+      return { ok: false, reason: 'unselected_work_mention' };
     }
   } else {
     if (!cleanField(draft.productionDetails) && (input.work.length || input.workTypes.length)) {
