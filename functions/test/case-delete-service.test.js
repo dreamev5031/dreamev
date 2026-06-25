@@ -63,6 +63,10 @@ test('deleteCaseImage removes shared image from gallery only', async () => {
     if (method === 'GET' && url.includes('/git/commits/')) {
       return Response.json({ tree: { sha: 'tree' } });
     }
+    if (method === 'GET' && /\/git\/trees\/.*recursive=1/.test(url)) {
+      const tree = [...files.keys()].map((path) => ({ type: 'blob', path }));
+      return Response.json({ tree });
+    }
     if (method === 'POST' && url.includes('/git/blobs')) {
       return Response.json({ sha: 'new-blob' });
     }
@@ -130,6 +134,10 @@ test('deleteCase deletes md and unshared images only', async () => {
     }
     if (method === 'GET' && url.includes('/git/commits/')) {
       return Response.json({ tree: { sha: 'tree' } });
+    }
+    if (method === 'GET' && /\/git\/trees\/.*recursive=1/.test(url)) {
+      const tree = [...files.keys()].map((path) => ({ type: 'blob', path }));
+      return Response.json({ tree });
     }
     if (method === 'POST' && url.includes('/git/trees')) {
       committed = JSON.parse(init.body);

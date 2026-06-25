@@ -86,6 +86,37 @@ export async function getFile(env, path) {
   return { path, sha: data.sha, content };
 }
 
+export async function getRepoBlobPathSet(env) {
+  const { owner, repo } = repoBase(env);
+  const token = env.GITHUB_TOKEN;
+  const { treeSha } = await getBranchState(env);
+  const res = await fetch(
+    `https://api.github.com/repos/${owner}/${repo}/git/trees/${treeSha}?recursive=1`,
+    { headers: githubHeaders(token) },
+  );
+  if (!res.ok) throw await githubResponseError('GitHub recursive tree fetch failed', res);
+  const data = await res.json();
+  const paths = new Set();
+  for (const item of data.tree || []) {
+    if (item.type === 'blob' && item.path) paths.add(item.path);
+  }
+  return paths;
+}
+
+export async function getFilesParallel(env, paths) {
+  const results = await Promise.allSettled(paths.map((path) => getFile(env, path)));
+  const files = [];
+  for (let i = 0; i < results.length; i += 1) {
+    const result = results[i];
+    if (result.status === 'fulfilled' && result.value) {
+      files.push(result.value);
+    } else if (result.status === 'rejected') {
+      console.warn('getFilesParallel skipped', paths[i], result.reason?.message);
+    }
+  }
+  return files;
+}
+
 async function getBranchState(env) {
   const { owner, repo, branch } = repoBase(env);
   const token = env.GITHUB_TOKEN;

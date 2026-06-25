@@ -67,6 +67,10 @@ function createGithubMock(files) {
     if (method === 'GET' && url.includes('/git/commits/')) {
       return Response.json({ tree: { sha: 'tree' } });
     }
+    if (method === 'GET' && /\/git\/trees\/.*recursive=1/.test(url)) {
+      const tree = [...files.keys()].map((path) => ({ type: 'blob', path }));
+      return Response.json({ tree });
+    }
     if (method === 'POST' && url.includes('/git/blobs')) {
       return Response.json({ sha: 'new-blob' });
     }
@@ -183,8 +187,9 @@ test('deleteCase returns NOT_FOUND for missing post', async () => {
   globalThis.fetch = createGithubMock(new Map());
   try {
     const result = await deleteCase(env, 'production', '없는-게시물.md');
-    assert.equal(result.ok, false);
-    assert.equal(result.code, 'NOT_FOUND');
+    assert.equal(result.ok, true);
+    assert.equal(result.deleted, true);
+    assert.equal(result.alreadyDeleted, true);
   } finally {
     globalThis.fetch = originalFetch;
   }

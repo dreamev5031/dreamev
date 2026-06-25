@@ -5,7 +5,10 @@ import {
   normalizeContentType,
   parseFrontmatterFields,
 } from './case-content.js';
-import { commitChanges, getFile, listMdFilesInDir, pathExists } from './github.js';
+import { commitChanges, getFile, getFilesParallel, getRepoBlobPathSet, listMdFilesInDir } from './github.js';
+import { createStepTimer } from './timing.js';
+
+export { createStepTimer };
 
 export const CONTENT_DIRS = {
   production: 'public/content/cases',
@@ -92,29 +95,47 @@ export function caseSummaryFromParsed(mdFileName, contentType, parsed) {
   };
 }
 
-export async function loadAllCaseFiles(env) {
-  const results = [];
+export async function loadAllCaseFiles(env, { parallel = true } = {}) {
+  const entries = [];
   for (const [contentType, dir] of Object.entries(CONTENT_DIRS)) {
     const names = await listMdFilesInDir(env, dir);
     for (const name of names) {
-      const path = `${dir}/${name}`;
+      entries.push({ contentType, path: `${dir}/${name}`, mdFileName: name });
+    }
+  }
+
+  if (!parallel) {
+    const results = [];
+    for (const entry of entries) {
       try {
-        const file = await getFile(env, path);
+        const file = await getFile(env, entry.path);
         if (!file) continue;
         const parsed = parseFrontmatterFields(file.content);
         if (!parsed.ok) continue;
-        results.push({
-          contentType,
-          path,
-          mdFileName: name,
-          sha: file.sha,
-          content: file.content,
-          parsed,
-        });
+        results.push({ ...entry, sha: file.sha, content: file.content, parsed });
       } catch (err) {
-        console.warn('loadAllCaseFiles skipped', path, err.message);
+        console.warn('loadAllCaseFiles skipped', entry.path, err.message);
       }
     }
+    return results;
+  }
+
+  const files = await getFilesParallel(env, entries.map((e) => e.path));
+  const byPath = new Map(files.map((f) => [f.path, f]));
+  const results = [];
+  for (const entry of entries) {
+    const file = byPath.get(entry.path);
+    if (!file) continue;
+    const parsed = parseFrontmatterFields(file.content);
+    if (!parsed.ok) continue;
+    results.push({
+      contentType: entry.contentType,
+      path: entry.path,
+      mdFileName: entry.mdFileName,
+      sha: file.sha,
+      content: file.content,
+      parsed,
+    });
   }
   return results;
 }
@@ -201,14 +222,17 @@ export async function deleteCaseImage(env, contentType, caseIdOrFileName, imageF
 
   parsed.gallery = galleryNorm.filter((g) => g !== targetGallery);
   const newMarkdown = rebuildMarkdownFrontmatter(parsed);
-  const usageMap = await buildGalleryUsageMap(env, mdPath);
+  const [usageMap, repoPaths] = await Promise.all([
+    buildGalleryUsageMap(env, mdPath),
+    getRepoBlobPathSet(env),
+  ]);
   const otherRefs = usageMap.get(targetGallery) || [];
   const deleteImageFile = otherRefs.length === 0;
   const imageRepoPath = `public/images/${imageFileName}`;
 
   const upserts = [{ path: mdPath, content: newMarkdown }];
   const deletes = [];
-  if (deleteImageFile && await pathExists(env, imageRepoPath)) {
+  if (deleteImageFile && repoPaths.has(imageRepoPath)) {
     deletes.push({ path: imageRepoPath });
   }
 
@@ -230,7 +254,8 @@ export async function deleteCaseImage(env, contentType, caseIdOrFileName, imageF
   };
 }
 
-export async function deleteCase(env, contentType, caseIdOrFileName) {
+export async function deleteCase(env, contentType, caseIdOrFileName, options = {}) {
+  const timer = options.timer;
   const mdFileName = normalizeCaseId(caseIdOrFileName);
   if (!mdFileName) {
     return { ok: false, code: 'VALIDATION_ERROR', message: '유효하지 않은 게시물 ID입니다.' };
@@ -239,21 +264,41 @@ export async function deleteCase(env, contentType, caseIdOrFileName) {
   const dir = CONTENT_DIRS[type];
   const mdPath = `${dir}/${mdFileName}`;
 
+  timer?.mark('loadPost');
   const file = await getFile(env, mdPath);
   if (!file) {
-    return { ok: false, code: 'NOT_FOUND', message: '게시물을 찾을 수 없습니다.' };
+    timer?.mark('alreadyDeleted');
+    return {
+      ok: true,
+      deleted: true,
+      alreadyDeleted: true,
+      mdPath,
+      imagesDeleted: [],
+      imagesKept: [],
+      imagesMissing: [],
+      warnings: [],
+      message: '이미 삭제된 게시물입니다.',
+    };
   }
 
   const parsed = parseFrontmatterFields(file.content);
+  timer?.mark('parseGallery');
   if (!parsed.ok) {
     return { ok: false, code: 'VALIDATION_ERROR', message: 'Markdown 형식이 올바르지 않습니다.' };
   }
 
-  const usageMap = await buildGalleryUsageMap(env, mdPath);
+  timer?.mark('scanReferences');
+  const [usageMap, repoPaths] = await Promise.all([
+    buildGalleryUsageMap(env, mdPath),
+    getRepoBlobPathSet(env),
+  ]);
+
+  timer?.mark('planDeletes');
   const deletes = [{ path: mdPath }];
   const imagesDeleted = [];
   const imagesKept = [];
   const imagesMissing = [];
+  const warnings = [];
 
   for (const g of parsed.gallery) {
     const norm = g.replace(/^["']|["']$/g, '');
@@ -262,7 +307,7 @@ export async function deleteCase(env, contentType, caseIdOrFileName) {
     const otherRefs = usageMap.get(norm) || [];
     if (otherRefs.length === 0) {
       const imageRepoPath = `public/images/${fileName}`;
-      if (await pathExists(env, imageRepoPath)) {
+      if (repoPaths.has(imageRepoPath)) {
         deletes.push({ path: imageRepoPath });
         imagesDeleted.push(fileName);
       } else {
@@ -273,15 +318,28 @@ export async function deleteCase(env, contentType, caseIdOrFileName) {
     }
   }
 
+  if (imagesMissing.length > 0) {
+    warnings.push({
+      code: 'IMAGE_CLEANUP_INCOMPLETE',
+      message: '게시물은 삭제됐지만 일부 이미지 파일이 저장소에 없어 정리되지 않았습니다.',
+      files: imagesMissing,
+    });
+  }
+
+  timer?.mark('createCommit');
   const commitSha = await commitChanges(env, { upserts: [], deletes }, `게시물 삭제: ${mdFileName}`);
+  timer?.mark('updateRef');
 
   return {
     ok: true,
+    deleted: true,
+    alreadyDeleted: false,
     commitSha,
     mdPath,
     imagesDeleted,
     imagesKept,
     imagesMissing,
+    warnings,
     message: '게시물이 삭제되었습니다.',
   };
 }
