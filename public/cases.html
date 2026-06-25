@@ -139,6 +139,12 @@
                     <p class="case-modal-date" id="modalDate"></p>
                 </div>
                 <div class="case-modal-text" id="modalContent"></div>
+                <div class="case-modal-actions">
+                    <button type="button" class="case-modal-nav-btn" id="modalPrev">이전 글</button>
+                    <button type="button" class="case-modal-nav-btn" id="modalNext">다음 글</button>
+                    <a href="/cases" class="case-modal-nav-btn case-modal-back" id="modalBackList">목록으로</a>
+                    <a href="contact.html?type=custom" class="header-btn btn-primary case-modal-contact">상담 신청</a>
+                </div>
             </div>
         </div>
     </div>
@@ -303,6 +309,7 @@
             var modalTitle = document.getElementById('modalTitle');
             var modalContent = document.getElementById('modalContent');
             var modalOverlay = modal ? modal.querySelector('.case-modal-overlay') : null;
+            var currentModalIndex = -1;
 
             // 날짜 포맷 (YYYY-MM-DD 또는 ISO 문자열 → 읽기 쉬운 형식)
             function formatDate(str) {
@@ -351,8 +358,9 @@
             }
 
             // Open modal with case data (이미지 확대, 제목·날짜·상세 설명). gallery면 여러 장, image면 한 장 출력.
-            window.openCaseModal = function(caseData) {
+            window.openCaseModal = function(caseData, index) {
                 if (!modal) return;
+                if (typeof index === 'number') currentModalIndex = index;
                 modalTitle.textContent = caseData.title || '제작사례';
                 modalCategory.textContent = caseData.categoryLabel || caseData.category || '';
                 var modalDateEl = document.getElementById('modalDate');
@@ -364,10 +372,37 @@
                     modalContent.innerHTML = bodyContent ? ('<p>' + bodyContent.replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>') + '</p>') : '';
                 }
                 renderModalImages(modalImageContainer, caseData);
+                updateModalNav();
                 modal.classList.add('active');
                 modal.setAttribute('aria-hidden', 'false');
                 document.body.style.overflow = 'hidden';
             };
+
+            function updateModalNav() {
+                var prevBtn = document.getElementById('modalPrev');
+                var nextBtn = document.getElementById('modalNext');
+                var list = window.allCasesData || [];
+                if (prevBtn) prevBtn.disabled = currentModalIndex <= 0;
+                if (nextBtn) nextBtn.disabled = currentModalIndex < 0 || currentModalIndex >= list.length - 1;
+            }
+
+            function openModalAt(index) {
+                var list = window.allCasesData || [];
+                if (index < 0 || index >= list.length) return;
+                var raw = list[index];
+                window.openCaseModal({
+                    title: raw.title,
+                    category: raw.category,
+                    categoryLabel: raw.category,
+                    image: raw.image,
+                    gallery: raw.gallery,
+                    date: raw.date,
+                    description: raw.description,
+                    body: raw.body
+                }, index);
+            }
+
+            window.openModalAt = openModalAt;
 
             // Close modal
             function closeModal() {
@@ -386,6 +421,13 @@
             if (modalOverlay) {
                 modalOverlay.addEventListener('click', closeModal);
             }
+
+            var modalPrev = document.getElementById('modalPrev');
+            var modalNext = document.getElementById('modalNext');
+            if (modalPrev) modalPrev.addEventListener('click', function() { openModalAt(currentModalIndex - 1); });
+            if (modalNext) modalNext.addEventListener('click', function() { openModalAt(currentModalIndex + 1); });
+            var modalBack = document.getElementById('modalBackList');
+            if (modalBack) modalBack.addEventListener('click', function(e) { e.preventDefault(); closeModal(); });
 
             // ESC key
             document.addEventListener('keydown', function(e) {
@@ -563,34 +605,23 @@ document.addEventListener('DOMContentLoaded', () => {
         caseGallery.addEventListener('click', function(e) {
             var item = e.target.closest('.gallery-item');
             if (!item) return;
-            var idx = item.getAttribute('data-case-index');
-            var data;
-            if (idx !== null && idx !== '' && window.allCasesData && window.allCasesData[parseInt(idx, 10)]) {
-                var raw = window.allCasesData[parseInt(idx, 10)];
-                data = {
-                    title: raw.title,
-                    image: (raw.image && raw.image.indexOf('/') === 0) ? raw.image : ('/' + (raw.image || '')),
-                    gallery: raw.gallery || (raw.image ? [{ image: raw.image }] : []),
-                    date: raw.date,
-                    description: raw.description,
-                    body: raw.body,
-                    categoryLabel: raw.category,
-                    category: raw.category
-                };
-            } else {
-                var img = item.querySelector('img');
-                var galleryJson = item.getAttribute('data-case-gallery');
-                var gallery = galleryJson ? (function() { try { return JSON.parse(galleryJson.replace(/&quot;/g, '"')); } catch (e) { return []; } })() : (img ? [{ image: img.src }] : []);
-                data = {
-                    title: item.getAttribute('data-case-title') || (img ? img.alt : ''),
-                    image: img ? img.src : '',
-                    gallery: gallery,
-                    date: '',
-                    description: item.getAttribute('data-case-body') || '',
-                    body: item.getAttribute('data-case-body') || '',
-                    categoryLabel: item.getAttribute('data-case-category') || ''
-                };
+            var idx = parseInt(item.getAttribute('data-case-index'), 10);
+            if (!isNaN(idx) && window.openModalAt) {
+                window.openModalAt(idx);
+                return;
             }
+            var img = item.querySelector('img');
+            var galleryJson = item.getAttribute('data-case-gallery');
+            var gallery = galleryJson ? (function() { try { return JSON.parse(galleryJson.replace(/&quot;/g, '"')); } catch (err) { return []; } })() : (img ? [{ image: img.src }] : []);
+            var data = {
+                title: item.getAttribute('data-case-title') || (img ? img.alt : ''),
+                image: img ? img.src : '',
+                gallery: gallery,
+                date: '',
+                description: item.getAttribute('data-case-body') || '',
+                body: item.getAttribute('data-case-body') || '',
+                categoryLabel: item.getAttribute('data-case-category') || ''
+            };
             if (window.openCaseModal) window.openCaseModal(data);
         });
     }
