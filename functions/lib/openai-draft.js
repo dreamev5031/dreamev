@@ -1,6 +1,6 @@
 const DEFAULT_MODEL = 'gpt-4.1-mini';
 const OPENAI_ENDPOINT = 'https://api.openai.com/v1/chat/completions';
-const OPENAI_TIMEOUT_MS = 45_000;
+const OPENAI_TIMEOUT_MS = 25_000;
 const MAX_OUTPUT_TOKENS = 1_400;
 const MAX_RETRIES = 1;
 
@@ -289,7 +289,7 @@ export function buildDraftPrompt(input) {
 
   return {
     system: `${COMMON_SYSTEM_PROMPT}\n\n${developer}`,
-    user: `아래 JSON 입력만 사용해 사례 초안 JSON을 작성하세요. 빈 문자열은 정보 없음입니다.\n\n${JSON.stringify(buildOpenAiUserInput(input), null, 2)}`,
+    user: `아래 JSON 입력만 사용해 사례 초안 JSON을 작성하세요. 빈 문자열은 정보 없음입니다.\n\n${JSON.stringify(buildOpenAiUserInput(input))}`,
   };
 }
 
@@ -536,6 +536,19 @@ export function logOpenAiDraftFailure(details) {
   });
 }
 
+function createOpenAiFetchSignal(timeoutMs) {
+  if (typeof AbortSignal?.timeout === 'function') {
+    return AbortSignal.timeout(timeoutMs);
+  }
+  const controller = new AbortController();
+  setTimeout(() => {
+    const err = new Error('OpenAI request timed out');
+    err.name = 'TimeoutError';
+    controller.abort(err);
+  }, timeoutMs);
+  return controller.signal;
+}
+
 async function requestOpenAi(env, input, fetchImpl) {
   const apiKey = (env.OPENAI_API_KEY || '').trim();
   if (!apiKey) {
@@ -576,7 +589,7 @@ async function requestOpenAi(env, input, fetchImpl) {
           json_schema: jsonSchema,
         },
       }),
-      signal: AbortSignal.timeout(OPENAI_TIMEOUT_MS),
+      signal: createOpenAiFetchSignal(OPENAI_TIMEOUT_MS),
     });
   } catch (err) {
     if (err?.name === 'TimeoutError' || err?.name === 'AbortError') {
