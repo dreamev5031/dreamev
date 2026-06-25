@@ -398,19 +398,25 @@ test('real OpenAI integration repair input 2', { skip: !process.env.OPENAI_API_K
   assert.match(result.draft.diagnosis, /컨트롤러/);
 });
 
-test('production schema draft sanitizes productionDetails and features', () => {
+test('production schema draft sanitizes productionDetails features and specifications', () => {
   const input = normalizeDraftInput({
     contentType: 'production',
-    userTitle: '999',
-    category: '산업용',
-    workTypes: ['맞춤 제작'],
-    result: ['납품 완료'],
+    title: '공장 자재 운반용 전동대차',
+    vehicleCategory: '전동대차',
+    purpose: '공장 내 자재 운반',
+    customerRequest: '좁은 통로 운반 요청',
+    customWork: '적재함 맞춤 제작',
+    specifications: { voltage: '48V', motor: '3kW' },
+    result: '제작 및 납품 완료',
   });
+  assert.equal(input.vehicleCategory, '전동대차');
+  assert.equal(input.specifications.voltage, '48V');
   const draft = sanitizeProductionDraft({
-    title: '산업용 전동대차 맞춤 제작',
+    title: '공장 자재 운반용 전동대차 맞춤 제작',
     summary: '공장 내부 운반용 전동대차를 맞춤 제작했습니다.',
     customerRequest: '공장 내부 운반용 차량 제작을 요청받았습니다.',
     productionDetails: '적재함 구조와 구동 계통을 현장 요구에 맞게 제작했습니다.',
+    specifications: '전압 48V, 모터 3kW',
     features: '좁은 통로에서 운행하기 쉬운 조향 구조를 적용했습니다.',
     result: '납품 후 현장에서 시운전을 진행했습니다.',
     seoTitle: '산업용 전동대차 맞춤 제작',
@@ -418,7 +424,21 @@ test('production schema draft sanitizes productionDetails and features', () => {
     keywords: ['산업용 전동대차 제작', '맞춤 전동차 제작'],
   }, input);
   assert.equal(typeof draft.productionDetails, 'string');
+  assert.equal(typeof draft.specifications, 'string');
   assert.equal(typeof draft.features, 'string');
+});
+
+test('repair input ignores production specifications fields', () => {
+  const input = normalizeDraftInput({
+    contentType: 'repair',
+    userTitle: '수리',
+    vehicle: '전동차',
+    symptoms: ['전진 불량'],
+    specifications: { voltage: '48V' },
+    result: ['주행 정상 확인'],
+  });
+  assert.equal(input.contentType, 'repair');
+  assert.equal(input.specifications, undefined);
 });
 
 test('validateDraftInput rejects empty payload', () => {

@@ -70,12 +70,16 @@ async function resolveFinalImageNames(env, proposedNames, stamp, count) {
 
 async function handleProductionUpload(env, formData, fields) {
   const {
-    title, category, date, proposedMdFileName, summary,
-    customerRequest, workDetails, result, imageStamp, images, proposedNames,
+    title, category, purpose, usagePlace, location, date, proposedMdFileName, summary,
+    customerRequest, productionDetails, features, workDetails, result, specifications,
+    imageStamp, images, proposedNames,
   } = fields;
 
+  if (!category) {
+    return errorResponse('VALIDATION_ERROR', '차량 종류 또는 제작 카테고리를 입력해 주세요.', 400);
+  }
   if (!validateCategory(category)) {
-    return errorResponse('VALIDATION_ERROR', '허용되지 않은 카테고리입니다.', 400);
+    return errorResponse('VALIDATION_ERROR', '카테고리 형식이 올바르지 않습니다.', 400);
   }
 
   const mdBase = buildMdBaseName(category, title);
@@ -93,12 +97,18 @@ async function handleProductionUpload(env, formData, fields) {
   const markdown = buildMarkdown({
     title,
     category,
+    purpose,
+    usagePlace,
+    location,
     date,
     imageFileNames: finalImageNames,
     summary,
     customerRequest,
+    productionDetails,
+    features,
     workDetails,
     result,
+    specifications,
   });
 
   const galleryCheck = validateGalleryMatches(finalImageNames, markdown);
@@ -209,6 +219,8 @@ export async function onRequestPost(context) {
   const contentType = normalizeContentType(formData.get('contentType'));
   const title = (formData.get('title') || '').toString().trim();
   const category = (formData.get('category') || '').toString().trim();
+  const purpose = (formData.get('purpose') || '').toString().trim();
+  const usagePlace = (formData.get('usagePlace') || '').toString().trim();
   const date = (formData.get('date') || '').toString().trim();
   const vehicle = (formData.get('vehicle') || '').toString().trim();
   const location = (formData.get('location') || '').toString().trim();
@@ -216,9 +228,20 @@ export async function onRequestPost(context) {
   const summary = (formData.get('summary') || '').toString();
   const customerRequest = (formData.get('customerRequest') || '').toString();
   const inspectionResult = (formData.get('inspectionResult') || '').toString();
+  const productionDetails = (formData.get('productionDetails') || '').toString();
+  const features = (formData.get('features') || '').toString();
   const workDetails = (formData.get('workDetails') || '').toString();
   const result = (formData.get('result') || '').toString();
   const imageStamp = (formData.get('imageStamp') || '').toString().trim();
+  let specifications = {};
+  const specsRaw = (formData.get('specifications') || '').toString().trim();
+  if (specsRaw) {
+    try {
+      specifications = JSON.parse(specsRaw);
+    } catch {
+      return errorResponse('VALIDATION_ERROR', '사양 정보 형식이 올바르지 않습니다.', 400);
+    }
+  }
 
   if (!title) return errorResponse('VALIDATION_ERROR', '제목을 입력해 주세요.', 400);
 
@@ -245,6 +268,8 @@ export async function onRequestPost(context) {
   const fields = {
     title,
     category,
+    purpose,
+    usagePlace,
     date,
     vehicle,
     location,
@@ -252,8 +277,11 @@ export async function onRequestPost(context) {
     summary,
     customerRequest,
     inspectionResult,
+    productionDetails,
+    features,
     workDetails,
     result,
+    specifications,
     imageStamp,
     images,
     proposedNames,

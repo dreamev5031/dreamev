@@ -2298,6 +2298,60 @@ header nav a.active {
 .featured-modal-dot.active {
     background: var(--primary);
 }
+.case-modal-specs-wrap {
+    margin: 0 0 1.25rem;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.04);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.case-modal-specs-title {
+    margin: 0 0 0.75rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #e2e8f0;
+}
+
+.case-modal-specs-table {
+    width: 100%;
+    border-collapse: collapse;
+    color: #e2e8f0;
+    font-size: 0.9rem;
+}
+
+.case-modal-specs-table th,
+.case-modal-specs-table td {
+    padding: 0.45rem 0.5rem 0.45rem 0;
+    text-align: left;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    vertical-align: top;
+}
+
+.case-modal-specs-table th {
+    color: #a0aec0;
+    font-weight: 600;
+    width: 38%;
+}
+
+.case-modal-specs-table td {
+    color: #f7fafc;
+    font-weight: 500;
+    word-break: keep-all;
+}
+
+@media (min-width: 769px) {
+    .case-modal-specs-table {
+        display: table;
+    }
+}
+
+@media (max-width: 768px) {
+    .case-modal-specs-table th {
+        width: 42%;
+    }
+}
+
 .featured-modal-specs-wrap {
     flex: 1;
     overflow-y: auto;

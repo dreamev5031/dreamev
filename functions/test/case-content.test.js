@@ -16,9 +16,10 @@ import {
   validateImages,
 } from '../lib/case-content.js';
 
-test('validateCategory allows only known categories', () => {
+test('validateCategory allows known and custom categories', () => {
   assert.equal(validateCategory('산업용'), true);
-  assert.equal(validateCategory('특수제작'), false);
+  assert.equal(validateCategory('전동대차'), true);
+  assert.equal(validateCategory(''), false);
   assert.deepEqual(ALLOWED_CATEGORIES, ['산업용', '농업용', '다목적', '맞춤제작']);
 });
 
@@ -83,7 +84,29 @@ test('markdown frontmatter field order', () => {
   assert.match(lines[7], /^date:/);
   assert.equal(lines[8], '---');
   assert.equal(lines[9], '');
-  assert.match(md, /## 고객 요청/);
+  assert.match(md, /## 제작 내용/);
+});
+
+test('production markdown includes specifications frontmatter', () => {
+  const md = buildMarkdown({
+    title: '공장 자재 운반용 전동대차',
+    category: '전동대차',
+    purpose: '공장 내 자재 운반',
+    usagePlace: '금속 가공 공장',
+    location: '포천',
+    date: '2026-06-25',
+    imageFileNames: ['20260624-120501-01.webp'],
+    summary: '요약',
+    customerRequest: '요청',
+    productionDetails: '제작 내용',
+    features: '특징',
+    result: '납품 완료',
+    specifications: { voltage: '48V', battery: '리튬인산철 배터리' },
+  });
+  assert.match(md, /specifications:/);
+  assert.match(md, /voltage: 48V/);
+  assert.match(md, /purpose: 공장 내 자재 운반/);
+  assert.doesNotMatch(md, /motor:/);
 });
 
 test('duplicate md filename gets sequence suffix', () => {

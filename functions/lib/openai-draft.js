@@ -116,19 +116,21 @@ const PRODUCTION_DEVELOPER_PROMPT = `contentType이 production인 제작사례�
 작성 목적:
 어떤 용도로 차량을 제작했고, 어떤 구조와 기능을 적용했으며, 어떤 현장에 적합한지를 보여주는 제작사례를 작성합니다.
 
-출력 항목: title, summary, customerRequest, productionDetails, features, result, seoTitle, seoDescription, keywords
+출력 항목: title, summary, customerRequest, productionDetails, specifications, features, result, seoTitle, seoDescription, keywords
 
-문체: summary, customerRequest, productionDetails, features, result, seoDescription은 모두 존댓말(~했습니다, ~되었습니다)로 작성합니다. 해라체(~했다, ~한다) 금지.
+문체: summary, customerRequest, productionDetails, specifications, features, result, seoDescription은 모두 존댓말(~했습니다, ~되었습니다)로 작성합니다. 해라체(~했다, ~한다) 금지.
 
-title: 차량 유형 + 주요 용도 또는 특징, 22~45자, 의미 없는 userTitle 무시, 명사형 제목
-summary: 제작 목적·핵심 사양, 60~130자, 존댓말
-customerRequest: 입력된 용도·요구만, 존댓말
-productionDetails: 제작·장착·구조 변경·사양 적용, 숫자는 입력된 경우만, 1~3문장, 존댓말
-features: 입력된 기능·장점, 과장 표현 금지, 존댓말
-result: 납품·시운전·현장 적용 결과가 입력된 경우만, 존댓말
-seoTitle: 30~55자, 명사형 제목
-seoDescription: 70~140자, 존댓말
-keywords: 4~7개, 구체적 조합`;
+필드별 역할:
+* title: 차량 종류와 핵심 용도 또는 특징 중심. 의미 없는 userTitle 무시, 명사형 제목
+* summary: 제작 목적과 핵심 제작 내용 2문장 이내 요약, 존댓말
+* customerRequest: 고객이 요청한 용도와 사용 환경만, 존댓말
+* productionDetails: 실제 제작 및 맞춤 작업 내용 정리, 존댓말
+* specifications: 입력된 사양만 자연스러운 문장 또는 항목으로 정리. 미입력 사양 생성 금지
+* features: 입력된 구조와 기능상 특징만. 과장 광고 금지, 존댓말
+* result: 제작 완료, 시운전, 납품 등 사용자가 입력한 결과만, 존댓말
+* seoTitle: 30~55자, 명사형 제목
+* seoDescription: 70~140자, 존댓말
+* keywords: 4~7개, 구체적 조합`;
 
 function buildStringSchema(properties, required) {
   return {
@@ -167,13 +169,14 @@ export const PRODUCTION_JSON_SCHEMA = buildStringSchema(
     summary: STRING,
     customerRequest: STRING,
     productionDetails: STRING,
+    specifications: STRING,
     features: STRING,
     result: STRING,
     seoTitle: STRING,
     seoDescription: STRING,
     keywords: KEYWORDS,
   },
-  ['title', 'summary', 'customerRequest', 'productionDetails', 'features', 'result', 'seoTitle', 'seoDescription', 'keywords'],
+  ['title', 'summary', 'customerRequest', 'productionDetails', 'specifications', 'features', 'result', 'seoTitle', 'seoDescription', 'keywords'],
 );
 
 function trimText(value, max) {
@@ -247,6 +250,17 @@ export function findUnselectedWorkMentions(workDetails, selectedWorkItems) {
   return REPAIR_WORK_ITEM_CANONICAL.filter((item) => !selected.has(item) && text.includes(item));
 }
 
+function normalizeSpecificationsInput(raw) {
+  if (!raw || typeof raw !== 'object') return {};
+  const result = {};
+  const keys = ['voltage', 'battery', 'motor', 'controller', 'chargingMethod', 'brake', 'tire', 'topSpeed', 'payload', 'curbWeight', 'frameMaterial'];
+  for (const key of keys) {
+    const value = emptyAsBlank(raw[key]);
+    if (value) result[key] = trimText(value, 80);
+  }
+  return result;
+}
+
 export function normalizeDraftInput(payload) {
   const contentType = trimText(payload?.contentType, 20).toLowerCase() === 'repair'
     ? 'repair'
@@ -254,36 +268,60 @@ export function normalizeDraftInput(payload) {
 
   const userTitle = trimText(payload?.userTitle ?? payload?.title, LIMITS.title);
 
-  const normalized = {
+  if (contentType === 'repair') {
+    const normalized = {
+      contentType,
+      userTitle,
+      title: userTitle,
+      category: trimText(payload?.category, LIMITS.category),
+      vehicle: trimText(payload?.vehicle, LIMITS.vehicle),
+      location: trimText(payload?.location, LIMITS.location),
+      workDate: trimText(payload?.workDate, 20),
+      workTypes: normalizeStringList(payload?.workTypes),
+      symptoms: normalizeStringList(payload?.symptoms),
+      diagnosis: normalizeStringList(payload?.diagnosis ?? payload?.confirmedCauses),
+      selectedWorkItems: normalizeRepairWorkItems(payload?.selectedWorkItems),
+      work: normalizeStringList(payload?.work ?? payload?.actions),
+      result: normalizeStringList(payload?.result ?? payload?.results),
+      additionalNote: trimText(payload?.additionalNote, LIMITS.additionalNote),
+    };
+
+    ['symptoms', 'diagnosis', 'work', 'result'].forEach((field) => {
+      if (typeof payload?.[field] === 'string') {
+        normalized[field] = normalizeStringList([payload[field]]);
+      }
+    });
+
+    return normalized;
+  }
+
+  return {
     contentType,
     userTitle,
     title: userTitle,
-    category: trimText(payload?.category, LIMITS.category),
-    vehicle: trimText(payload?.vehicle, LIMITS.vehicle),
+    vehicleCategory: trimText(payload?.vehicleCategory ?? payload?.category, LIMITS.category),
+    purpose: trimText(payload?.purpose, LIMITS.singleField),
+    usagePlace: trimText(payload?.usagePlace, LIMITS.singleField),
     location: trimText(payload?.location, LIMITS.location),
+    customerRequest: trimText(payload?.customerRequest, LIMITS.singleField),
+    customWork: trimText(payload?.customWork, LIMITS.singleField),
+    result: trimText(payload?.result, LIMITS.singleField),
     workDate: trimText(payload?.workDate, 20),
-    workTypes: normalizeStringList(payload?.workTypes),
-    symptoms: normalizeStringList(payload?.symptoms),
-    diagnosis: normalizeStringList(payload?.diagnosis ?? payload?.confirmedCauses),
-    selectedWorkItems: normalizeRepairWorkItems(payload?.selectedWorkItems),
-    work: normalizeStringList(payload?.work ?? payload?.actions),
-    result: normalizeStringList(payload?.result ?? payload?.results),
+    specifications: normalizeSpecificationsInput(payload?.specifications),
     additionalNote: trimText(payload?.additionalNote, LIMITS.additionalNote),
   };
-
-  ['symptoms', 'diagnosis', 'work', 'result'].forEach((field) => {
-    if (typeof payload?.[field] === 'string') {
-      normalized[field] = normalizeStringList([payload[field]]);
-    }
-  });
-
-  return normalized;
 }
 
 export function validateDraftInput(input) {
-  if (!input.userTitle && !input.symptoms.length && !input.work.length
-    && !input.diagnosis.length && !input.result.length && !input.additionalNote
-    && !input.workTypes.length && !input.selectedWorkItems.length) {
+  if (input.contentType === 'repair') {
+    if (!input.userTitle && !input.symptoms.length && !input.work.length
+      && !input.diagnosis.length && !input.result.length && !input.additionalNote
+      && !input.workTypes.length && !input.selectedWorkItems.length) {
+      return { ok: false, code: 'VALIDATION_ERROR', message: '초안 생성에 필요한 입력 정보가 없습니다.' };
+    }
+  } else if (!input.userTitle && !input.customerRequest && !input.customWork
+    && !input.purpose && !input.result && !input.additionalNote
+    && Object.keys(input.specifications || {}).length === 0) {
     return { ok: false, code: 'VALIDATION_ERROR', message: '초안 생성에 필요한 입력 정보가 없습니다.' };
   }
 
@@ -299,19 +337,42 @@ function joinInputList(items) {
 }
 
 export function buildOpenAiUserInput(input) {
+  if (input.contentType === 'repair') {
+    return {
+      contentType: input.contentType,
+      category: emptyAsBlank(input.category),
+      userTitle: emptyAsBlank(input.userTitle),
+      vehicle: emptyAsBlank(input.vehicle),
+      location: emptyAsBlank(input.location),
+      workDate: emptyAsBlank(input.workDate),
+      workTypes: joinInputList(input.workTypes),
+      symptoms: joinInputList(input.symptoms),
+      diagnosis: joinInputList(input.diagnosis),
+      selectedWorkItems: input.selectedWorkItems,
+      work: joinInputList(input.work),
+      result: joinInputList(input.result),
+      additionalNote: emptyAsBlank(input.additionalNote),
+    };
+  }
+
+  const specs = input.specifications || {};
+  const specPayload = {};
+  for (const [key, value] of Object.entries(specs)) {
+    if (value) specPayload[key] = value;
+  }
+
   return {
     contentType: input.contentType,
-    category: emptyAsBlank(input.category),
-    userTitle: emptyAsBlank(input.userTitle),
-    vehicle: emptyAsBlank(input.vehicle),
+    title: emptyAsBlank(input.userTitle),
+    vehicleCategory: emptyAsBlank(input.vehicleCategory),
+    purpose: emptyAsBlank(input.purpose),
+    usagePlace: emptyAsBlank(input.usagePlace),
     location: emptyAsBlank(input.location),
+    customerRequest: emptyAsBlank(input.customerRequest),
+    customWork: emptyAsBlank(input.customWork),
+    specifications: specPayload,
+    result: emptyAsBlank(input.result),
     workDate: emptyAsBlank(input.workDate),
-    workTypes: joinInputList(input.workTypes),
-    symptoms: joinInputList(input.symptoms),
-    diagnosis: joinInputList(input.diagnosis),
-    selectedWorkItems: input.selectedWorkItems,
-    work: joinInputList(input.work),
-    result: joinInputList(input.result),
     additionalNote: emptyAsBlank(input.additionalNote),
   };
 }
@@ -377,7 +438,7 @@ export function getHonorificBodyFields(contentType) {
   if (contentType === 'repair') {
     return ['summary', 'customerRequest', 'diagnosis', 'workDetails', 'result', 'seoDescription'];
   }
-  return ['summary', 'customerRequest', 'productionDetails', 'features', 'result', 'seoDescription'];
+  return ['summary', 'customerRequest', 'productionDetails', 'specifications', 'features', 'result', 'seoDescription'];
 }
 
 export function findDraftInformalSpeechViolations(draft, input) {
@@ -449,6 +510,7 @@ export function validateDraftQuality(draft, input) {
     cleanField(draft.diagnosis ?? draft.inspectionResult),
     cleanField(draft.workDetails),
     cleanField(draft.productionDetails),
+    cleanField(draft.specifications),
     cleanField(draft.features),
     cleanField(draft.result),
     cleanField(draft.seoTitle),
@@ -478,7 +540,7 @@ export function validateDraftQuality(draft, input) {
       return { ok: false, reason: 'unselected_work_mention' };
     }
   } else {
-    if (!cleanField(draft.productionDetails) && (input.work.length || input.workTypes.length)) {
+    if (!cleanField(draft.productionDetails) && (input.customWork || input.additionalNote)) {
       return { ok: false, reason: 'missing_production_details' };
     }
   }
@@ -519,6 +581,7 @@ export function sanitizeProductionDraft(draft, input) {
   const summary = cleanField(draft.summary);
   const customerRequest = cleanField(draft.customerRequest);
   const productionDetails = cleanField(draft.productionDetails ?? draft.workDetails);
+  const specifications = cleanField(draft.specifications);
   const features = cleanField(draft.features);
   const result = cleanField(draft.result);
   const keywords = normalizeKeywords(draft.keywords);
@@ -534,6 +597,7 @@ export function sanitizeProductionDraft(draft, input) {
     summary,
     customerRequest,
     productionDetails,
+    specifications,
     features,
     result,
     seoTitle: cleanField(draft.seoTitle) || title,

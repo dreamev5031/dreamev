@@ -138,6 +138,10 @@
                     <h2 class="case-modal-title" id="modalTitle"></h2>
                     <p class="case-modal-date" id="modalDate"></p>
                 </div>
+                <div class="case-modal-specs-wrap" id="modalSpecsWrap" hidden>
+                    <h3 class="case-modal-specs-title">주요 사양</h3>
+                    <table class="case-modal-specs-table" id="modalSpecsTable"></table>
+                </div>
                 <div class="case-modal-text" id="modalContent"></div>
                 <div class="case-modal-actions">
                     <button type="button" class="case-modal-nav-btn" id="modalPrev">이전 글</button>
@@ -240,17 +244,46 @@
                             i--;
                             continue;
                         }
+                        if (line.match(/^specifications\s*:\s*$/)) {
+                            frontmatter.specifications = {};
+                            i++;
+                            while (i < lines.length) {
+                                if (!lines[i].trim()) { i++; continue; }
+                                var sm = lines[i].match(/^\s{2}([a-zA-Z]+)\s*:\s*(.+)$/);
+                                if (sm) {
+                                    frontmatter.specifications[sm[1]] = sm[2].trim().replace(/^["']|["']$/g, '');
+                                    i++;
+                                } else break;
+                            }
+                            i--;
+                            continue;
+                        }
                         var colonIndex = line.indexOf(':');
                         if (colonIndex > 0 && !line.match(/^\s/)) {
                             var key = line.substring(0, colonIndex).trim();
                             var value = line.substring(colonIndex + 1).trim().replace(/^["']|["']$/g, '');
-                            if (key !== 'gallery') frontmatter[key] = value;
+                            if (key !== 'gallery' && key !== 'specifications') frontmatter[key] = value;
                         }
                     }
                 }
                 frontmatter.body = body;
                 return frontmatter;
             }
+
+            var SPEC_LABELS = {
+                voltage: '전압',
+                battery: '배터리',
+                motor: '모터',
+                controller: '컨트롤러',
+                chargingMethod: '충전 방식',
+                brake: '브레이크',
+                tire: '타이어',
+                topSpeed: '최고속도',
+                payload: '적재중량',
+                curbWeight: '공차중량',
+                frameMaterial: '프레임 재질'
+            };
+            var SPEC_ORDER = ['voltage', 'battery', 'motor', 'controller', 'chargingMethod', 'brake', 'tire', 'topSpeed', 'payload', 'curbWeight', 'frameMaterial'];
 
             // content/cases 폴더에서 마크다운 기반 제작사례 목록 반환 (Promise). 파일명은 전부 콘텐츠에서 로드.
             window.loadCasesFromContent = function() {
@@ -276,6 +309,7 @@
                                         title: frontmatter.title || '',
                                         category: category,
                                         categoryLabel: frontmatter.category || '',
+                                        specifications: frontmatter.specifications || {},
                                         image: firstImage,
                                         gallery: galleryList,
                                         date: frontmatter.date || '',
@@ -308,6 +342,8 @@
             var modalCategory = document.getElementById('modalCategory');
             var modalTitle = document.getElementById('modalTitle');
             var modalContent = document.getElementById('modalContent');
+            var modalSpecsWrap = document.getElementById('modalSpecsWrap');
+            var modalSpecsTable = document.getElementById('modalSpecsTable');
             var modalOverlay = modal ? modal.querySelector('.case-modal-overlay') : null;
             var currentModalIndex = -1;
 
@@ -357,6 +393,23 @@
                 }
             }
 
+            function renderModalSpecs(specs) {
+                if (!modalSpecsWrap || !modalSpecsTable) return;
+                var entries = [];
+                SPEC_ORDER.forEach(function(key) {
+                    if (specs && specs[key]) entries.push({ label: SPEC_LABELS[key] || key, value: specs[key] });
+                });
+                if (entries.length === 0) {
+                    modalSpecsWrap.hidden = true;
+                    modalSpecsTable.innerHTML = '';
+                    return;
+                }
+                modalSpecsWrap.hidden = false;
+                modalSpecsTable.innerHTML = entries.map(function(e) {
+                    return '<tr><th>' + e.label + '</th><td>' + e.value + '</td></tr>';
+                }).join('');
+            }
+
             // Open modal with case data (이미지 확대, 제목·날짜·상세 설명). gallery면 여러 장, image면 한 장 출력.
             window.openCaseModal = function(caseData, index) {
                 if (!modal) return;
@@ -365,6 +418,7 @@
                 modalCategory.textContent = caseData.categoryLabel || caseData.category || '';
                 var modalDateEl = document.getElementById('modalDate');
                 if (modalDateEl) modalDateEl.textContent = formatDate(caseData.date || '');
+                renderModalSpecs(caseData.specifications || {});
                 var bodyContent = caseData.description || caseData.body || '';
                 if (bodyContent && typeof marked !== 'undefined') {
                     modalContent.innerHTML = marked.parse(bodyContent);
@@ -394,6 +448,7 @@
                     title: raw.title,
                     category: raw.category,
                     categoryLabel: raw.category,
+                    specifications: raw.specifications,
                     image: raw.image,
                     gallery: raw.gallery,
                     date: raw.date,

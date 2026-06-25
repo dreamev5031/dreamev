@@ -77,7 +77,50 @@ export function galleryPath(imageFileName) {
 }
 
 export function validateCategory(category) {
-  return ALLOWED_CATEGORIES.includes(category);
+  const text = (category || '').trim();
+  if (!text) return false;
+  if (ALLOWED_CATEGORIES.includes(text)) return true;
+  return text.length <= 80 && !PATH_TRAVERSAL.test(text);
+}
+
+export const SPECIFICATION_KEYS = [
+  'voltage',
+  'battery',
+  'motor',
+  'controller',
+  'chargingMethod',
+  'brake',
+  'tire',
+  'topSpeed',
+  'payload',
+  'curbWeight',
+  'frameMaterial',
+];
+
+export function normalizeSpecifications(raw) {
+  if (!raw || typeof raw !== 'object') return {};
+  const result = {};
+  for (const key of SPECIFICATION_KEYS) {
+    const value = (raw[key] || '').toString().trim();
+    if (value && value !== '-' && value !== '없음' && value !== '미입력') {
+      result[key] = value.slice(0, 80);
+    }
+  }
+  return result;
+}
+
+export function parseSpecificationsBlock(fm) {
+  const specs = {};
+  const blockMatch = fm.match(/^specifications:\s*\n((?:  [a-zA-Z]+:.*\n)*)/m);
+  if (!blockMatch) return specs;
+  for (const line of blockMatch[1].split('\n')) {
+    const m = line.match(/^\s{2}([a-zA-Z]+):\s*(.+)$/);
+    if (m) {
+      const value = m[2].trim().replace(/^["']|["']$/g, '');
+      if (value) specs[m[1]] = value;
+    }
+  }
+  return specs;
 }
 
 export function validateImages(images) {
@@ -121,15 +164,30 @@ export function formatKstDateTime(dateInput) {
   return `${y}-${m}-${d}T${hh}:${mm}:${ss}.000+09:00`;
 }
 
+function escapeYamlValue(value) {
+  const text = (value || '').trim();
+  if (!text) return '';
+  if (/[:#\[\]{}\"'&*!?|>@]/.test(text)) {
+    return `"${text.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`;
+  }
+  return text;
+}
+
 export function buildMarkdown({
   title,
   category,
+  purpose,
+  usagePlace,
+  location,
   date,
   imageFileNames,
   summary,
   customerRequest,
+  productionDetails,
+  features,
   workDetails,
   result,
+  specifications = {},
 }) {
   const galleryLines = imageFileNames.map((name) => `  - image: ${galleryPath(name)}`);
   const body = [];
@@ -139,26 +197,35 @@ export function buildMarkdown({
   if (customerRequest?.trim()) {
     body.push('## 고객 요청', '', customerRequest.trim(), '');
   }
-  if (workDetails?.trim()) {
-    body.push('## 제작 및 작업 내용', '', workDetails.trim(), '');
+  const details = (productionDetails || workDetails || '').trim();
+  if (details) {
+    body.push('## 제작 내용', '', details, '');
+  }
+  if (features?.trim()) {
+    body.push('## 특징', '', features.trim(), '');
   }
   if (result?.trim()) {
-    body.push('## 작업 결과', '', result.trim(), '');
+    body.push('## 납품 및 활용 결과', '', result.trim(), '');
   }
 
-  return [
+  const specs = normalizeSpecifications(specifications);
+  const fm = [
     '---',
-    `title: ${title.trim()}`,
+    `title: ${escapeYamlValue(title)}`,
     'type: production',
-    `category: ${category}`,
-    'gallery:',
-    ...galleryLines,
-    '',
-    `date: ${formatKstDateTime(date)}`,
-    '---',
-    '',
-    body.join('\n').trimEnd(),
-  ].join('\n');
+    `category: ${escapeYamlValue(category)}`,
+  ];
+  if (purpose?.trim()) fm.push(`purpose: ${escapeYamlValue(purpose)}`);
+  if (usagePlace?.trim()) fm.push(`usagePlace: ${escapeYamlValue(usagePlace)}`);
+  if (location?.trim()) fm.push(`location: ${escapeYamlValue(location)}`);
+  if (Object.keys(specs).length > 0) {
+    fm.push('specifications:');
+    for (const key of SPECIFICATION_KEYS) {
+      if (specs[key]) fm.push(`  ${key}: ${escapeYamlValue(specs[key])}`);
+    }
+  }
+  fm.push('gallery:', ...galleryLines, '', `date: ${formatKstDateTime(date)}`, '---', '', body.join('\n').trimEnd());
+  return fm.join('\n');
 }
 
 export function buildRepairMarkdown({
@@ -216,8 +283,11 @@ export function parseFrontmatterFields(markdown) {
     type,
     title: read('title'),
     category: read('category'),
+    purpose: read('purpose'),
+    usagePlace: read('usagePlace'),
     vehicle: read('vehicle'),
     location: read('location'),
+    specifications: parseSpecificationsBlock(fm),
     date: read('date'),
     gallery,
     body,
