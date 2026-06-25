@@ -1,41 +1,49 @@
 #!/usr/bin/env node
 /**
- * AI 초안 API 통합 점검 스크립트
- * 사용: UPLOAD_ADMIN_SECRET=... OPENAI_API_KEY=... node scripts/test-draft-integration.mjs [baseUrl]
+ * Android DraftPayloadBuilder와 동일 필드로 1회 통합 테스트
+ * USE_LOCAL_HANDLER=1 UPLOAD_ADMIN_SECRET=... OPENAI_API_KEY=... node scripts/test-draft-integration.mjs
  */
 import { onRequestPost } from '../functions/api/generate-case-draft.js';
 
 const baseUrl = (process.argv[2] || 'https://dreamev.kr/').replace(/\/?$/, '/');
 const endpoint = `${baseUrl}api/generate-case-draft`;
+const useLocalHandler = process.env.USE_LOCAL_HANDLER === '1';
 
-const payload = {
+/** Android GenerateCaseDraftPayload와 동일 구조 */
+const androidPayload = {
   contentType: 'repair',
-  userTitle: '456',
-  vehicle: '산업용 전동차',
-  symptoms: ['전진 불량'],
-  diagnosis: ['전자브레이크 쇼트'],
-  selectedWorkItems: ['컨트롤러 교체', '배선 교체'],
-  work: ['교체 후 주행 테스트 진행'],
+  userTitle: 'SUV 수리',
+  category: '산업용',
+  vehicle: '산업용 SUV',
+  location: '',
+  workDate: '2026-06-25',
+  workTypes: [],
+  symptoms: ['주행 불가'],
+  diagnosis: ['컨트롤러 이상'],
+  selectedWorkItems: ['컨트롤러 교체'],
+  work: ['충전기 점검', '시운전'],
   result: ['주행 정상 확인'],
+  additionalNote: '',
 };
 
 const secret = process.env.UPLOAD_ADMIN_SECRET || '';
-const useLocalHandler = process.env.USE_LOCAL_HANDLER === '1';
 
 async function callRemote() {
+  const started = Date.now();
   const response = await fetch(endpoint, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${secret}`,
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify(payload),
+    body: JSON.stringify(androidPayload),
   });
   const bodyText = await response.text();
-  return { httpStatus: response.status, bodyText };
+  return { httpStatus: response.status, bodyText, elapsedMs: Date.now() - started };
 }
 
 async function callLocal() {
+  const started = Date.now();
   const response = await onRequestPost({
     request: new Request(endpoint, {
       method: 'POST',
@@ -43,7 +51,7 @@ async function callLocal() {
         Authorization: `Bearer ${secret || 'secret'}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(payload),
+      body: JSON.stringify(androidPayload),
     }),
     env: {
       UPLOAD_ADMIN_SECRET: secret || 'secret',
@@ -52,7 +60,7 @@ async function callLocal() {
     },
   });
   const bodyText = await response.text();
-  return { httpStatus: response.status, bodyText };
+  return { httpStatus: response.status, bodyText, elapsedMs: Date.now() - started };
 }
 
 function safeParse(text) {
@@ -63,25 +71,28 @@ function safeParse(text) {
   }
 }
 
-const { httpStatus, bodyText } = useLocalHandler
+const { httpStatus, bodyText, elapsedMs } = useLocalHandler
   ? await callLocal()
   : await callRemote();
 
 const parsed = safeParse(bodyText);
+const isHtml502 = httpStatus === 502 && bodyText.trim().startsWith('<');
 
-console.log('=== AI Draft Integration Report ===');
-console.log('1. Request URL:', endpoint);
-console.log('2. Request payload fields:', Object.keys(payload).join(', '));
-console.log('3. Cloudflare HTTP status:', httpStatus);
-console.log('4. Server raw JSON:', bodyText.slice(0, 1200));
-console.log('5. Parsed success:', parsed?.success ?? null);
-console.log('6. Server code:', parsed?.code ?? null);
-console.log('7. Server message:', parsed?.message ?? null);
-console.log('8. requestId:', parsed?.requestId ?? null);
-console.log('9. draft title:', parsed?.draft?.title ?? null);
-console.log('10. Android DTO parse:', parsed && (parsed.success ? parsed.draft != null : parsed.code != null) ? 'OK' : 'FAIL');
-
-if (!secret && !useLocalHandler) {
-  console.warn('\nWARN: UPLOAD_ADMIN_SECRET 미설정 — Production 원격 호출은 401이 예상됩니다.');
-  console.warn('로컬 핸들러 테스트: USE_LOCAL_HANDLER=1 UPLOAD_ADMIN_SECRET=secret OPENAI_API_KEY=... node scripts/test-draft-integration.mjs');
+console.log('=== AI Draft Integration (Android payload, 1 run) ===');
+console.log('mode:', useLocalHandler ? 'local_handler' : 'production');
+console.log('HTTP status:', httpStatus);
+console.log('isHtml502:', isHtml502);
+console.log('elapsedMs:', elapsedMs);
+console.log('isJson:', Boolean(parsed));
+console.log('code:', parsed?.code ?? null);
+console.log('message:', parsed?.message ?? null);
+console.log('requestId:', parsed?.requestId ?? null);
+console.log('model:', parsed?.model ?? null);
+if (parsed?.draft) {
+  console.log('draft.summary:', parsed.draft.summary);
+  console.log('draft.diagnosis:', parsed.draft.diagnosis);
+  console.log('draft.workDetails:', parsed.draft.workDetails);
+  console.log('draft.result:', parsed.draft.result);
+} else {
+  console.log('bodyPreview:', bodyText.slice(0, 500));
 }

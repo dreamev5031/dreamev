@@ -1,6 +1,11 @@
 const DEFAULT_MODEL = 'gpt-4.1-mini';
 const OPENAI_ENDPOINT = 'https://api.openai.com/v1/chat/completions';
-const OPENAI_TIMEOUT_MS = 25_000;
+/** OpenAI 단일 요청 상한 (Cloudflare Pages ~30s 벽시계 한도 내) */
+const OPENAI_TIMEOUT_MS = 20_000;
+/** Function 전체 실행 예산 — 초과 시 JSON 504 반환 (HTML 502 방지) */
+const FUNCTION_BUDGET_MS = 28_000;
+const MIN_OPENAI_TIMEOUT_MS = 5_000;
+const OPENAI_SERVER_RETRY_DELAY_MS = 400;
 const MAX_OUTPUT_TOKENS = 1_400;
 const MAX_RETRIES = 1;
 
@@ -55,77 +60,46 @@ ${POLITE_STYLE_RULE}
 * 현장 기술자가 실제로 작성한 것처럼 구체적이고 차분한 문체를 사용합니다.
 * 과장 광고, 감탄 표현, 막연한 홍보 문구는 사용하지 않습니다.
 * 일반 고객도 이해할 수 있는 표현을 사용합니다.
-* 각 항목은 중복 없이 역할이 분명해야 합니다. summary, diagnosis, workDetails, result에 같은 작업 내용을 반복하지 않습니다.
+* 각 항목은 역할이 분명해야 합니다. summary, diagnosis, workDetails, result에 같은 사실을 반복하지 않습니다.
 * "(이)가", "을(를)", "은(는)" 같은 선택형 조사 표현을 절대 출력하지 않습니다.
-* "확인했습니다"라는 표현을 한 글에서 지나치게 반복하지 않습니다.
-* 동작 서술 시 "실시했습니다"보다 "진행했습니다"를 우선 사용합니다.
 * 입력에 없는 정상 작동이나 수리 성공을 임의로 단정하지 않습니다.
-* 작업 결과에 정상 주행 확인이 입력된 경우에만 정상 작동을 확인했습니다고 작성합니다.
+* 작업 결과에 정상 주행 확인이 입력된 경우에만 result에서 정상 작동을 확인했습니다고 작성합니다.
 * 실제 교체가 입력된 경우에만 "교체"라고 작성합니다.
 * 점검만 입력된 경우 교체나 수리를 했다고 확대 해석하지 않습니다.
 * 제목이 숫자, 임의 문자열, DREAMEV, test, SSSS처럼 의미 없는 값이면 해당 제목을 사용하지 말고 작업 내용을 바탕으로 새 제목을 만듭니다.
 * 차량 명칭이 애매하면 사용자가 입력한 표현을 그대로 유지합니다.
-* 문장은 짧고 명확하게 작성하되 지나치게 단문만 나열하지 않습니다.
-* 항목끼리 같은 사실을 반복하지 말고, 전체 글이 하나의 수리 흐름(요청→점검→작업→결과)으로 자연스럽게 이어지게 작성합니다.
-* "점검했습니다", "확인했습니다"만 반복하지 말고 표현을 자연스럽게 변형합니다.
-* 입력이 짧은 키워드(예: "주행 정상 확인", "컨트롤러 교체")여도 그대로 출력하지 말고 반드시 완전한 존댓말 문장으로 확장합니다.
+* 입력이 짧은 키워드여도 존댓말 문장으로 작성합니다.
 * Markdown 기호는 출력하지 않습니다.
 * JSON 외의 설명은 출력하지 않습니다.`;
 
 const REPAIR_DEVELOPER_PROMPT = `contentType이 repair인 수리사례를 작성합니다.
 
-작성 목적:
-고객이 어떤 증상으로 요청했고, 무엇을 점검했으며, 어떤 작업을 했고, 결과가 어땠는지를 명확히 보여주는 수리사례를 작성합니다.
-현장 작업자가 정리한 기술 보고서처럼 신뢰감 있게, 입력 사실만으로 자연스럽게 확장된 문장을 작성합니다.
-
 출력 항목: title, summary, customerRequest, diagnosis, workDetails, result, seoTitle, seoDescription, keywords
 
-문체: summary, customerRequest, diagnosis, workDetails, result, seoDescription은 모두 존댓말(~했습니다, ~되었습니다)로 작성합니다. 해라체(~했다, ~한다) 금지.
+문체: summary, customerRequest, diagnosis, workDetails, result, seoDescription은 존댓말(~했습니다, ~되었습니다). 해라체(~했다) 금지.
 
-작성 품질 규칙:
-* 입력 문장·키워드를 그대로 복사하지 말고, 의미를 유지한 채 전문적인 사례 문장으로 다시 작성합니다.
-* 각 본문 항목은 최소 1문장, 권장 2문장입니다. summary는 2문장 이내로 짧은 개요만 작성합니다.
-* 항목별 역할을 분리합니다. 같은 사실(충전기 점검, 시운전, 정상 주행 확인 등)을 여러 필드에서 반복하지 않습니다.
-* 사실 확장은 금지합니다. 입력에 없는 부품·원인·작업·시운전·배선 점검 등을 임의로 추가하지 않습니다.
-* 광고 문구나 과장 표현은 넣지 않습니다.
-* 동작 서술 시 "실시했습니다"보다 "진행했습니다"를 우선 사용합니다.
+필드별 정보 배치 (같은 핵심 명사·작업을 여러 필드에 반복하지 않음):
+* summary: 증상, 핵심 원인, 주요 작업만 간단히 요약. 작업 결과와 세부 점검 항목은 쓰지 않음.
+* customerRequest: 고객이 요청한 증상만.
+* diagnosis: 확인된 고장 원인만. 추가 점검 항목은 넣지 않음.
+* workDetails: 실제 교체, 보수, 추가 점검, 시운전 내용. 충전기 점검 등 보조 작업은 여기서만 상세히.
+* result: 최종 결과만. 교체 부품이나 점검 항목을 다시 쓰지 않음.
 
-필드별 역할 (중복 금지):
-* summary: 전체 작업의 짧은 개요만. 증상과 핵심 원인·주요 작업을 한눈에 요약. 시운전·충전기 점검·최종 주행 결과는 상세히 쓰지 않음.
-* customerRequest: 고객 요청·증상만.
-* diagnosis: 확인된 고장 원인과 점검에서 밝혀진 사실만. 실제 작업·시운전·최종 결과는 쓰지 않음.
-* workDetails: 실제 교체·보수·점검·시운전 과정만. 최종 정상 주행 여부는 쓰지 않음.
-* result: 최종 상태만. 작업 과정·점검 내용을 다시 설명하지 않음.
-* diagnosis, workDetails, result에 같은 문장이나 같은 작업 내용이 겹치면 한 항목에서만 자세히 작성합니다.
-* diagnosis에 이미 적은 원인·부품(예: 충전기 불량)을 summary·workDetails에서 다시 설명하지 않습니다.
+배치 예시 (증상: 주행 불가, 원인: 컨트롤러 이상, 작업: 컨트롤러 교체·충전기 점검·시운전, 결과: 정상 주행 확인):
+* summary → 주행 불가 증상, 컨트롤러 이상, 교체 작업만 요약
+* diagnosis → 컨트롤러 이상만
+* workDetails → 컨트롤러 교체, 충전기 점검, 시운전
+* result → 정상 주행 확인만
 
-금지 예 (너무 짧거나 기계적인 출력):
-* "주행 정상 확인", "현장 수리 완료", "점검 진행", "컨트롤러 교체", "충전기 확인"처럼 입력을 그대로 적는 것
-* "점검을 진행했습니다."만 있고 무엇을 확인했는지 없는 diagnosis
-* 증상·작업·결과를 한 줄 키워드로만 나열하는 것
-
-입력 확장 예 (사실은 동일, 표현만 문장화):
-* "주행 정상 확인" → "작업 후 시운전을 진행했으며 차량이 정상적으로 주행하는 것을 확인했습니다." (시운전이 입력된 경우에만 시운전 언급)
-* "컨트롤러 교체" → "이상이 확인된 컨트롤러를 교체하고 관련 계통의 상태를 함께 확인했습니다." (입력에 배선·계통 점검이 없으면 배선·계통은 쓰지 말 것)
-* "충전기 점검" → "충전기의 작동 상태와 연결 상태를 점검해 추가 이상 여부를 확인했습니다."
-
-참고 출력 수준 (입력: 산업용 SUV, 주행 불가, 컨트롤러 이상, 컨트롤러 교체, 충전기 점검, 주행 정상 확인):
-summary: "산업용 SUV 전동차에서 주행 불가 증상으로 현장 점검을 진행했습니다. 점검 결과 컨트롤러 이상이 확인되어 교체 작업을 진행했습니다."
-customerRequest: "산업용 SUV 전동차가 주행되지 않는 증상으로 점검과 수리를 요청받았습니다."
-diagnosis: "차량의 주행 계통과 전원 상태를 점검한 결과 컨트롤러 이상이 확인되었습니다."
-workDetails: "이상이 확인된 컨트롤러를 교체했습니다. 이후 충전기 작동 상태를 점검하고 주행 확인을 위해 시운전을 진행했습니다."
-result: "작업 후 차량이 정상적으로 주행하는 것을 확인했습니다."
-
-필드별 길이·구성:
-title: 차량 종류 + 핵심 증상 + 주요 점검 또는 수리 내용, 22~45자 권장, 의미 없는 userTitle 무시, 지역은 입력된 경우에만, 명사형 제목
-summary: 2문장 이내, 전체 개요만, 80~160자 권장, 존댓말
-customerRequest: 1~2문장, 고객이 어떤 증상으로 점검 또는 수리를 요청했는지, 40~100자 권장, 존댓말
-diagnosis: 1~2문장, 입력된 점검 결과·원인만, 40~120자 권장, 존댓말
-workDetails: 2~3문장, 교체·보수·점검·시운전 과정만, 70~180자 권장, 존댓말
-result: 1~2문장, 최종 상태만, 40~100자 권장, 존댓말. "주행 정상 확인" 입력 시 정상 주행 확인으로 문장화
-seoTitle: 30~55자, 회사명 불필요 시 생략, 명사형 제목
-seoDescription: 70~140자, 키워드 나열 금지, 존댓말
-keywords: 4~7개 문자열 배열, 구체적 조합, 입력 없는 지역·부품 금지
+title: 차량 + 핵심 증상 + 주요 작업, 22~45자, 명사형. 의미 없는 userTitle 무시.
+summary: 2문장 이내, 존댓말.
+customerRequest: 1~2문장, 존댓말.
+diagnosis: 1~2문장, 존댓말.
+workDetails: 2~3문장, 존댓말.
+result: 1~2문장, 존댓말.
+seoTitle: 30~55자, 명사형.
+seoDescription: 70~140자, 존댓말.
+keywords: 4~7개, 입력 사실만.
 
 selectedWorkItems 규칙:
 * selectedWorkItems는 사용자가 선택한 실제 작업 사실이다.
@@ -347,23 +321,13 @@ export function buildDraftPrompt(input, options = {}) {
     ? REPAIR_DEVELOPER_PROMPT
     : PRODUCTION_DEVELOPER_PROMPT;
 
-  const retryHints = {
-    field_duplication: `중요: 이전 응답은 항목 간 내용이 중복되었습니다. 아래 역할 분리를 반드시 지키세요.
-- summary: 전체 개요만 (시운전·충전기 점검·정상 주행 결과는 넣지 않음)
-- diagnosis: 확인된 원인만 (작업·시운전·최종 결과 없음)
-- workDetails: 실제 작업 과정만 (최종 정상 주행 여부 없음)
-- result: 최종 상태만 (작업 과정·시운전 재설명 없음)
-충전기는 diagnosis 또는 workDetails 중 한 곳에만, 시운전은 workDetails 또는 result 중 한 곳에만, 정상 주행 확인은 result에만 작성하세요.`,
-    insufficient_expansion: '중요: 이전 응답이 너무 짧거나 입력을 그대로 복사했습니다. 각 항목을 완전한 존댓말 문장으로 확장하되 사실은 추가하지 마세요.',
-    informal_speech: '중요: 이전 응답에 해라체가 포함되었습니다. 모든 서술문을 ~했습니다, ~되었습니다 존댓말로 작성하세요.',
-  };
-  const retryHint = retryHints[options.qualityRetryReason] || '';
+  const retryHint = options.qualityRetryReason === 'informal_speech'
+    ? '중요: 이전 응답에 해라체가 포함되었습니다. 모든 서술문을 ~했습니다, ~되었습니다 존댓말로 작성하세요.\n\n'
+    : '';
 
   return {
     system: `${COMMON_SYSTEM_PROMPT}\n\n${developer}`,
-    user: `${retryHint ? `${retryHint}\n\n` : ''}아래 JSON 입력만 사용해 사례 초안 JSON을 작성하세요. 빈 문자열은 정보 없음입니다.
-입력 문장·키워드를 그대로 복사하지 말고, 각 항목을 자연스러운 기술 사례 문장으로 확장하세요.
-summary·diagnosis·workDetails·result는 역할이 다르므로 같은 내용을 반복하지 마세요. 사실은 추가하지 마세요.
+    user: `${retryHint}아래 JSON 입력만 사용해 사례 초안 JSON을 작성하세요. 빈 문자열은 정보 없음입니다.
 
 ${JSON.stringify(buildOpenAiUserInput(input))}`,
   };
@@ -439,239 +403,16 @@ export function findDraftInformalSpeechViolations(draft, input) {
   return violations;
 }
 
-const BRIEF_LITERAL_PHRASES = [
-  '주행 정상 확인',
-  '현장 수리 완료',
-  '점검 진행',
-  '컨트롤러 교체',
-  '충전기 확인',
-  '충전기 점검',
-];
-
-const GENERIC_DIAGNOSIS_PATTERNS = [
-  /^[^.]{0,60}점검(?:을)?\s*진행했습니다\.?$/,
-  /^[^.]{0,40}점검했습니다\.?$/,
-  /^[^.]{0,60}증상에\s*대해\s*점검(?:을)?\s*진행했습니다\.?$/,
-  /^[^.]{0,60}에\s*대해\s*점검(?:을)?\s*진행했습니다\.?$/,
-];
-
-function normalizeCompareText(text) {
-  return cleanField(text).replace(/\s+/g, '').replace(/[.,!?~]/g, '');
-}
-
-export function countSentences(text) {
-  const normalized = cleanField(text);
-  if (!normalized) return 0;
-  return normalized.split(/[.!?]+/).map((part) => part.trim()).filter(Boolean).length;
-}
-
-export function isExactInputCopy(fieldText, inputItems) {
-  const normalized = normalizeCompareText(fieldText);
-  if (!normalized || !inputItems?.length) return false;
-  return inputItems.some((item) => normalizeCompareText(item) === normalized);
-}
-
-export function isResultTooBrief(resultText) {
-  const text = cleanField(resultText);
-  if (!text) return true;
-  if (text.length <= 15) return true;
-  return BRIEF_LITERAL_PHRASES.some((phrase) => normalizeCompareText(text) === normalizeCompareText(phrase));
-}
-
-function diagnosisMentionsInput(diagnosisText, inputDiagnosis) {
-  const text = normalizeCompareText(diagnosisText);
-  return inputDiagnosis.some((item) => {
-    const norm = normalizeCompareText(item);
-    if (norm.length >= 2 && text.includes(norm)) return true;
-    const tokens = item.split(/\s+/).map((t) => normalizeCompareText(t)).filter((t) => t.length >= 2);
-    return tokens.some((token) => text.includes(token));
-  });
-}
-
-export function isGenericDiagnosis(diagnosisText, input) {
-  const text = cleanField(diagnosisText);
-  if (!text) return false;
-
-  if (GENERIC_DIAGNOSIS_PATTERNS.some((pattern) => pattern.test(text))) {
-    return true;
-  }
-
-  if (input.diagnosis.length > 0 && !diagnosisMentionsInput(text, input.diagnosis)) {
-    return true;
-  }
-
-  if (text.length < 25 && input.diagnosis.length > 0) {
-    return true;
-  }
-
-  return false;
-}
-
-export function isSummaryInsufficient(summaryText) {
-  const text = cleanField(summaryText);
-  if (!text) return true;
-  if (text.length < 50) return true;
-  const sentences = countSentences(text);
-  return sentences === 1 && text.length < 70;
-}
-
-export function splitSentences(text) {
-  return cleanField(text).split(/[.!?]+/).map((part) => part.trim()).filter(Boolean);
-}
-
-function sentencesAreSimilar(a, b) {
-  const na = normalizeCompareText(a);
-  const nb = normalizeCompareText(b);
-  if (!na || !nb) return false;
-  if (na === nb) return true;
-  const minLen = Math.min(na.length, nb.length);
-  const maxLen = Math.max(na.length, nb.length);
-  return minLen >= 10 && minLen / maxLen >= 0.55 && (na.includes(nb) || nb.includes(na));
-}
-
-const CROSS_FIELD_REPEAT_TOPICS = [
-  { id: 'test_drive', pattern: /시운전/ },
-  { id: 'charger', pattern: /충전기/ },
-  { id: 'normal_drive', pattern: /정상적(?:으로)?\s*주행|정상\s*주행/ },
-];
-
-function getRepairFieldTexts(draft) {
-  return {
-    summary: cleanField(draft.summary),
-    diagnosis: cleanField(draft.diagnosis ?? draft.inspectionResult),
-    workDetails: cleanField(draft.workDetails),
-    result: cleanField(draft.result),
-  };
-}
-
-function fieldsMatchingTopic(fieldTexts, pattern) {
-  return Object.entries(fieldTexts)
-    .filter(([, text]) => pattern.test(text))
-    .map(([field]) => field);
-}
-
-function workInputMentionsDiagnosisTerm(term, input) {
-  const norm = normalizeCompareText(term);
-  const sources = [...input.work, ...input.selectedWorkItems];
-  return sources.some((source) => {
-    const ns = normalizeCompareText(source);
-    if (ns.includes(norm) || norm.includes(ns)) return true;
-    const tokens = String(term).match(/[가-힣A-Za-z0-9]{2,}/g) || [];
-    return tokens.some((token) => {
-      const nt = normalizeCompareText(token);
-      return nt.length >= 2 && ns.includes(nt);
-    });
-  });
-}
-
-function findTopicDuplicationViolations(fieldTexts, input) {
-  const violations = [];
-
-  const testDriveFields = fieldsMatchingTopic(fieldTexts, /시운전/);
-  if (testDriveFields.includes('workDetails') && testDriveFields.includes('result')) {
-    violations.push({ issue: 'repeated_topic', topic: 'test_drive', fields: ['workDetails', 'result'] });
-  }
-  if (testDriveFields.includes('summary') && testDriveFields.some((f) => f === 'workDetails' || f === 'result')) {
-    violations.push({ issue: 'repeated_topic', topic: 'test_drive', fields: testDriveFields });
-  }
-
-  const chargerFields = fieldsMatchingTopic(fieldTexts, /충전기/);
-  if (chargerFields.includes('summary') && chargerFields.some((f) => f === 'diagnosis' || f === 'workDetails')) {
-    violations.push({ issue: 'repeated_topic', topic: 'charger', fields: chargerFields });
-  }
-  if (chargerFields.includes('diagnosis') && chargerFields.includes('workDetails')) {
-    if (!workInputMentionsDiagnosisTerm('충전기', input)) {
-      violations.push({ issue: 'repeated_topic', topic: 'charger', fields: ['diagnosis', 'workDetails'] });
-    }
-  }
-
-  const driveFields = fieldsMatchingTopic(fieldTexts, /정상적(?:으로)?\s*주행|정상\s*주행/);
-  const driveOutsideResult = driveFields.filter((f) => f !== 'result');
-  if (driveOutsideResult.length > 0) {
-    violations.push({ issue: 'repeated_topic', topic: 'normal_drive', fields: driveFields });
-  }
-
-  return violations;
-}
-
-export function findDraftFieldDuplicationViolations(draft, input = null) {
-  if (!draft || typeof draft !== 'object') return [];
-
-  const violations = [];
-  const fieldTexts = getRepairFieldTexts(draft);
-
-  const detailFields = ['diagnosis', 'workDetails', 'result'];
-  for (let i = 0; i < detailFields.length; i += 1) {
-    for (let j = i + 1; j < detailFields.length; j += 1) {
-      const f1 = detailFields[i];
-      const f2 = detailFields[j];
-      for (const s1 of splitSentences(fieldTexts[f1])) {
-        for (const s2 of splitSentences(fieldTexts[f2])) {
-          if (sentencesAreSimilar(s1, s2)) {
-            violations.push({
-              issue: 'duplicate_sentence',
-              fields: [f1, f2],
-              excerpt: s1.slice(0, 80),
-            });
-          }
-        }
-      }
-    }
-  }
-
-  if (input?.contentType === 'repair') {
-    violations.push(...findTopicDuplicationViolations(fieldTexts, input));
-  }
-
-  if (countSentences(fieldTexts.summary) > 2) {
-    violations.push({ issue: 'summary_too_long', field: 'summary' });
-  }
-
-  return violations;
-}
-
-export function findDraftExpansionViolations(draft, input) {
-  if (!draft || input.contentType !== 'repair') return [];
-
-  const violations = [];
-  const result = cleanField(draft.result);
-  const diagnosis = cleanField(draft.diagnosis ?? draft.inspectionResult);
-  const customerRequest = cleanField(draft.customerRequest);
-  const workDetails = cleanField(draft.workDetails);
-  const summary = cleanField(draft.summary);
-  const workInputs = [...input.selectedWorkItems, ...input.work];
-
-  if (isResultTooBrief(result)) {
-    violations.push({ field: 'result', issue: 'too_brief', excerpt: result });
-  }
-
-  if (diagnosis && isGenericDiagnosis(diagnosis, input)) {
-    violations.push({ field: 'diagnosis', issue: 'generic', excerpt: diagnosis.slice(0, 80) });
-  }
-
-  if (customerRequest && isExactInputCopy(customerRequest, input.symptoms)) {
-    violations.push({ field: 'customerRequest', issue: 'literal_copy' });
-  }
-
-  if (diagnosis && isExactInputCopy(diagnosis, input.diagnosis)) {
-    violations.push({ field: 'diagnosis', issue: 'literal_copy' });
-  }
-
-  if (workDetails && (isExactInputCopy(workDetails, workInputs)
-    || BRIEF_LITERAL_PHRASES.some((phrase) => normalizeCompareText(workDetails) === normalizeCompareText(phrase)))) {
-    violations.push({ field: 'workDetails', issue: 'literal_copy', excerpt: workDetails.slice(0, 80) });
-  }
-
-  if (result && isExactInputCopy(result, input.result)) {
-    violations.push({ field: 'result', issue: 'literal_copy' });
-  }
-
-  if (isSummaryInsufficient(summary)) {
-    violations.push({ field: 'summary', issue: 'too_short', excerpt: summary.slice(0, 80) });
-  }
-
-  return violations;
-}
+/** 빈 필드·스키마·해라체일 때만 재생성 */
+const QUALITY_RETRY_REASONS = new Set([
+  'informal_speech',
+  'missing_draft',
+  'missing_summary',
+  'missing_work_details',
+  'missing_customer_request',
+  'missing_production_details',
+  'keywords_not_array',
+]);
 
 export function validateDraftQuality(draft, input) {
   if (!draft || typeof draft !== 'object') {
@@ -735,24 +476,6 @@ export function validateDraftQuality(draft, input) {
     const unselectedMentions = findUnselectedWorkMentions(cleanField(draft.workDetails), input.selectedWorkItems);
     if (unselectedMentions.length > 0) {
       return { ok: false, reason: 'unselected_work_mention' };
-    }
-
-    const expansionViolations = findDraftExpansionViolations(draft, input);
-    if (expansionViolations.length > 0) {
-      return {
-        ok: false,
-        reason: 'insufficient_expansion',
-        expansionViolations,
-      };
-    }
-
-    const duplicationViolations = findDraftFieldDuplicationViolations(draft, input);
-    if (duplicationViolations.length > 0) {
-      return {
-        ok: false,
-        reason: 'field_duplication',
-        duplicationViolations,
-      };
     }
   } else {
     if (!cleanField(draft.productionDetails) && (input.work.length || input.workTypes.length)) {
@@ -913,6 +636,16 @@ export function logOpenAiDraftFailure(details) {
     qualityReason: details.qualityReason || '',
     contentType: details.contentType || '',
     attempt: details.attempt ?? null,
+    openAiElapsedMs: details.openAiElapsedMs ?? null,
+    elapsedMs: details.elapsedMs ?? null,
+    aborted: details.aborted ?? null,
+    errorName: details.errorName || '',
+  });
+}
+
+function sleep(ms) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
   });
 }
 
@@ -929,19 +662,8 @@ function createOpenAiFetchSignal(timeoutMs) {
   return controller.signal;
 }
 
-async function requestOpenAi(env, input, fetchImpl, options = {}) {
+async function executeOpenAiFetch(env, input, fetchImpl, options, timeoutMs) {
   const apiKey = (env.OPENAI_API_KEY || '').trim();
-  if (!apiKey) {
-    return {
-      ok: false,
-      code: 'OPENAI_CONFIG_MISSING',
-      message: 'AI 기능 설정이 완료되지 않았습니다.',
-      status: 503,
-      stage: 'config_missing',
-      model: resolveOpenAiModel(env),
-    };
-  }
-
   const model = resolveOpenAiModel(env);
   const prompt = buildDraftPrompt(input, options);
   const jsonSchema = input.contentType === 'repair'
@@ -949,6 +671,7 @@ async function requestOpenAi(env, input, fetchImpl, options = {}) {
     : PRODUCTION_JSON_SCHEMA;
 
   let response;
+  const fetchStartedAt = Date.now();
   try {
     response = await fetchImpl(OPENAI_ENDPOINT, {
       method: 'POST',
@@ -969,9 +692,10 @@ async function requestOpenAi(env, input, fetchImpl, options = {}) {
           json_schema: jsonSchema,
         },
       }),
-      signal: createOpenAiFetchSignal(OPENAI_TIMEOUT_MS),
+      signal: createOpenAiFetchSignal(timeoutMs),
     });
   } catch (err) {
+    const fetchElapsedMs = Date.now() - fetchStartedAt;
     if (err?.name === 'TimeoutError' || err?.name === 'AbortError') {
       return {
         ok: false,
@@ -980,21 +704,27 @@ async function requestOpenAi(env, input, fetchImpl, options = {}) {
         status: 504,
         stage: 'openai_fetch_timeout',
         model,
+        fetchElapsedMs,
+        aborted: true,
       };
     }
     return {
       ok: false,
-      code: 'OPENAI_NETWORK_ERROR',
+      code: 'OPENAI_SERVER_ERROR',
       message: 'AI 서버에 연결하지 못했습니다.',
       status: 502,
       stage: 'openai_fetch_error',
       model,
+      fetchElapsedMs,
+      errorName: err?.name || '',
     };
   }
 
+  const fetchElapsedMs = Date.now() - fetchStartedAt;
   const openAiStatus = response.status;
   const openAiRequestId = response.headers?.get?.('x-request-id') || '';
   const bodyText = await response.text();
+
   if (!response.ok) {
     const mapped = mapOpenAiHttpError(openAiStatus, bodyText);
     return {
@@ -1004,6 +734,7 @@ async function requestOpenAi(env, input, fetchImpl, options = {}) {
       openAiRequestId,
       model,
       stage: 'openai_http_error',
+      fetchElapsedMs,
     };
   }
 
@@ -1020,6 +751,7 @@ async function requestOpenAi(env, input, fetchImpl, options = {}) {
       openAiRequestId,
       model,
       stage: 'openai_response_json_parse',
+      fetchElapsedMs,
     };
   }
 
@@ -1027,13 +759,14 @@ async function requestOpenAi(env, input, fetchImpl, options = {}) {
   if (!content || typeof content !== 'string') {
     return {
       ok: false,
-      code: 'OPENAI_EMPTY_OUTPUT',
+      code: 'OPENAI_PARSE_ERROR',
       message: 'AI가 빈 초안을 반환했습니다.',
       status: 502,
       openAiStatus,
       openAiRequestId,
       model,
       stage: 'openai_empty_output',
+      fetchElapsedMs,
     };
   }
 
@@ -1050,18 +783,115 @@ async function requestOpenAi(env, input, fetchImpl, options = {}) {
       openAiRequestId,
       model,
       stage: 'openai_content_json_parse',
+      fetchElapsedMs,
     };
   }
 
-  return { ok: true, draftJson, openAiStatus, openAiRequestId, model };
+  return {
+    ok: true,
+    draftJson,
+    openAiStatus,
+    openAiRequestId,
+    model,
+    stage: 'openai_fetch_success',
+    fetchElapsedMs,
+  };
+}
+
+async function requestOpenAi(env, input, fetchImpl, options = {}) {
+  const apiKey = (env.OPENAI_API_KEY || '').trim();
+  if (!apiKey) {
+    return {
+      ok: false,
+      code: 'CONFIG_ERROR',
+      message: 'AI 기능 설정이 완료되지 않았습니다.',
+      status: 503,
+      stage: 'config_missing',
+      model: resolveOpenAiModel(env),
+    };
+  }
+
+  const budgetRemainingMs = options.budgetRemainingMs ?? FUNCTION_BUDGET_MS;
+  const openAiStartedAt = Date.now();
+  let serverRetried = false;
+
+  for (let fetchAttempt = 0; fetchAttempt < 2; fetchAttempt += 1) {
+    const elapsed = Date.now() - openAiStartedAt;
+    const remaining = budgetRemainingMs - elapsed;
+    if (remaining < MIN_OPENAI_TIMEOUT_MS) {
+      return {
+        ok: false,
+        code: 'OPENAI_TIMEOUT',
+        message: 'AI 응답 시간이 초과되었습니다. 잠시 후 다시 시도해 주세요.',
+        status: 504,
+        stage: 'openai_budget_exhausted',
+        model: resolveOpenAiModel(env),
+        openAiElapsedMs: elapsed,
+      };
+    }
+
+    const timeoutMs = Math.min(OPENAI_TIMEOUT_MS, remaining);
+    const result = await executeOpenAiFetch(env, input, fetchImpl, options, timeoutMs);
+    result.openAiElapsedMs = Date.now() - openAiStartedAt;
+
+    if (result.ok) {
+      return result;
+    }
+
+    const canServerRetry = !serverRetried
+      && (result.openAiStatus === 500 || result.openAiStatus === 503)
+      && (budgetRemainingMs - (Date.now() - openAiStartedAt)) > (MIN_OPENAI_TIMEOUT_MS + OPENAI_SERVER_RETRY_DELAY_MS);
+
+    if (canServerRetry) {
+      serverRetried = true;
+      logOpenAiDraftFailure({
+        stage: 'openai_server_retry',
+        model: result.model,
+        openAiHttpStatus: result.openAiStatus,
+        openAiRequestId: result.openAiRequestId || '',
+        contentType: input.contentType,
+        attempt: fetchAttempt,
+      });
+      await sleep(OPENAI_SERVER_RETRY_DELAY_MS);
+      continue;
+    }
+
+    return result;
+  }
+
+  return {
+    ok: false,
+    code: 'OPENAI_SERVER_ERROR',
+    message: 'AI 서버 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.',
+    status: 502,
+    stage: 'openai_fetch_exhausted',
+    model: resolveOpenAiModel(env),
+    openAiElapsedMs: Date.now() - openAiStartedAt,
+  };
 }
 
 export async function callOpenAiDraft(env, input, fetchImpl = fetch) {
+  const functionStartedAt = Date.now();
+  const getBudgetRemaining = () => FUNCTION_BUDGET_MS - (Date.now() - functionStartedAt);
   let lastQualityReason = '';
 
   for (let attempt = 0; attempt <= MAX_RETRIES; attempt += 1) {
+    const budgetRemainingMs = getBudgetRemaining();
+    if (budgetRemainingMs < MIN_OPENAI_TIMEOUT_MS) {
+      return {
+        ok: false,
+        code: 'OPENAI_TIMEOUT',
+        message: 'AI 응답 시간이 초과되었습니다. 잠시 후 다시 시도해 주세요.',
+        status: 504,
+        stage: 'function_budget_exhausted',
+        model: resolveOpenAiModel(env),
+        elapsedMs: Date.now() - functionStartedAt,
+      };
+    }
+
     const response = await requestOpenAi(env, input, fetchImpl, {
       qualityRetryReason: attempt > 0 ? lastQualityReason : '',
+      budgetRemainingMs,
     });
     if (!response.ok) {
       logOpenAiDraftFailure({
@@ -1072,14 +902,22 @@ export async function callOpenAiDraft(env, input, fetchImpl = fetch) {
         openAiRequestId: response.openAiRequestId,
         contentType: input.contentType,
         attempt,
+        openAiElapsedMs: response.openAiElapsedMs,
+        elapsedMs: Date.now() - functionStartedAt,
       });
-      return response;
+      return {
+        ...response,
+        elapsedMs: Date.now() - functionStartedAt,
+      };
     }
 
     const quality = validateDraftQuality(response.draftJson, input);
     if (!quality.ok) {
       lastQualityReason = quality.reason;
-      if (attempt < MAX_RETRIES) {
+      const canQualityRetry = attempt < MAX_RETRIES
+        && QUALITY_RETRY_REASONS.has(quality.reason)
+        && getBudgetRemaining() > (MIN_OPENAI_TIMEOUT_MS + OPENAI_SERVER_RETRY_DELAY_MS);
+      if (canQualityRetry) {
         continue;
       }
       const failure = {
@@ -1087,20 +925,16 @@ export async function callOpenAiDraft(env, input, fetchImpl = fetch) {
         code: 'OPENAI_PARSE_ERROR',
         message: lastQualityReason === 'informal_speech'
           ? 'AI 초안 문체가 존댓말 규칙에 맞지 않습니다. 다시 시도해 주세요.'
-          : lastQualityReason === 'insufficient_expansion'
-            ? 'AI 초안이 입력 내용을 충분히 확장하지 못했습니다. 다시 시도해 주세요.'
-            : lastQualityReason === 'field_duplication'
-              ? 'AI 초안 항목 간 내용이 중복됩니다. 다시 시도해 주세요.'
-              : `AI 응답 품질 검증에 실패했습니다. (${lastQualityReason})`,
+          : `AI 응답 품질 검증에 실패했습니다. (${lastQualityReason})`,
         status: 502,
         openAiStatus: response.openAiStatus,
         openAiRequestId: response.openAiRequestId,
         model: response.model,
         qualityReason: lastQualityReason,
         informalViolations: quality.informalViolations,
-        expansionViolations: quality.expansionViolations,
-        duplicationViolations: quality.duplicationViolations,
         stage: 'quality_validation',
+        openAiElapsedMs: response.openAiElapsedMs,
+        elapsedMs: Date.now() - functionStartedAt,
       };
       logOpenAiDraftFailure({
         stage: failure.stage,
@@ -1110,6 +944,8 @@ export async function callOpenAiDraft(env, input, fetchImpl = fetch) {
         qualityReason: lastQualityReason,
         contentType: input.contentType,
         attempt,
+        openAiElapsedMs: failure.openAiElapsedMs,
+        elapsedMs: failure.elapsedMs,
       });
       return failure;
     }
@@ -1123,10 +959,15 @@ export async function callOpenAiDraft(env, input, fetchImpl = fetch) {
         openAiStatus: response.openAiStatus,
         openAiRequestId: response.openAiRequestId,
         attempt,
+        openAiElapsedMs: response.openAiElapsedMs,
+        elapsedMs: Date.now() - functionStartedAt,
       };
     } catch (err) {
-      lastQualityReason = err.message;
-      if (attempt < MAX_RETRIES) {
+      lastQualityReason = err.code || err.message;
+      const canSanitizeRetry = attempt < MAX_RETRIES
+        && (err.code === 'OPENAI_SCHEMA_ERROR' || err.code === 'OPENAI_PARSE_ERROR')
+        && getBudgetRemaining() > (MIN_OPENAI_TIMEOUT_MS + OPENAI_SERVER_RETRY_DELAY_MS);
+      if (canSanitizeRetry) {
         continue;
       }
       const failure = {
@@ -1139,6 +980,8 @@ export async function callOpenAiDraft(env, input, fetchImpl = fetch) {
         model: response.model,
         qualityReason: lastQualityReason,
         stage: 'sanitize_draft',
+        openAiElapsedMs: response.openAiElapsedMs,
+        elapsedMs: Date.now() - functionStartedAt,
       };
       logOpenAiDraftFailure({
         stage: failure.stage,
@@ -1148,6 +991,8 @@ export async function callOpenAiDraft(env, input, fetchImpl = fetch) {
         qualityReason: lastQualityReason,
         contentType: input.contentType,
         attempt,
+        openAiElapsedMs: failure.openAiElapsedMs,
+        elapsedMs: failure.elapsedMs,
       });
       return failure;
     }
@@ -1159,6 +1004,7 @@ export async function callOpenAiDraft(env, input, fetchImpl = fetch) {
     message: 'AI 응답을 처리하지 못했습니다.',
     status: 502,
     stage: 'quality_validation_exhausted',
+    elapsedMs: Date.now() - functionStartedAt,
   };
 }
 
@@ -1167,6 +1013,7 @@ export const openAiDraftInternals = {
   resolveOpenAiModel,
   OPENAI_ENDPOINT,
   OPENAI_TIMEOUT_MS,
+  FUNCTION_BUDGET_MS,
   REPAIR_JSON_SCHEMA,
   PRODUCTION_JSON_SCHEMA,
 };

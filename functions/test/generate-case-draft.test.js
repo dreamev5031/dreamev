@@ -17,12 +17,6 @@ import {
   findInformalSpeechInText,
   findDraftInformalSpeechViolations,
   resolveOpenAiModel,
-  countSentences,
-  isResultTooBrief,
-  isGenericDiagnosis,
-  isSummaryInsufficient,
-  findDraftExpansionViolations,
-  findDraftFieldDuplicationViolations,
 } from '../lib/openai-draft.js';
 
 const env = {
@@ -182,77 +176,6 @@ test('callOpenAiDraft fails without auto-replace when informal speech persists',
   assert.match(result.message, /존댓말/);
 });
 
-test('isResultTooBrief rejects short literal result phrases', () => {
-  assert.equal(isResultTooBrief('주행 정상 확인'), true);
-  assert.equal(isResultTooBrief('현장 수리 완료'), true);
-  assert.equal(isResultTooBrief('작업 후 시운전을 통해 차량이 정상적으로 주행하는 것을 확인했습니다.'), false);
-});
-
-test('isGenericDiagnosis rejects inspection-only diagnosis', () => {
-  const input = normalizeDraftInput(repairInputSuv);
-  assert.equal(isGenericDiagnosis('주행 불가 증상에 대해 점검을 진행했습니다.', input), true);
-  assert.equal(
-    isGenericDiagnosis('차량의 주행 계통을 점검한 결과 컨트롤러 이상이 확인되었습니다.', input),
-    false,
-  );
-});
-
-test('validateDraftQuality rejects insufficient expansion', () => {
-  const input = normalizeDraftInput(repairInputSuv);
-  const result = validateDraftQuality({
-    ...repairSampleDraftSuv,
-    summary: '주행 불가 점검을 진행했습니다.',
-    diagnosis: '증상에 대해 점검을 진행했습니다.',
-    workDetails: '컨트롤러 교체',
-    result: '주행 정상 확인',
-  }, input);
-  assert.equal(result.ok, false);
-  assert.equal(result.reason, 'insufficient_expansion');
-  assert.ok(result.expansionViolations.length >= 3);
-});
-
-test('validateDraftQuality rejects field duplication across repair fields', () => {
-  const input = normalizeDraftInput(repairInputSuv);
-  const result = validateDraftQuality({
-    ...repairSampleDraftSuv,
-    diagnosis: '차량의 주행 계통을 점검한 결과 컨트롤러 이상이 확인되었습니다. 충전기 작동 상태도 점검했습니다.',
-    workDetails: '충전기 작동 상태를 점검하고 시운전을 진행했습니다.',
-    result: '시운전을 통해 차량이 정상적으로 주행하는 것을 확인했습니다.',
-    summary: '산업용 SUV에서 주행 불가 증상으로 점검을 진행했습니다. 충전기 상태를 확인하고 시운전을 진행했습니다.',
-  }, input);
-  assert.equal(result.ok, false);
-  assert.equal(result.reason, 'field_duplication');
-  assert.ok(result.duplicationViolations.length >= 1);
-});
-
-test('findDraftFieldDuplicationViolations detects repeated topics', () => {
-  const input = normalizeDraftInput({ contentType: 'repair', vehicle: '테스트', symptoms: ['주행 불량'] });
-  const violations = findDraftFieldDuplicationViolations({
-    summary: '시운전을 진행했습니다.',
-    diagnosis: '컨트롤러 이상이 확인되었습니다.',
-    workDetails: '시운전을 진행했습니다.',
-    result: '정상 주행을 확인했습니다.',
-  }, input);
-  assert.ok(violations.some((v) => v.issue === 'repeated_topic' && v.topic === 'test_drive'));
-});
-
-test('callOpenAiDraft retries once when expansion quality fails', async () => {
-  let calls = 0;
-  const fetchImpl = async () => {
-    calls += 1;
-    if (calls === 1) {
-      return openAiSuccessResponse({
-        ...repairSampleDraft,
-        result: '주행 정상 확인',
-      });
-    }
-    return openAiSuccessResponse(repairSampleDraftSuv);
-  };
-  const result = await callOpenAiDraft(env, normalizeDraftInput(repairInputSuv), fetchImpl);
-  assert.equal(result.ok, true);
-  assert.equal(calls, 2);
-});
-
 test('normalizeRepairWorkItemLabel normalizes spacing and brush spelling', () => {
   assert.equal(normalizeRepairWorkItemLabel('배선교체'), '배선 교체');
   assert.equal(normalizeRepairWorkItemLabel('카본브러쉬 교체'), '카본브러시 교체');
@@ -401,20 +324,16 @@ test('callOpenAiDraft handles timeout', async () => {
   assert.equal(result.code, 'OPENAI_TIMEOUT');
 });
 
-test('callOpenAiDraft retries once on meaningless title', async () => {
+test('callOpenAiDraft does not retry on meaningless title', async () => {
   let calls = 0;
   const fetchImpl = async () => {
     calls += 1;
-    return openAiSuccessResponse(
-      calls === 1
-        ? { ...repairSampleDraft, title: '456' }
-        : repairSampleDraft,
-    );
+    return openAiSuccessResponse({ ...repairSampleDraft, title: '456' });
   };
   const result = await callOpenAiDraft(env, normalizeDraftInput(repairInput1), fetchImpl);
-  assert.equal(result.ok, true);
-  assert.equal(calls, 2);
-  assert.notEqual(result.draft.title, '456');
+  assert.equal(result.ok, false);
+  assert.equal(calls, 1);
+  assert.equal(result.qualityReason, 'numeric_title');
 });
 
 test('callOpenAiDraft does not invent replacement when only inspection work', async () => {
@@ -477,7 +396,6 @@ test('real OpenAI integration repair input 2', { skip: !process.env.OPENAI_API_K
   );
   assert.equal(result.ok, true, JSON.stringify(result));
   assert.match(result.draft.diagnosis, /컨트롤러/);
-  assert.equal(findDraftFieldDuplicationViolations(result.draft, normalizeDraftInput(repairInputSuv)).length, 0);
 });
 
 test('production schema draft sanitizes productionDetails and features', () => {
@@ -520,7 +438,7 @@ test('generate-case-draft handler returns 503 without API key', async () => {
   });
   assert.equal(response.status, 503);
   const body = await response.json();
-  assert.equal(body.code, 'OPENAI_CONFIG_MISSING');
+  assert.equal(body.code, 'CONFIG_ERROR');
   assert.equal(body.success, false);
   assert.ok(body.requestId);
 });
