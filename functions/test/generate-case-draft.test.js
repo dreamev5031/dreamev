@@ -14,6 +14,8 @@ import {
   validateDraftQuality,
   normalizeRepairWorkItemLabel,
   findUnselectedWorkMentions,
+  findInformalSpeechInText,
+  findDraftInformalSpeechViolations,
 } from '../lib/openai-draft.js';
 
 const env = {
@@ -71,6 +73,61 @@ const repairSampleDraft = {
   seoDescription: '전진 불량 증상의 산업용 전동차에서 전자브레이크 쇼트를 확인하고 배선 보수를 진행한 수리 사례입니다.',
   keywords: ['산업용 전동차 수리', '전동차 전진 불량', '전자브레이크 쇼트', '전동차 배선 보수'],
 };
+
+test('findInformalSpeechInText detects haera-che sentence endings only', () => {
+  assert.deepEqual(findInformalSpeechInText('점검을 진행했다.'), ['했다.']);
+  assert.deepEqual(findInformalSpeechInText('점검을 진행했습니다.'), []);
+  assert.deepEqual(findInformalSpeechInText('주행 불량 전자브레이크 수리'), []);
+  assert.deepEqual(findInformalSpeechInText('요청했다. 작업 후 확인했습니다.'), ['했다.']);
+});
+
+test('validateDraftQuality rejects informal speech in body fields', () => {
+  const input = normalizeDraftInput(repairInput2);
+  const result = validateDraftQuality({
+    ...repairSampleDraft,
+    summary: '주행이 되지 않는 증상으로 점검을 요청했다.',
+    customerRequest: '점검을 요청받았습니다.',
+  }, input);
+  assert.equal(result.ok, false);
+  assert.equal(result.reason, 'informal_speech');
+});
+
+test('validateDraftQuality allows noun-style title with informal-like substring', () => {
+  const input = normalizeDraftInput(repairInput1);
+  const result = validateDraftQuality({
+    ...repairSampleDraft,
+    title: '산업용 전동차 전진 불량 배선 수리',
+  }, input);
+  assert.equal(result.ok, true);
+});
+
+test('callOpenAiDraft retries once when informal speech detected', async () => {
+  let calls = 0;
+  const fetchImpl = async () => {
+    calls += 1;
+    if (calls === 1) {
+      return openAiSuccessResponse({
+        ...repairSampleDraft,
+        workDetails: '컨트롤러를 교체하고 충전기 상태를 점검했다.',
+      });
+    }
+    return openAiSuccessResponse(repairSampleDraft);
+  };
+  const result = await callOpenAiDraft(env, normalizeDraftInput(repairInput2), fetchImpl);
+  assert.equal(result.ok, true);
+  assert.equal(calls, 2);
+});
+
+test('callOpenAiDraft fails without auto-replace when informal speech persists', async () => {
+  const fetchImpl = async () => openAiSuccessResponse({
+    ...repairSampleDraft,
+    result: '작업 후 정상 주행을 확인했다.',
+  });
+  const result = await callOpenAiDraft(env, normalizeDraftInput(repairInput2), fetchImpl);
+  assert.equal(result.ok, false);
+  assert.equal(result.qualityReason, 'informal_speech');
+  assert.match(result.message, /존댓말/);
+});
 
 test('normalizeRepairWorkItemLabel normalizes spacing and brush spelling', () => {
   assert.equal(normalizeRepairWorkItemLabel('배선교체'), '배선 교체');

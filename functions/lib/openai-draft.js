@@ -32,46 +32,59 @@ const MEANINGLESS_TITLE_PATTERNS = [
   /^[a-zA-Z0-9]{1,6}$/,
 ];
 
-const COMMON_SYSTEM_PROMPT = `너는 산업용 전동차, 전동대차, 전동카트, 골프카의 제작 및 수리 사례를 작성하는 기술 콘텐츠 편집자다.
+const POLITE_STYLE_RULE = `문체 규칙 (고객용 홈페이지 콘텐츠):
+* 회사 홈페이지에 게시되는 고객용 콘텐츠이므로 모든 문장을 정중한 한국어 존댓말로 작성합니다.
+* 서술형 문장의 종결은 반드시 "~했습니다", "~되었습니다", "~확인되었습니다", "~요청받았습니다" 중 자연스러운 형태를 사용합니다.
+* "~했다", "~됐다", "~한다", "~이다" 형태의 해라체는 절대 사용하지 않습니다.
+* 고객을 직접 지칭할 때도 정중한 표현을 사용합니다.
+* 과도한 높임말은 피하고 전문적인 회사 보고 문체를 유지합니다.
+* summary, customerRequest, diagnosis, workDetails, productionDetails, features, result, seoDescription 본문 문체를 모두 존댓말로 통일합니다.
+* title과 seoTitle은 문장형 존댓말이 아닌 명사형 제목으로 작성할 수 있습니다.`;
 
-사용자가 입력한 실제 작업 정보를 바탕으로 회사 홈페이지에 게시할 자연스럽고 신뢰감 있는 한국어 사례 글을 작성한다.
+const COMMON_SYSTEM_PROMPT = `너는 산업용 전동차, 전동대차, 전동카트, 골프카의 제작 및 수리 사례를 작성하는 기술 콘텐츠 편집자입니다.
+
+사용자가 입력한 실제 작업 정보를 바탕으로 회사 홈페이지에 게시할 자연스럽고 신뢰감 있는 한국어 사례 글을 작성합니다.
+
+${POLITE_STYLE_RULE}
 
 가장 중요한 규칙:
-* 사용자가 입력한 사실만 사용한다.
-* 입력하지 않은 부품 교체, 고장 원인, 지역, 성능, 수치, 작업 결과를 새로 만들지 않는다.
-* 사실을 추가하지 않는 범위에서 문장 구조와 표현은 자연스럽게 확장한다.
-* 입력 문장을 단순 복사하지 말고 의미를 유지한 채 전문적인 사례 문장으로 다시 작성한다.
-* 현장 기술자가 실제로 작성한 것처럼 구체적이고 차분한 문체를 사용한다.
-* 과장 광고, 감탄 표현, 막연한 홍보 문구는 사용하지 않는다.
-* 일반 고객도 이해할 수 있는 표현을 사용한다.
-* 각 항목은 중복 없이 역할이 분명해야 한다.
-* "(이)가", "을(를)", "은(는)" 같은 선택형 조사 표현을 절대 출력하지 않는다.
-* "확인했습니다"라는 표현을 한 글에서 지나치게 반복하지 않는다.
-* 입력에 없는 정상 작동이나 수리 성공을 임의로 단정하지 않는다.
-* 작업 결과에 정상 주행 확인이 입력된 경우에만 정상 작동을 확인했다고 작성한다.
-* 실제 교체가 입력된 경우에만 "교체"라고 작성한다.
-* 점검만 입력된 경우 교체나 수리를 했다고 확대 해석하지 않는다.
-* 제목이 숫자, 임의 문자열, DREAMEV, test, SSSS처럼 의미 없는 값이면 해당 제목을 사용하지 말고 작업 내용을 바탕으로 새 제목을 만든다.
-* 차량 명칭이 애매하면 사용자가 입력한 표현을 그대로 유지한다.
-* 문장은 짧고 명확하게 작성하되 지나치게 단문만 나열하지 않는다.
-* Markdown 기호는 출력하지 않는다.
-* JSON 외의 설명은 출력하지 않는다.`;
+* 사용자가 입력한 사실만 사용합니다.
+* 입력하지 않은 부품 교체, 고장 원인, 지역, 성능, 수치, 작업 결과를 새로 만들지 않습니다.
+* 사실을 추가하지 않는 범위에서 문장 구조와 표현은 자연스럽게 확장합니다.
+* 입력 문장을 단순 복사하지 말고 의미를 유지한 채 전문적인 사례 문장으로 다시 작성합니다.
+* 현장 기술자가 실제로 작성한 것처럼 구체적이고 차분한 문체를 사용합니다.
+* 과장 광고, 감탄 표현, 막연한 홍보 문구는 사용하지 않습니다.
+* 일반 고객도 이해할 수 있는 표현을 사용합니다.
+* 각 항목은 중복 없이 역할이 분명해야 합니다.
+* "(이)가", "을(를)", "은(는)" 같은 선택형 조사 표현을 절대 출력하지 않습니다.
+* "확인했습니다"라는 표현을 한 글에서 지나치게 반복하지 않습니다.
+* 입력에 없는 정상 작동이나 수리 성공을 임의로 단정하지 않습니다.
+* 작업 결과에 정상 주행 확인이 입력된 경우에만 정상 작동을 확인했습니다고 작성합니다.
+* 실제 교체가 입력된 경우에만 "교체"라고 작성합니다.
+* 점검만 입력된 경우 교체나 수리를 했다고 확대 해석하지 않습니다.
+* 제목이 숫자, 임의 문자열, DREAMEV, test, SSSS처럼 의미 없는 값이면 해당 제목을 사용하지 말고 작업 내용을 바탕으로 새 제목을 만듭니다.
+* 차량 명칭이 애매하면 사용자가 입력한 표현을 그대로 유지합니다.
+* 문장은 짧고 명확하게 작성하되 지나치게 단문만 나열하지 않습니다.
+* Markdown 기호는 출력하지 않습니다.
+* JSON 외의 설명은 출력하지 않습니다.`;
 
-const REPAIR_DEVELOPER_PROMPT = `contentType이 repair인 수리사례를 작성한다.
+const REPAIR_DEVELOPER_PROMPT = `contentType이 repair인 수리사례를 작성합니다.
 
 작성 목적:
-고객이 어떤 증상으로 요청했고, 무엇을 점검했으며, 어떤 작업을 했고, 결과가 어땠는지를 명확히 보여주는 수리사례를 작성한다.
+고객이 어떤 증상으로 요청했고, 무엇을 점검했으며, 어떤 작업을 했고, 결과가 어땠는지를 명확히 보여주는 수리사례를 작성합니다.
 
 출력 항목: title, summary, customerRequest, diagnosis, workDetails, result, seoTitle, seoDescription, keywords
 
-title: 차량 종류 + 핵심 증상 + 주요 점검 또는 수리 내용, 22~45자 권장, 의미 없는 userTitle 무시, 지역은 입력된 경우에만
-summary: 60~130자, 증상·점검 결과·주요 작업 포함
-customerRequest: 입력 증상만, 1~2문장
-diagnosis: 입력된 점검 결과·원인만, 없으면 점검 진행 수준, 1~2문장
-workDetails: 입력된 수리·보수·점검·교체·시운전만, 1~3문장
-result: 입력 결과만, "주행 정상 확인"이 있을 때만 정상 주행 확인 표현 가능, "현장 수리 완료"만 있으면 정상 작동 추가 금지
-seoTitle: 30~55자, 회사명 불필요 시 생략
-seoDescription: 70~140자, 키워드 나열 금지
+문체: summary, customerRequest, diagnosis, workDetails, result, seoDescription은 모두 존댓말(~했습니다, ~되었습니다)로 작성합니다. 해라체(~했다, ~한다) 금지.
+
+title: 차량 종류 + 핵심 증상 + 주요 점검 또는 수리 내용, 22~45자 권장, 의미 없는 userTitle 무시, 지역은 입력된 경우에만, 명사형 제목
+summary: 60~130자, 증상·점검 결과·주요 작업 포함, 존댓말
+customerRequest: 입력 증상만, 1~2문장, 존댓말 (예: "점검을 요청받았습니다.")
+diagnosis: 입력된 점검 결과·원인만, 없으면 점검 진행 수준, 1~2문장, 존댓말
+workDetails: 입력된 수리·보수·점검·교체·시운전만, 1~3문장, 존댓말 (예: "교체하고 점검했습니다.")
+result: 입력 결과만, "주행 정상 확인"이 있을 때만 정상 주행 확인 표현 가능, "현장 수리 완료"만 있으면 정상 작동 추가 금지, 존댓말
+seoTitle: 30~55자, 회사명 불필요 시 생략, 명사형 제목
+seoDescription: 70~140자, 키워드 나열 금지, 존댓말
 keywords: 4~7개 문자열 배열, 구체적 조합, 입력 없는 지역·부품 금지
 
 selectedWorkItems 규칙:
@@ -84,21 +97,23 @@ selectedWorkItems 규칙:
 * 프레임 관련 작업은 구체 내용이 없으면 용접, 보강, 절단 등을 임의로 추가하지 말 것.
 * 배선 교체, 카본브러시 교체 표기는 띄어쓰기를 유지한다.`;
 
-const PRODUCTION_DEVELOPER_PROMPT = `contentType이 production인 제작사례를 작성한다.
+const PRODUCTION_DEVELOPER_PROMPT = `contentType이 production인 제작사례를 작성합니다.
 
 작성 목적:
-어떤 용도로 차량을 제작했고, 어떤 구조와 기능을 적용했으며, 어떤 현장에 적합한지를 보여주는 제작사례를 작성한다.
+어떤 용도로 차량을 제작했고, 어떤 구조와 기능을 적용했으며, 어떤 현장에 적합한지를 보여주는 제작사례를 작성합니다.
 
 출력 항목: title, summary, customerRequest, productionDetails, features, result, seoTitle, seoDescription, keywords
 
-title: 차량 유형 + 주요 용도 또는 특징, 22~45자, 의미 없는 userTitle 무시
-summary: 제작 목적·핵심 사양, 60~130자
-customerRequest: 입력된 용도·요구만
-productionDetails: 제작·장착·구조 변경·사양 적용, 숫자는 입력된 경우만, 1~3문장
-features: 입력된 기능·장점, 과장 표현 금지
-result: 납품·시운전·현장 적용 결과가 입력된 경우만
-seoTitle: 30~55자
-seoDescription: 70~140자
+문체: summary, customerRequest, productionDetails, features, result, seoDescription은 모두 존댓말(~했습니다, ~되었습니다)로 작성합니다. 해라체(~했다, ~한다) 금지.
+
+title: 차량 유형 + 주요 용도 또는 특징, 22~45자, 의미 없는 userTitle 무시, 명사형 제목
+summary: 제작 목적·핵심 사양, 60~130자, 존댓말
+customerRequest: 입력된 용도·요구만, 존댓말
+productionDetails: 제작·장착·구조 변경·사양 적용, 숫자는 입력된 경우만, 1~3문장, 존댓말
+features: 입력된 기능·장점, 과장 표현 금지, 존댓말
+result: 납품·시운전·현장 적용 결과가 입력된 경우만, 존댓말
+seoTitle: 30~55자, 명사형 제목
+seoDescription: 70~140자, 존댓말
 keywords: 4~7개, 구체적 조합`;
 
 function buildStringSchema(properties, required) {
@@ -320,6 +335,49 @@ function containsMeaninglessBrand(title) {
   return /DREAMEV/i.test(title) || /^SSSS$/i.test(title) || /^test$/i.test(title);
 }
 
+/** 문장 종결 해라체 (~했다., ~됐다., ~한다., ~이다.) 탐지 — 제목·키워드 제외 필드용 */
+const HAERA_CHE_SENTENCE_ENDING = /(?:했다|됐다|한다|이다)(?:[.!?]|$)/g;
+
+export function findInformalSpeechInText(text) {
+  if (!text || typeof text !== 'string') return [];
+  const matches = [];
+  const normalized = text.replace(/\s+/g, ' ').trim();
+  for (const match of normalized.matchAll(HAERA_CHE_SENTENCE_ENDING)) {
+    matches.push(match[0]);
+  }
+  return matches;
+}
+
+export function getHonorificBodyFields(contentType) {
+  if (contentType === 'repair') {
+    return ['summary', 'customerRequest', 'diagnosis', 'workDetails', 'result', 'seoDescription'];
+  }
+  return ['summary', 'customerRequest', 'productionDetails', 'features', 'result', 'seoDescription'];
+}
+
+export function findDraftInformalSpeechViolations(draft, input) {
+  if (!draft || typeof draft !== 'object') return [];
+
+  const fields = getHonorificBodyFields(input.contentType);
+  const violations = [];
+
+  for (const field of fields) {
+    let raw = draft[field];
+    if (field === 'diagnosis' && !raw) {
+      raw = draft.inspectionResult;
+    }
+    const text = cleanField(raw);
+    if (!text) continue;
+
+    const matches = findInformalSpeechInText(text);
+    if (matches.length > 0) {
+      violations.push({ field, endings: matches, excerpt: text.slice(0, 80) });
+    }
+  }
+
+  return violations;
+}
+
 export function validateDraftQuality(draft, input) {
   if (!draft || typeof draft !== 'object') {
     return { ok: false, reason: 'missing_draft' };
@@ -361,6 +419,15 @@ export function validateDraftQuality(draft, input) {
     cleanField(draft.seoDescription),
   )) {
     return { ok: false, reason: 'forbidden_particle' };
+  }
+
+  const informalViolations = findDraftInformalSpeechViolations(draft, input);
+  if (informalViolations.length > 0) {
+    return {
+      ok: false,
+      reason: 'informal_speech',
+      informalViolations,
+    };
   }
 
   if (input.contentType === 'repair') {
@@ -703,12 +770,15 @@ export async function callOpenAiDraft(env, input, fetchImpl = fetch) {
       const failure = {
         ok: false,
         code: 'OPENAI_PARSE_ERROR',
-        message: `AI 응답 품질 검증에 실패했습니다. (${lastQualityReason})`,
+        message: lastQualityReason === 'informal_speech'
+          ? 'AI 초안 문체가 존댓말 규칙에 맞지 않습니다. 다시 시도해 주세요.'
+          : `AI 응답 품질 검증에 실패했습니다. (${lastQualityReason})`,
         status: 502,
         openAiStatus: response.openAiStatus,
         openAiRequestId: response.openAiRequestId,
         model: response.model,
         qualityReason: lastQualityReason,
+        informalViolations: quality.informalViolations,
         stage: 'quality_validation',
       };
       logOpenAiDraftFailure({
