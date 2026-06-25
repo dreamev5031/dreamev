@@ -4,8 +4,12 @@ import {
   ALLOWED_CATEGORIES,
   buildMarkdown,
   buildMdBaseName,
+  buildRepairMarkdown,
+  buildRepairMdBaseName,
   isValidImageFileName,
   isValidMdFileName,
+  normalizeContentType,
+  parseRepairFrontmatter,
   resolveMdFileName,
   validateCategory,
   validateGalleryMatches,
@@ -71,13 +75,14 @@ test('markdown frontmatter field order', () => {
   const lines = md.split('\n');
   assert.equal(lines[0], '---');
   assert.match(lines[1], /^title:/);
-  assert.match(lines[2], /^category:/);
-  assert.match(lines[3], /^gallery:/);
-  assert.match(lines[4], /^\s+- image: \/images\//);
-  assert.equal(lines[5], '');
-  assert.match(lines[6], /^date:/);
-  assert.equal(lines[7], '---');
-  assert.equal(lines[8], '');
+  assert.match(lines[2], /^type: production/);
+  assert.match(lines[3], /^category:/);
+  assert.match(lines[4], /^gallery:/);
+  assert.match(lines[5], /^\s+- image: \/images\//);
+  assert.equal(lines[6], '');
+  assert.match(lines[7], /^date:/);
+  assert.equal(lines[8], '---');
+  assert.equal(lines[9], '');
   assert.match(md, /## 고객 요청/);
 });
 
@@ -103,4 +108,40 @@ test('gallery mismatch is rejected', () => {
   });
   const check = validateGalleryMatches(names, md);
   assert.equal(check.ok, false);
+});
+
+test('normalizeContentType defaults to production', () => {
+  assert.equal(normalizeContentType(''), 'production');
+  assert.equal(normalizeContentType(undefined), 'production');
+  assert.equal(normalizeContentType('repair'), 'repair');
+});
+
+test('repair markdown has no category', () => {
+  const md = buildRepairMarkdown({
+    title: '산업용 전동차 전진 불량 수리',
+    vehicle: '산업용 전동차',
+    location: '양주',
+    date: '2026-06-24',
+    imageFileNames: ['20260624-122830-01.webp'],
+    summary: '전진 불량 증상 수리',
+    customerRequest: '전진 불량으로 점검 요청',
+    inspectionResult: '배선 단선 확인',
+    workDetails: '배선 보수 및 시운전',
+    result: '수리 후 정상 주행 확인',
+  });
+  assert.match(md, /type: repair/);
+  assert.match(md, /vehicle: 산업용 전동차/);
+  assert.match(md, /location: 양주/);
+  assert.doesNotMatch(md, /^category:/m);
+  assert.match(md, /## 점검 결과/);
+  assert.match(md, /## 수리 및 작업 내용/);
+  const parsed = parseRepairFrontmatter(md);
+  assert.equal(parsed.ok, true);
+  assert.equal(parsed.title, '산업용 전동차 전진 불량 수리');
+  assert.equal(parsed.gallery.length, 1);
+});
+
+test('repair md filename uses title only', () => {
+  const base = buildRepairMdBaseName('전진 불량 수리');
+  assert.equal(base, '전진-불량-수리');
 });

@@ -24,14 +24,14 @@ export async function pathExists(env, path) {
   return true;
 }
 
-export async function listExistingMdNames(env) {
+export async function listExistingMdNames(env, contentDir = 'public/content/cases') {
   const { owner, repo } = repoBase(env);
   const token = env.GITHUB_TOKEN;
-  const res = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/public/content/cases`, {
+  const res = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${contentDir}`, {
     headers: githubHeaders(token),
   });
   if (res.status === 404) return new Set();
-  if (!res.ok) throw new Error(`GitHub list cases failed: ${res.status}`);
+  if (!res.ok) throw new Error(`GitHub list ${contentDir} failed: ${res.status}`);
   const data = await res.json();
   if (!Array.isArray(data)) return new Set();
   return new Set(data.filter((f) => f.type === 'file' && f.name.endsWith('.md')).map((f) => f.name));

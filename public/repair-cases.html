@@ -4,14 +4,14 @@
     <meta charset="UTF-8">
     <meta name="naver-site-verification" content="ace2af17fbb8c6d1e47c18d8fabd4258501fd952" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>전동차 제작·수리 사례 | 드림전동차</title>
-    <meta name="description" content="산업용 전동차 맞춤 제작, 전동대차 수리, 전장 계통 점검과 차량 개조 등 드림전동차의 작업 사례를 확인해 보세요.">
-    <link rel="canonical" href="https://dreamev.kr/cases.html">
+    <title>전동차 수리 사례 | 드림전동차</title>
+    <meta name="description" content="산업용 전동차, 전동대차, 전동카트, 골프카의 주행 불량, 배선, 컨트롤러, 브레이크 및 전장 수리 사례를 확인하세요.">
+    <link rel="canonical" href="https://dreamev.kr/repair-cases">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="드림전동차">
-    <meta property="og:title" content="전동차 제작·수리 사례 | 드림전동차">
-    <meta property="og:description" content="맞춤 제작과 고장 수리, 부품 교체 및 차량 개조 작업 사례를 소개합니다.">
-    <meta property="og:url" content="https://dreamev.kr/cases.html">
+    <meta property="og:title" content="전동차 수리 사례 | 드림전동차">
+    <meta property="og:description" content="산업용 전동차, 전동대차, 전동카트, 골프카의 고장 진단과 수리 사례를 확인하세요.">
+    <meta property="og:url" content="https://dreamev.kr/repair-cases">
     <meta property="og:image" content="https://dreamev.kr/images/og-dreamev.jpg">
     <link rel="stylesheet" href="css/style.css?v=20260214-999">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
@@ -28,8 +28,8 @@
             <ul class="mobile-menu-list">
                 <li><a href="index.html">처음으로</a></li>
                 <li><a href="about.html">회사소개</a></li>
-                <li><a href="cases.html" class="active">제작사례</a></li>
-                <li><a href="repair-cases.html">수리사례</a></li>
+                <li><a href="cases.html">제작사례</a></li>
+                <li><a href="repair-cases.html" class="active">수리사례</a></li>
                 <li><a href="support.html">고객센터</a></li>
                 <li><a href="contact.html">상담·견적 문의</a></li>
             </ul>
@@ -44,53 +44,21 @@
         <a href="contact.html" class="header-btn btn-primary">상담·견적 문의</a>
     </header>
 
-    <!-- 제작 사례 갤러리 (카테고리 선택 + 갤러리) -->
+    <!-- 수리 사례 갤러리 -->
     <section class="case-page-section">
         <div class="page-header gallery-header hero hero--subpage case-page-hero">
             <div class="header-icon-box">
-                <i class="fas fa-images"></i>
+                <i class="fas fa-wrench"></i>
             </div>
             <div class="header-text-box">
-                <h2>PORTFOLIO GALLERY</h2>
-                <h3>드림전동차 제작 사례</h3>
-                <p>현장의 요구에 완벽히 부응하는 맞춤형 라인업을 생생한 사진으로 확인하세요.</p>
-                <button type="button" class="btn-all-cases" id="btnAllCases">전체 보기</button>
+                <h2>REPAIR CASES</h2>
+                <h3>드림전동차 수리 사례</h3>
+                <p>산업용 전동차, 전동대차, 전동카트 및 골프카의 고장 진단과 수리 사례를 확인하세요.</p>
             </div>
         </div>
-        <div class="case-grid-container" id="caseCategoryNav">
-            <button type="button" class="case-item-card" data-category="industrial" aria-pressed="false">
-                <div class="icon-box"><i class="fas fa-industry"></i></div>
-                <div class="text-box">
-                    <h3>산업용 전동차</h3>
-                    <p>건설 및 물류 현장 최적화</p>
-                </div>
-            </button>
-            <button type="button" class="case-item-card" data-category="agricultural" aria-pressed="false">
-                <div class="icon-box"><i class="fas fa-tractor"></i></div>
-                <div class="text-box">
-                    <h3>농업용 전동차</h3>
-                    <p>농가 환경 맞춤형 설계</p>
-                </div>
-            </button>
-            <button type="button" class="case-item-card" data-category="multipurpose" aria-pressed="false">
-                <div class="icon-box"><i class="fas fa-th-large"></i></div>
-                <div class="text-box">
-                    <h3>다목적 전동차</h3>
-                    <p>다양한 용도의 전천후 기동</p>
-                </div>
-            </button>
-            <button type="button" class="case-item-card" data-category="custom" aria-pressed="false">
-                <div class="icon-box"><i class="fas fa-pencil-ruler"></i></div>
-                <div class="text-box">
-                    <h3>맞춤제작</h3>
-                    <p>1:1 커스텀 제작</p>
-                </div>
-            </button>
-        </div>
         <div class="case-gallery-wrap">
-            <p class="gallery-label">선택한 카테고리의 제작 사례</p>
-            <div class="gallery" id="caseGallery" data-dynamic="true">
-                <!-- 갤러리: content/cases 마크다운 Frontmatter만 사용. 폴더 스캔·cases.json 미사용. CMS 발행 게시물의 이미지만 표시. -->
+            <p class="gallery-label">최신 수리 사례</p>
+            <div class="gallery gallery--repair" id="caseGallery" data-dynamic="true">
             </div>
         </div>
     </section>
@@ -124,7 +92,7 @@
         </div>
     </footer>
 
-    <!-- 제작사례 상세 모달 (이미지·제목·날짜·설명) -->
+    <!-- 수리사례 상세 모달 -->
     <div class="case-modal" id="caseModal" aria-hidden="true">
         <div class="case-modal-overlay" aria-label="모달 닫기"></div>
         <div class="case-modal-content">
@@ -134,11 +102,17 @@
             </div>
             <div class="case-modal-body">
                 <div class="case-modal-header">
-                    <span class="case-modal-category" id="modalCategory"></span>
+                    <p class="case-modal-meta" id="modalMeta"></p>
                     <h2 class="case-modal-title" id="modalTitle"></h2>
                     <p class="case-modal-date" id="modalDate"></p>
                 </div>
                 <div class="case-modal-text" id="modalContent"></div>
+                <div class="case-modal-actions">
+                    <button type="button" class="case-modal-nav-btn" id="modalPrev">이전 글</button>
+                    <button type="button" class="case-modal-nav-btn" id="modalNext">다음 글</button>
+                    <a href="repair-cases.html" class="case-modal-nav-btn case-modal-back" id="modalBackList">목록으로</a>
+                    <a href="contact.html" class="header-btn btn-primary case-modal-contact">상담·견적 문의</a>
+                </div>
             </div>
         </div>
     </div>
@@ -201,15 +175,8 @@
         })();
         */
 
-        // CMS/콘텐츠 데이터 로드 (DOM 조작 없이 데이터만 반환)
+        // 수리사례 콘텐츠 로드
         (function() {
-            var categoryMap = {
-                '산업용': 'industrial',
-                '농업용': 'agricultural',
-                '다목적': 'multipurpose',
-                '맞춤제작': 'custom'
-            };
-
             function parseFrontmatter(content) {
                 var frontmatter = {};
                 var body = '';
@@ -246,9 +213,14 @@
                 return frontmatter;
             }
 
-            // content/cases 폴더에서 마크다운 기반 제작사례 목록 반환 (Promise). 파일명은 전부 콘텐츠에서 로드.
-            window.loadCasesFromContent = function() {
-                var apiUrl = 'https://api.github.com/repos/dreamev5031/dreamev/contents/public/content/cases';
+            function extractSummary(body) {
+                if (!body) return '';
+                var text = body.replace(/^##\s+.+$/gm, '').replace(/\s+/g, ' ').trim();
+                return text.length > 120 ? text.slice(0, 117) + '...' : text;
+            }
+
+            window.loadRepairCasesFromContent = function() {
+                var apiUrl = 'https://api.github.com/repos/dreamev5031/dreamev/contents/public/content/repair-cases';
                 return fetch(apiUrl)
                     .then(function(response) {
                         if (!response.ok) return [];
@@ -262,24 +234,23 @@
                                 .then(function(r) { return r.text(); })
                                 .then(function(content) {
                                     var frontmatter = parseFrontmatter(content);
-                                    var rawCat = (frontmatter.category != null ? String(frontmatter.category) : '').trim();
-                                    var category = categoryMap[rawCat] || rawCat.toLowerCase().replace(/\s+/g, '');
-                                    var galleryList = frontmatter.gallery && Array.isArray(frontmatter.gallery) ? frontmatter.gallery : (frontmatter.image ? [{ image: frontmatter.image }] : []);
-                                    var firstImage = (galleryList[0] && galleryList[0].image) || frontmatter.image || '';
+                                    var galleryList = frontmatter.gallery && Array.isArray(frontmatter.gallery) ? frontmatter.gallery : [];
+                                    var firstImage = (galleryList[0] && galleryList[0].image) || '';
                                     return {
                                         title: frontmatter.title || '',
-                                        category: category,
-                                        categoryLabel: frontmatter.category || '',
+                                        vehicle: frontmatter.vehicle || '',
+                                        location: frontmatter.location || '',
                                         image: firstImage,
                                         gallery: galleryList,
                                         date: frontmatter.date || '',
                                         body: frontmatter.body || '',
+                                        summary: extractSummary(frontmatter.body || ''),
                                         _filename: file.name || ''
                                     };
                                 })
                                 .catch(function() { return null; });
                         })).then(function(cases) {
-                            var list = (cases || []).filter(function(c) { return c && ((c.gallery && c.gallery.length) || c.image); });
+                            var list = (cases || []).filter(function(c) { return c && c.gallery && c.gallery.length; });
                             list.sort(function(a, b) {
                                 var aT = (a.date && new Date(a.date).getTime()) || 0;
                                 var bT = (b.date && new Date(b.date).getTime()) || 0;
@@ -291,18 +262,17 @@
                     })
                     .catch(function() { return []; });
             };
-
-            // 폴더 스캔(glob/fs) 없음. 제작사례는 content/cases 마크다운 Frontmatter의 gallery/image만 사용.
         })();
 
         // Modal functionality
         (function() {
             var modal = document.getElementById('caseModal');
             var modalClose = document.getElementById('modalClose');
-            var modalCategory = document.getElementById('modalCategory');
+            var modalMeta = document.getElementById('modalMeta');
             var modalTitle = document.getElementById('modalTitle');
             var modalContent = document.getElementById('modalContent');
             var modalOverlay = modal ? modal.querySelector('.case-modal-overlay') : null;
+            var currentModalIndex = -1;
 
             // 날짜 포맷 (YYYY-MM-DD 또는 ISO 문자열 → 읽기 쉬운 형식)
             function formatDate(str) {
@@ -351,10 +321,17 @@
             }
 
             // Open modal with case data (이미지 확대, 제목·날짜·상세 설명). gallery면 여러 장, image면 한 장 출력.
-            window.openCaseModal = function(caseData) {
+            window.openCaseModal = function(caseData, index) {
                 if (!modal) return;
-                modalTitle.textContent = caseData.title || '제작사례';
-                modalCategory.textContent = caseData.categoryLabel || caseData.category || '';
+                if (typeof index === 'number') currentModalIndex = index;
+                modalTitle.textContent = caseData.title || '수리사례';
+                if (modalMeta) {
+                    var metaParts = [];
+                    if (caseData.vehicle) metaParts.push(caseData.vehicle);
+                    if (caseData.location) metaParts.push(caseData.location);
+                    modalMeta.textContent = metaParts.join(' · ');
+                    modalMeta.style.display = metaParts.length ? 'block' : 'none';
+                }
                 var modalDateEl = document.getElementById('modalDate');
                 if (modalDateEl) modalDateEl.textContent = formatDate(caseData.date || '');
                 var bodyContent = caseData.description || caseData.body || '';
@@ -364,10 +341,53 @@
                     modalContent.innerHTML = bodyContent ? ('<p>' + bodyContent.replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>') + '</p>') : '';
                 }
                 renderModalImages(modalImageContainer, caseData);
+                updateModalNav();
                 modal.classList.add('active');
                 modal.setAttribute('aria-hidden', 'false');
                 document.body.style.overflow = 'hidden';
+                if (caseData.title) {
+                    document.title = caseData.title + ' | 드림전동차';
+                    var desc = (caseData.summary || bodyContent || '').replace(/\s+/g, ' ').trim().slice(0, 150);
+                    var metaDesc = document.querySelector('meta[name="description"]');
+                    if (metaDesc && desc) metaDesc.setAttribute('content', desc);
+                    var ogTitle = document.querySelector('meta[property="og:title"]');
+                    if (ogTitle) ogTitle.setAttribute('content', caseData.title + ' | 드림전동차');
+                    var ogDesc = document.querySelector('meta[property="og:description"]');
+                    if (ogDesc && desc) ogDesc.setAttribute('content', desc);
+                    var gallery = caseData.gallery && caseData.gallery.length ? caseData.gallery : [];
+                    var ogImg = gallery[0] && gallery[0].image ? gallery[0].image : caseData.image;
+                    if (ogImg) {
+                        var ogImage = document.querySelector('meta[property="og:image"]');
+                        if (ogImage) ogImage.setAttribute('content', ogImg.indexOf('http') === 0 ? ogImg : ('https://dreamev.kr' + ogImg));
+                    }
+                }
             };
+
+            function updateModalNav() {
+                var prevBtn = document.getElementById('modalPrev');
+                var nextBtn = document.getElementById('modalNext');
+                var list = window.allCasesData || [];
+                if (prevBtn) prevBtn.disabled = currentModalIndex <= 0;
+                if (nextBtn) nextBtn.disabled = currentModalIndex < 0 || currentModalIndex >= list.length - 1;
+            }
+
+            function openModalAt(index) {
+                var list = window.allCasesData || [];
+                if (index < 0 || index >= list.length) return;
+                var raw = list[index];
+                window.openCaseModal({
+                    title: raw.title,
+                    vehicle: raw.vehicle,
+                    location: raw.location,
+                    image: raw.image,
+                    gallery: raw.gallery,
+                    date: raw.date,
+                    body: raw.body,
+                    summary: raw.summary
+                }, index);
+            }
+
+            window.openModalAt = openModalAt;
 
             // Close modal
             function closeModal() {
@@ -386,6 +406,13 @@
             if (modalOverlay) {
                 modalOverlay.addEventListener('click', closeModal);
             }
+
+            var modalPrev = document.getElementById('modalPrev');
+            var modalNext = document.getElementById('modalNext');
+            if (modalPrev) modalPrev.addEventListener('click', function() { openModalAt(currentModalIndex - 1); });
+            if (modalNext) modalNext.addEventListener('click', function() { openModalAt(currentModalIndex + 1); });
+            var modalBack = document.getElementById('modalBackList');
+            if (modalBack) modalBack.addEventListener('click', function(e) { e.preventDefault(); closeModal(); });
 
             // ESC key
             document.addEventListener('keydown', function(e) {
@@ -486,43 +513,14 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 제작 사례 갤러리: content/cases 마크다운만 사용. 카테고리 매칭은 띄어쓰기 무시.
-    var categoryNav = document.getElementById('caseCategoryNav');
+    // 수리 사례 갤러리
     var caseGallery = document.getElementById('caseGallery');
-    var btnAllCases = document.getElementById('btnAllCases');
-    var galleryWrap = document.querySelector('.case-gallery-wrap');
 
-    function norm(s) {
-        return (String(s || '').trim().replace(/\s+/g, '')).toLowerCase();
-    }
-
-    // 버튼 값(또는 data-category)과 포스트 카테고리(문자열 또는 배열) 유연 비교. trim·소문자·배열 포함 여부 지원.
-    function matchCategory(buttonValue, itemCategoryNorm) {
-        var cleanTarget = norm(buttonValue);
-        if (!cleanTarget) return false;
-        var itemNorm = (itemCategoryNorm || '').trim();
-        if (!itemNorm) return false;
-        var parts = itemNorm.split(',').map(function(p) { return norm(p); });
-        return parts.indexOf(cleanTarget) !== -1 || parts.some(function(p) { return p.indexOf(cleanTarget) !== -1 || cleanTarget.indexOf(p) !== -1; });
-    }
-
-    function filterGallery(categoryKey) {
-        if (!caseGallery) return;
-        var items = caseGallery.querySelectorAll('.gallery-item');
-        var cards = categoryNav ? categoryNav.querySelectorAll('.case-item-card') : [];
-
-        items.forEach(function(el) {
-            var itemNorm = el.getAttribute('data-category-norm') || '';
-            var show = categoryKey === 'all' ||
-                (itemNorm && matchCategory(categoryKey, itemNorm));
-            el.classList.toggle('hidden', !show);
-        });
-        cards.forEach(function(c) {
-            var cardKey = c.getAttribute('data-category') || '';
-            var isActive = categoryKey !== 'all' && cardKey && norm(cardKey) === norm(categoryKey);
-            c.classList.toggle('active', isActive);
-            c.setAttribute('aria-pressed', isActive);
-        });
+    function formatDateShort(str) {
+        if (!str) return '';
+        var d = new Date(str);
+        if (isNaN(d.getTime())) return str;
+        return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
     }
 
     function renderGallery(list) {
@@ -530,85 +528,50 @@ document.addEventListener('DOMContentLoaded', () => {
         var items = list || [];
         var jsonHtml = '';
         items.forEach(function(item, i) {
-            var gallery = item.gallery && Array.isArray(item.gallery) ? item.gallery : (item.image ? [{ image: item.image }] : []);
+            var gallery = item.gallery && Array.isArray(item.gallery) ? item.gallery : [];
             var thumbSrc = (gallery[0] && gallery[0].image) ? gallery[0].image : item.image;
             if (!thumbSrc) return;
-            var categoryNorm = Array.isArray(item.category) ? item.category.map(function(c) { return norm(String(c)); }).join(',') : norm(String(item.category || ''));
             var thumbPath = thumbSrc.indexOf('/') === 0 ? thumbSrc : '/' + thumbSrc;
-            jsonHtml += '<div class="gallery-item" data-category="' + (item.slug || '') + '" data-category-norm="' + categoryNorm + '" data-case-index="' + i + '" data-case-gallery="' + (JSON.stringify(gallery).replace(/"/g, '&quot;')) + '">';
+            var dateLabel = formatDateShort(item.date);
+            var locLabel = item.location || '';
+            jsonHtml += '<div class="gallery-item gallery-item--repair" data-case-index="' + i + '">';
             jsonHtml += '<img src="' + thumbPath + '" alt="' + (item.title || '').replace(/"/g, '&quot;') + '" loading="lazy">';
-            jsonHtml += '</div>';
+            jsonHtml += '<div class="gallery-item-caption">';
+            jsonHtml += '<h4 class="gallery-item-title">' + (item.title || '').replace(/</g, '&lt;') + '</h4>';
+            jsonHtml += '<p class="gallery-item-meta-line">';
+            if (dateLabel) jsonHtml += '<span>' + dateLabel + '</span>';
+            if (locLabel) jsonHtml += (dateLabel ? ' · ' : '') + '<span>' + locLabel.replace(/</g, '&lt;') + '</span>';
+            jsonHtml += '</p>';
+            if (item.summary) jsonHtml += '<p class="gallery-item-summary">' + item.summary.replace(/</g, '&lt;') + '</p>';
+            jsonHtml += '</div></div>';
         });
-        if (!jsonHtml) jsonHtml = '<p class="gallery-empty-msg">등록된 제작사례가 없습니다. Admin(CMS)에서 제작사례를 추가하고 이미지 갤러리에 표시할 사진을 선택해 주세요.</p>';
+        if (!jsonHtml) jsonHtml = '<p class="gallery-empty-msg">등록된 수리 사례가 없습니다. 곧 현장 수리 사례를 업데이트할 예정입니다.</p>';
         caseGallery.innerHTML = jsonHtml;
     }
 
-    function setupCategoryCards() {
-        if (!categoryNav || !caseGallery) return;
-        var cards = categoryNav.querySelectorAll('.case-item-card');
-        cards.forEach(function(card) {
-            card.addEventListener('click', function() {
-                var categoryKey = card.getAttribute('data-category') || '';
-                if (galleryWrap) galleryWrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                filterGallery(categoryKey);
-            });
-        });
-        if (btnAllCases) btnAllCases.addEventListener('click', function() { filterGallery('all'); });
-        filterGallery('all');
-    }
-
-    // 갤러리 이미지 클릭 → 상세 모달 열기 (allCasesData 또는 data-case-gallery)
     function setupGalleryClicks() {
         if (!caseGallery) return;
         caseGallery.addEventListener('click', function(e) {
             var item = e.target.closest('.gallery-item');
             if (!item) return;
-            var idx = item.getAttribute('data-case-index');
-            var data;
-            if (idx !== null && idx !== '' && window.allCasesData && window.allCasesData[parseInt(idx, 10)]) {
-                var raw = window.allCasesData[parseInt(idx, 10)];
-                data = {
-                    title: raw.title,
-                    image: (raw.image && raw.image.indexOf('/') === 0) ? raw.image : ('/' + (raw.image || '')),
-                    gallery: raw.gallery || (raw.image ? [{ image: raw.image }] : []),
-                    date: raw.date,
-                    description: raw.description,
-                    body: raw.body,
-                    categoryLabel: raw.category,
-                    category: raw.category
-                };
-            } else {
-                var img = item.querySelector('img');
-                var galleryJson = item.getAttribute('data-case-gallery');
-                var gallery = galleryJson ? (function() { try { return JSON.parse(galleryJson.replace(/&quot;/g, '"')); } catch (e) { return []; } })() : (img ? [{ image: img.src }] : []);
-                data = {
-                    title: item.getAttribute('data-case-title') || (img ? img.alt : ''),
-                    image: img ? img.src : '',
-                    gallery: gallery,
-                    date: '',
-                    description: item.getAttribute('data-case-body') || '',
-                    body: item.getAttribute('data-case-body') || '',
-                    categoryLabel: item.getAttribute('data-case-category') || ''
-                };
+            var idx = parseInt(item.getAttribute('data-case-index'), 10);
+            if (!isNaN(idx) && window.openModalAt) {
+                window.openModalAt(idx);
             }
-            if (window.openCaseModal) window.openCaseModal(data);
         });
     }
 
-    // 제작사례 데이터: content/cases 마크다운만 사용. date 내림차순(최신 먼저), 동일 시 파일명 내림차순.
-    var contentPromise = window.loadCasesFromContent ? window.loadCasesFromContent() : Promise.resolve([]);
+    var contentPromise = window.loadRepairCasesFromContent ? window.loadRepairCasesFromContent() : Promise.resolve([]);
     contentPromise
         .then(function(contentList) {
             var list = Array.isArray(contentList) ? contentList : [];
             window.allCasesData = list;
             renderGallery(list);
-            setupCategoryCards();
             setupGalleryClicks();
         })
         .catch(function() {
             window.allCasesData = [];
             renderGallery([]);
-            setupCategoryCards();
             setupGalleryClicks();
         });
 });

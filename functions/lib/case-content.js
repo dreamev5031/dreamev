@@ -19,6 +19,17 @@ export function sanitizePart(part) {
     .replace(/^-+|-+$/g, '');
 }
 
+export function normalizeContentType(value) {
+  const v = (value || '').toString().trim().toLowerCase();
+  if (v === 'repair') return 'repair';
+  return 'production';
+}
+
+export function buildRepairMdBaseName(title) {
+  const tit = sanitizePart(title);
+  return tit ? tit.slice(0, 100) : '수리사례';
+}
+
 export function buildMdBaseName(category, title) {
   const cat = sanitizePart(category);
   const tit = sanitizePart(title);
@@ -138,6 +149,7 @@ export function buildMarkdown({
   return [
     '---',
     `title: ${title.trim()}`,
+    'type: production',
     `category: ${category}`,
     'gallery:',
     ...galleryLines,
@@ -149,18 +161,97 @@ export function buildMarkdown({
   ].join('\n');
 }
 
-export function parseFrontmatter(markdown) {
-  const match = markdown.match(/^---\s*\n([\s\S]*?)\n---\s*\n/);
+export function buildRepairMarkdown({
+  title,
+  vehicle,
+  location,
+  date,
+  imageFileNames,
+  summary,
+  customerRequest,
+  inspectionResult,
+  workDetails,
+  result,
+}) {
+  const galleryLines = imageFileNames.map((name) => `  - image: ${galleryPath(name)}`);
+  const body = [];
+  if (summary?.trim()) {
+    body.push(summary.trim(), '');
+  }
+  if (customerRequest?.trim()) {
+    body.push('## 고객 요청', '', customerRequest.trim(), '');
+  }
+  if (inspectionResult?.trim()) {
+    body.push('## 점검 결과', '', inspectionResult.trim(), '');
+  }
+  if (workDetails?.trim()) {
+    body.push('## 수리 및 작업 내용', '', workDetails.trim(), '');
+  }
+  if (result?.trim()) {
+    body.push('## 작업 결과', '', result.trim(), '');
+  }
+
+  const fm = [
+    '---',
+    `title: ${title.trim()}`,
+    'type: repair',
+  ];
+  if (vehicle?.trim()) fm.push(`vehicle: ${vehicle.trim()}`);
+  if (location?.trim()) fm.push(`location: ${location.trim()}`);
+  fm.push('gallery:', ...galleryLines, '', `date: ${formatKstDateTime(date)}`, '---', '', body.join('\n').trimEnd());
+  return fm.join('\n');
+}
+
+export function parseFrontmatterFields(markdown) {
+  const match = markdown.match(/^---\s*\n([\s\S]*?)\n---\s*\n([\s\S]*)$/);
   if (!match) return { ok: false };
   const fm = match[1];
-  const title = fm.match(/^title:\s*(.+)$/m)?.[1]?.trim();
-  const category = fm.match(/^category:\s*(.+)$/m)?.[1]?.trim();
-  const gallery = [...fm.matchAll(/^\s*-\s*image:\s*(.+)$/gm)].map((m) => m[1].trim());
-  return { ok: true, title, category, gallery };
+  const body = match[2] || '';
+  const read = (key) => fm.match(new RegExp(`^${key}:\\s*(.+)$`, 'm'))?.[1]?.trim().replace(/^["']|["']$/g, '');
+  const gallery = [...fm.matchAll(/^\s*-\s*image:\s*(.+)$/gm)].map((m) => m[1].trim().replace(/^["']|["']$/g, ''));
+  const typeRaw = read('type');
+  const type = typeRaw === 'repair' ? 'repair' : 'production';
+  return {
+    ok: true,
+    type,
+    title: read('title'),
+    category: read('category'),
+    vehicle: read('vehicle'),
+    location: read('location'),
+    date: read('date'),
+    gallery,
+    body,
+  };
+}
+
+export function parseFrontmatter(markdown) {
+  const parsed = parseFrontmatterFields(markdown);
+  if (!parsed.ok) return { ok: false };
+  return {
+    ok: true,
+    title: parsed.title,
+    category: parsed.category,
+    gallery: parsed.gallery,
+    type: parsed.type,
+  };
+}
+
+export function parseRepairFrontmatter(markdown) {
+  const parsed = parseFrontmatterFields(markdown);
+  if (!parsed.ok) return { ok: false };
+  return {
+    ok: true,
+    title: parsed.title,
+    vehicle: parsed.vehicle,
+    location: parsed.location,
+    date: parsed.date,
+    gallery: parsed.gallery,
+    body: parsed.body,
+  };
 }
 
 export function validateGalleryMatches(imageFileNames, markdown) {
-  const parsed = parseFrontmatter(markdown);
+  const parsed = parseFrontmatterFields(markdown);
   if (!parsed.ok) return { ok: false, message: 'Markdown frontmatter 형식이 올바르지 않습니다.' };
   const expected = imageFileNames.map((n) => galleryPath(n));
   if (parsed.gallery.length !== expected.length) {
