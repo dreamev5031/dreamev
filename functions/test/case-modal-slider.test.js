@@ -42,5 +42,8 @@ test('lightbox stops at first and last image', () => {
 test('style.css defines modal slider layout', () => {
   assert.match(styleCss, /\.case-modal-slider/);
   assert.match(styleCss, /object-fit:\s*contain/);
-  assert.match(styleCss, /max-height:\s*min\(60vh/);
+  assert.match(styleCss, /\.case-modal-image-wrap[\s\S]*height:\s*clamp\(280px,\s*58vh,\s*520px\)/);
+  assert.match(styleCss, /\.case-modal-slider-img[\s\S]*height:\s*100%/);
+  assert.doesNotMatch(styleCss, /\.case-modal-slider-nav[\s\S]{0,200}display:\s*none/);
+  assert.match(styleCss, /height:\s*min\(58svh,\s*480px\)/);
 });

@@ -1131,35 +1131,36 @@ header nav a.active {
     overflow: hidden;
     background: #2d3748;
     border-radius: 12px 12px 0 0;
+    height: clamp(280px, 58vh, 520px);
 }
 
 .case-modal-detail-images {
     padding: 0;
     overflow: hidden;
+    width: 100%;
+    height: 100%;
 }
 
 /* 사례 상세 모달 이미지 슬라이더 */
 .case-modal-slider {
     position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     width: 100%;
-    min-height: 160px;
-    max-height: min(60vh, 480px);
-    padding: 0.75rem 0.5rem 2rem;
+    height: 100%;
+    min-height: 0;
+    padding: 0;
     box-sizing: border-box;
     overflow: hidden;
     touch-action: pan-y;
 }
 
 .case-modal-slider-viewport {
-    flex: 1;
+    position: relative;
+    width: 100%;
+    height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
     min-width: 0;
-    max-height: min(56vh, 440px);
     overflow: hidden;
     touch-action: pan-y;
 }
@@ -1168,10 +1169,11 @@ header nav a.active {
 .case-modal-detail-images .case-modal-slider-img {
     display: block;
     width: 100%;
+    height: 100%;
     max-width: 100%;
-    height: auto;
-    max-height: min(56vh, 440px);
+    max-height: none;
     object-fit: contain;
+    object-position: center;
     border-radius: 8px;
     cursor: pointer;
     pointer-events: auto;
@@ -1183,9 +1185,12 @@ header nav a.active {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    z-index: 2;
-    width: 40px;
-    height: 40px;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
     border: none;
     border-radius: 50%;
     background: rgba(0, 0, 0, 0.55);
@@ -1216,9 +1221,10 @@ header nav a.active {
 
 .case-modal-slider-counter {
     position: absolute;
-    bottom: 0.35rem;
+    bottom: 8px;
     left: 50%;
     transform: translateX(-50%);
+    z-index: 3;
     margin: 0;
     padding: 0.25rem 0.65rem;
     border-radius: 999px;
@@ -1230,23 +1236,29 @@ header nav a.active {
 }
 
 @media (max-width: 768px) {
-    .case-modal-slider {
-        max-height: min(52vh, 400px);
-        padding-bottom: 1.75rem;
-    }
-
-    .case-modal-slider-viewport,
-    .case-modal-slider-img {
-        max-height: min(48vh, 360px);
+    .case-modal-image-wrap {
+        height: min(58svh, 480px);
+        min-height: 300px;
     }
 
     .case-modal-slider-nav {
-        display: none;
+        opacity: 1;
+    }
+
+    .case-modal-slider-nav:disabled {
+        opacity: 0.35;
+    }
+
+    .case-modal-slider-prev { left: 8px; }
+    .case-modal-slider-next { right: 8px; }
+
+    .case-modal-body {
+        padding: 1.25rem 1rem 1.5rem;
     }
 }
 
-.case-modal-detail-images .detail-image,
-.case-modal-detail-images .case-modal-image {
+.case-modal-detail-images .detail-image:not(.case-modal-slider-img),
+.case-modal-detail-images .case-modal-image:not(.case-modal-slider-img) {
     display: block;
     width: 100%;
     max-width: 100%;
@@ -1256,13 +1268,13 @@ header nav a.active {
     margin-bottom: 0;
     border-radius: 8px;
 }
-.case-modal-detail-images .detail-image:last-child,
-.case-modal-detail-images .case-modal-image:last-child {
+.case-modal-detail-images .detail-image:not(.case-modal-slider-img):last-child,
+.case-modal-detail-images .case-modal-image:not(.case-modal-slider-img):last-child {
     margin-bottom: 0;
 }
 
-.case-modal-detail-images .detail-image,
-.case-modal-detail-images .case-modal-image {
+.case-modal-detail-images .detail-image:not(.case-modal-slider-img),
+.case-modal-detail-images .case-modal-image:not(.case-modal-slider-img) {
     cursor: pointer;
     pointer-events: auto;
 }
