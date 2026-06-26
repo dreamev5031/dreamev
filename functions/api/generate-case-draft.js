@@ -7,7 +7,7 @@ import {
   validateDraftInput,
 } from '../lib/openai-draft.js';
 import { buildRepairLogMeta } from '../lib/repair-draft-canonical.js';
-import { createRequestId, errorResponse, handleOptions, readJsonBody, successResponse } from '../lib/http.js';
+import { createRequestId, deployHeaders, errorResponse, handleOptions, readJsonBody, successResponse } from '../lib/http.js';
 import { requireUploadAuth } from '../lib/session.js';
 
 export async function onRequestOptions() {
@@ -35,6 +35,7 @@ export async function onRequestPost(context) {
   const requestId = createRequestId();
   const handlerStartedAt = Date.now();
   let lastStage = 'handler_start';
+  const responseHeaders = deployHeaders(env);
 
   try {
     lastStage = 'auth';
@@ -55,13 +56,14 @@ export async function onRequestPost(context) {
         'AI 기능 설정이 완료되지 않았습니다.',
         503,
         { requestId },
+        responseHeaders,
       );
     }
 
     lastStage = 'read_json_body';
     const payload = await readJsonBody(request);
     if (!payload) {
-      return errorResponse('VALIDATION_ERROR', '요청 본문이 올바른 JSON이 아닙니다.', 400, { requestId });
+      return errorResponse('VALIDATION_ERROR', '요청 본문이 올바른 JSON이 아닙니다.', 400, { requestId }, responseHeaders);
     }
 
     lastStage = 'normalize_input';
@@ -70,7 +72,7 @@ export async function onRequestPost(context) {
     lastStage = 'validate_input';
     const validation = validateDraftInput(input);
     if (!validation.ok) {
-      return errorResponse(validation.code, validation.message, 400, { requestId });
+      return errorResponse(validation.code, validation.message, 400, { requestId }, responseHeaders);
     }
 
     logStage(requestId, 'openai_call_start', {
@@ -107,7 +109,7 @@ export async function onRequestPost(context) {
           model: resolveOpenAiModel(env),
           draft: fallbackDraft,
           usedFallback: true,
-        });
+        }, responseHeaders);
       }
       throw err;
     }
@@ -127,7 +129,7 @@ export async function onRequestPost(context) {
           model: result.model || resolveOpenAiModel(env),
           draft: fallbackDraft,
           usedFallback: true,
-        });
+        }, responseHeaders);
       }
 
       lastStage = result.stage || 'openai_draft_failed';
@@ -157,6 +159,7 @@ export async function onRequestPost(context) {
         result.message || 'AI 초안 생성에 실패했습니다.',
         result.status || 502,
         { requestId },
+        responseHeaders,
       );
     }
 
@@ -178,7 +181,7 @@ export async function onRequestPost(context) {
       model: result.model,
       draft: result.draft,
       ...(result.usedFallback ? { usedFallback: true } : {}),
-    });
+    }, responseHeaders);
   } catch (err) {
     const elapsedMs = Date.now() - handlerStartedAt;
     console.error('generate-case-draft unexpected error', {
@@ -195,6 +198,7 @@ export async function onRequestPost(context) {
       'AI 처리 중 서버 오류가 발생했습니다.',
       500,
       { requestId },
+      responseHeaders,
     );
   }
 }

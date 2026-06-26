@@ -18,21 +18,33 @@ export function withCors(response) {
   });
 }
 
-export function json(data, status = 200) {
+export function deployHeaders(env = {}) {
+  const commit = env.CF_PAGES_COMMIT_SHA || env.DREAMEV_DEPLOY_COMMIT || '';
+  const branch = env.CF_PAGES_BRANCH || '';
+  const headers = {};
+  if (commit) headers['X-Dreamev-Deploy-Commit'] = commit.slice(0, 12);
+  if (branch) headers['X-Dreamev-Deploy-Branch'] = branch;
+  return headers;
+}
+
+export function json(data, status = 200, extraHeaders = {}) {
   return withCors(
     new Response(JSON.stringify(data), {
       status,
-      headers: { 'Content-Type': 'application/json; charset=utf-8' },
+      headers: {
+        'Content-Type': 'application/json; charset=utf-8',
+        ...extraHeaders,
+      },
     }),
   );
 }
 
-export function errorResponse(code, message, status = 400, extra = {}) {
-  return json({ success: false, code, message, ...extra }, status);
+export function errorResponse(code, message, status = 400, extra = {}, extraHeaders = {}) {
+  return json({ success: false, code, message, ...extra }, status, extraHeaders);
 }
 
-export function successResponse(data) {
-  return json({ success: true, ...data });
+export function successResponse(data, extraHeaders = {}) {
+  return json({ success: true, ...data }, 200, extraHeaders);
 }
 
 export function handleOptions() {
