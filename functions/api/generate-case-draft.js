@@ -76,8 +76,7 @@ export async function onRequestPost(context) {
       contentType: input.contentType,
       symptomCount: input.symptoms.length,
       diagnosisCount: input.diagnosis.length,
-      selectedWorkItemCount: input.selectedWorkItems.length,
-      workCount: input.work.length,
+      workContentLength: (input.workContent || '').length,
       resultCount: input.result.length,
       payloadFieldCount: Object.keys(payload).length,
     });

@@ -6,8 +6,10 @@ import {
   buildMdBaseName,
   buildRepairMarkdown,
   buildRepairMdBaseName,
+  dedupeRepairTextLines,
   isValidImageFileName,
   isValidMdFileName,
+  mergeLegacyRepairWorkContent,
   normalizeContentType,
   parseRepairFrontmatter,
   resolveMdFileName,
@@ -157,7 +159,9 @@ test('repair markdown has no category', () => {
   assert.match(md, /location: 양주/);
   assert.doesNotMatch(md, /^category:/m);
   assert.match(md, /## 점검 결과/);
-  assert.match(md, /## 수리 및 작업 내용/);
+  assert.match(md, /## 접수 증상/);
+  assert.match(md, /## 작업 내용/);
+  assert.doesNotMatch(md, /## 수리 및 작업 내용/);
   const parsed = parseRepairFrontmatter(md);
   assert.equal(parsed.ok, true);
   assert.equal(parsed.title, '산업용 전동차 전진 불량 수리');
@@ -167,4 +171,20 @@ test('repair markdown has no category', () => {
 test('repair md filename uses title only', () => {
   const base = buildRepairMdBaseName('전진 불량 수리');
   assert.equal(base, '전진-불량-수리');
+});
+
+test('mergeLegacyRepairWorkContent merges legacy fields', () => {
+  const merged = mergeLegacyRepairWorkContent({
+    selectedWorkItems: ['컨트롤러 교체', '배선 교체'],
+    workDetails: '컨트롤러 교체 후 배선을 정비했습니다.',
+    additionalNote: '시운전을 진행했습니다.',
+  });
+  assert.match(merged, /컨트롤러 교체/);
+  assert.match(merged, /배선/);
+  assert.match(merged, /시운전/);
+});
+
+test('dedupeRepairTextLines removes repeated lines', () => {
+  const text = dedupeRepairTextLines('배선 보수', '배선 보수', '시운전 완료');
+  assert.equal(text, '배선 보수\n시운전 완료');
 });

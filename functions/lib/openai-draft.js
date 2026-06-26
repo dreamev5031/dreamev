@@ -1,3 +1,5 @@
+import { mergeLegacyRepairWorkContent } from './case-content.js';
+
 const DEFAULT_MODEL = 'gpt-4.1-mini';
 const OPENAI_ENDPOINT = 'https://api.openai.com/v1/chat/completions';
 /** OpenAI 단일 요청 상한 (Cloudflare Pages ~30s 벽시계 한도 내) */
@@ -17,6 +19,7 @@ const LIMITS = {
   listItem: 80,
   listCount: 10,
   additionalNote: 500,
+  workContent: 2000,
   singleField: 400,
 };
 
@@ -78,38 +81,30 @@ const REPAIR_DEVELOPER_PROMPT = `contentType이 repair인 수리사례를 작성
 
 문체: summary, customerRequest, diagnosis, workDetails, result, seoDescription은 존댓말(~했습니다, ~되었습니다). 해라체(~했다) 금지.
 
-필드별 정보 배치 (같은 핵심 명사·작업을 여러 필드에 반복하지 않음):
-* summary: 증상, 핵심 원인, 주요 작업만 간단히 요약. 작업 결과와 세부 점검 항목은 쓰지 않음.
-* customerRequest: 고객이 요청한 증상만.
-* diagnosis: 확인된 고장 원인만. 추가 점검 항목은 넣지 않음.
-* workDetails: 실제 교체, 보수, 추가 점검, 시운전 내용. 충전기 점검 등 보조 작업은 여기서만 상세히.
-* result: 최종 결과만. 교체 부품이나 점검 항목을 다시 쓰지 않음.
+필드별 역할 (접수 증상·작업 내용·작업 결과가 서로 반복되지 않게 작성):
+* customerRequest (접수 증상): 고객이 차량을 맡길 당시의 문제와 증상만 설명합니다.
+* workDetails (작업 내용): workContent 입력을 바탕으로 실제 점검·수리·교체·보수 작업을 2~4문장으로 설명합니다.
+* result (작업 결과): 작업 후 확인된 상태와 시운전 결과만 설명합니다.
+* diagnosis: diagnosis 입력이 있을 때만 확인된 원인을 설명합니다. 없으면 빈 문자열을 반환합니다.
+* summary: 증상과 핵심 작업만 간단히 요약합니다. 작업 결과 문장은 반복하지 않습니다.
 
-배치 예시 (증상: 주행 불가, 원인: 컨트롤러 이상, 작업: 컨트롤러 교체·충전기 점검·시운전, 결과: 정상 주행 확인):
-* summary → 주행 불가 증상, 컨트롤러 이상, 교체 작업만 요약
-* diagnosis → 컨트롤러 이상만
-* workDetails → 컨트롤러 교체, 충전기 점검, 시운전
-* result → 정상 주행 확인만
+workContent 확장 규칙:
+* 사용자가 짧게 입력해도 홈페이지 게시용 문장으로 자연스럽게 확장할 수 있습니다.
+* 예: "컨트롤러 교체, 배선 정리" → 점검 결과 컨트롤러 이상 확인 후 신품 교체, 배선 정리 작업 진행
+* 입력에 없는 부품, 고장 원인, 작업 결과를 임의로 만들지 말 것
+* 입력된 핵심 작업을 모두 포함할 것
+* 정중하고 전문적인 문체, 과장 광고 금지, 같은 내용 반복 금지
+* 너무 긴 문장보다 2~4문장 우선
 
 title: 차량 + 핵심 증상 + 주요 작업, 22~45자, 명사형. 의미 없는 userTitle 무시.
 summary: 2문장 이내, 존댓말.
 customerRequest: 1~2문장, 존댓말.
-diagnosis: 1~2문장, 존댓말.
-workDetails: 2~3문장, 존댓말.
+diagnosis: 입력이 있을 때만 1~2문장, 존댓말.
+workDetails: 2~4문장, 존댓말.
 result: 1~2문장, 존댓말.
 seoTitle: 30~55자, 명사형.
 seoDescription: 70~140자, 존댓말.
-keywords: 4~7개, 입력 사실만.
-
-selectedWorkItems 규칙:
-* selectedWorkItems는 사용자가 선택한 실제 작업 사실이다.
-* 선택된 항목만 workDetails와 keywords에 반영한다.
-* 선택하지 않은 부품 교체나 작업을 새로 만들지 말 것.
-* work는 사용자가 자유 입력한 작업 설명이다. selectedWorkItems와 자연스럽게 합치되 같은 내용을 반복하지 말 것.
-* EM브레이크는 전자브레이크로 바꾸지 말고 입력 명칭을 우선 유지한다.
-* ET126 쓰로틀 교체는 "ET126 쓰로틀" 또는 "ET126 가속 레버" 중 자연스러운 표현을 사용한다.
-* 프레임 관련 작업은 구체 내용이 없으면 용접, 보강, 절단 등을 임의로 추가하지 말 것.
-* 배선 교체, 카본브러시 교체 표기는 띄어쓰기를 유지한다.`;
+keywords: 4~7개, 입력 사실만.`;
 
 const PRODUCTION_DEVELOPER_PROMPT = `contentType이 production인 제작사례를 작성합니다.
 
@@ -280,13 +275,22 @@ export function normalizeDraftInput(payload) {
       workTypes: normalizeStringList(payload?.workTypes),
       symptoms: normalizeStringList(payload?.symptoms),
       diagnosis: normalizeStringList(payload?.diagnosis ?? payload?.confirmedCauses),
-      selectedWorkItems: normalizeRepairWorkItems(payload?.selectedWorkItems),
-      work: normalizeStringList(payload?.work ?? payload?.actions),
+      workContent: trimText(
+        mergeLegacyRepairWorkContent({
+          workContent: payload?.workContent,
+          workDetails: payload?.workDetails,
+          selectedWorkItems: payload?.selectedWorkItems,
+          work: payload?.work ?? payload?.actions,
+          actions: payload?.actions,
+          additionalNote: payload?.additionalNote,
+        }),
+        LIMITS.workContent,
+      ),
       result: normalizeStringList(payload?.result ?? payload?.results),
       additionalNote: trimText(payload?.additionalNote, LIMITS.additionalNote),
     };
 
-    ['symptoms', 'diagnosis', 'work', 'result'].forEach((field) => {
+    ['symptoms', 'diagnosis', 'result'].forEach((field) => {
       if (typeof payload?.[field] === 'string') {
         normalized[field] = normalizeStringList([payload[field]]);
       }
@@ -314,10 +318,19 @@ export function normalizeDraftInput(payload) {
 
 export function validateDraftInput(input) {
   if (input.contentType === 'repair') {
-    if (!input.userTitle && !input.symptoms.length && !input.work.length
-      && !input.diagnosis.length && !input.result.length && !input.additionalNote
-      && !input.workTypes.length && !input.selectedWorkItems.length) {
+    const workContent = (input.workContent || '').trim();
+    if (!input.userTitle && !input.symptoms.length && !workContent
+      && !input.diagnosis.length && !input.result.length) {
       return { ok: false, code: 'VALIDATION_ERROR', message: '초안 생성에 필요한 입력 정보가 없습니다.' };
+    }
+    if (input.symptoms.length && !workContent) {
+      return { ok: false, code: 'VALIDATION_ERROR', message: '작업 내용을 입력해 주세요.' };
+    }
+    if (workContent && workContent.length < 4) {
+      return { ok: false, code: 'VALIDATION_ERROR', message: '작업 내용을 조금 더 자세히 입력해 주세요.' };
+    }
+    if (workContent.length > LIMITS.workContent) {
+      return { ok: false, code: 'VALIDATION_ERROR', message: `작업 내용은 ${LIMITS.workContent}자 이하로 입력해 주세요.` };
     }
   } else if (!input.userTitle && !input.customerRequest && !input.customWork
     && !input.purpose && !input.result && !input.additionalNote
@@ -348,8 +361,7 @@ export function buildOpenAiUserInput(input) {
       workTypes: joinInputList(input.workTypes),
       symptoms: joinInputList(input.symptoms),
       diagnosis: joinInputList(input.diagnosis),
-      selectedWorkItems: input.selectedWorkItems,
-      work: joinInputList(input.work),
+      workContent: emptyAsBlank(input.workContent),
       result: joinInputList(input.result),
       additionalNote: emptyAsBlank(input.additionalNote),
     };
@@ -529,15 +541,11 @@ export function validateDraftQuality(draft, input) {
   }
 
   if (input.contentType === 'repair') {
-    if (!cleanField(draft.workDetails) && (input.work.length || input.selectedWorkItems.length)) {
+    if (!cleanField(draft.workDetails) && input.workContent) {
       return { ok: false, reason: 'missing_work_details' };
     }
     if (!cleanField(draft.customerRequest) && input.symptoms.length) {
       return { ok: false, reason: 'missing_customer_request' };
-    }
-    const unselectedMentions = findUnselectedWorkMentions(cleanField(draft.workDetails), input.selectedWorkItems);
-    if (unselectedMentions.length > 0) {
-      return { ok: false, reason: 'unselected_work_mention' };
     }
   } else {
     if (!cleanField(draft.productionDetails) && (input.customWork || input.additionalNote)) {

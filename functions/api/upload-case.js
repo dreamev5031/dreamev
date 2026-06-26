@@ -8,6 +8,7 @@ import {
   isValidImageFileName,
   isValidMdFileName,
   makeImageFileName,
+  mergeLegacyRepairWorkContent,
   normalizeContentType,
   parseFrontmatter,
   parseRepairFrontmatter,
@@ -141,11 +142,22 @@ async function handleProductionUpload(env, formData, fields) {
 async function handleRepairUpload(env, formData, fields) {
   const {
     title, date, vehicle, location, proposedMdFileName, summary,
-    customerRequest, inspectionResult, workDetails, result, imageStamp, images, proposedNames,
+    customerRequest, inspectionResult, workDetails, workContent, result, imageStamp, images, proposedNames,
   } = fields;
 
   if (!vehicle) {
     return errorResponse('VALIDATION_ERROR', '차량 종류를 입력해 주세요.', 400);
+  }
+
+  const resolvedWorkContent = mergeLegacyRepairWorkContent({ workContent, workDetails });
+  if (!resolvedWorkContent) {
+    return errorResponse('VALIDATION_ERROR', '작업 내용을 입력해 주세요.', 400);
+  }
+  if (resolvedWorkContent.length < 4) {
+    return errorResponse('VALIDATION_ERROR', '작업 내용을 조금 더 자세히 입력해 주세요.', 400);
+  }
+  if (resolvedWorkContent.length > 2000) {
+    return errorResponse('VALIDATION_ERROR', '작업 내용은 2000자 이하로 입력해 주세요.', 400);
   }
 
   const mdBase = buildRepairMdBaseName(title);
@@ -169,7 +181,8 @@ async function handleRepairUpload(env, formData, fields) {
     summary,
     customerRequest,
     inspectionResult,
-    workDetails,
+    workDetails: resolvedWorkContent,
+    workContent: resolvedWorkContent,
     result,
   });
 
@@ -231,6 +244,7 @@ export async function onRequestPost(context) {
   const productionDetails = (formData.get('productionDetails') || '').toString();
   const features = (formData.get('features') || '').toString();
   const workDetails = (formData.get('workDetails') || '').toString();
+  const workContent = (formData.get('workContent') || '').toString();
   const result = (formData.get('result') || '').toString();
   const imageStamp = (formData.get('imageStamp') || '').toString().trim();
   let specifications = {};
@@ -280,6 +294,7 @@ export async function onRequestPost(context) {
     productionDetails,
     features,
     workDetails,
+    workContent,
     result,
     specifications,
     imageStamp,

@@ -228,6 +228,50 @@ export function buildMarkdown({
   return fm.join('\n');
 }
 
+export function dedupeRepairTextLines(...chunks) {
+  const seen = new Set();
+  const lines = [];
+  for (const chunk of chunks) {
+    if (!chunk) continue;
+    for (const rawLine of String(chunk).split('\n')) {
+      const line = rawLine.trim();
+      if (!line) continue;
+      const key = line.replace(/\s+/g, ' ');
+      if (seen.has(key)) continue;
+      seen.add(key);
+      lines.push(line);
+    }
+  }
+  return lines.join('\n');
+}
+
+export function mergeLegacyRepairWorkContent({
+  workContent,
+  workDetails,
+  workItems,
+  selectedWorkItems,
+  work,
+  actions,
+  additionalNote,
+} = {}) {
+  const direct = (workContent || '').trim();
+  if (direct) return direct;
+
+  const itemList = []
+    .concat(Array.isArray(workItems) ? workItems : [])
+    .concat(Array.isArray(selectedWorkItems) ? selectedWorkItems : [])
+    .concat(Array.isArray(work) ? work : [])
+    .concat(Array.isArray(actions) ? actions : [])
+    .map((item) => String(item || '').trim())
+    .filter(Boolean);
+
+  return dedupeRepairTextLines(
+    itemList.join('\n'),
+    workDetails,
+    additionalNote,
+  );
+}
+
 export function buildRepairMarkdown({
   title,
   vehicle,
@@ -238,21 +282,26 @@ export function buildRepairMarkdown({
   customerRequest,
   inspectionResult,
   workDetails,
+  workContent,
   result,
 }) {
   const galleryLines = imageFileNames.map((name) => `  - image: ${galleryPath(name)}`);
+  const resolvedWorkContent = mergeLegacyRepairWorkContent({
+    workContent,
+    workDetails,
+  });
   const body = [];
   if (summary?.trim()) {
     body.push(summary.trim(), '');
   }
   if (customerRequest?.trim()) {
-    body.push('## 고객 요청', '', customerRequest.trim(), '');
+    body.push('## 접수 증상', '', customerRequest.trim(), '');
   }
   if (inspectionResult?.trim()) {
     body.push('## 점검 결과', '', inspectionResult.trim(), '');
   }
-  if (workDetails?.trim()) {
-    body.push('## 수리 및 작업 내용', '', workDetails.trim(), '');
+  if (resolvedWorkContent) {
+    body.push('## 작업 내용', '', resolvedWorkContent, '');
   }
   if (result?.trim()) {
     body.push('## 작업 결과', '', result.trim(), '');

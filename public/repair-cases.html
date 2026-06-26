@@ -221,6 +221,83 @@
                 return text.length > 120 ? text.slice(0, 117) + '...' : text;
             }
 
+            function dedupeRepairDisplayLines(text) {
+                var seen = new Set();
+                var lines = [];
+                (text || '').split('\n').forEach(function(line) {
+                    var trimmed = line.trim();
+                    if (!trimmed) return;
+                    var key = trimmed.replace(/\s+/g, ' ');
+                    if (seen.has(key)) return;
+                    seen.add(key);
+                    lines.push(trimmed);
+                });
+                return lines.join('\n');
+            }
+
+            function normalizeRepairBodyForDisplay(body) {
+                if (!body) return '';
+                var sections = [];
+                var intro = '';
+                var currentHeading = '';
+                var currentLines = [];
+                var lines = body.split('\n');
+
+                function flushSection() {
+                    if (!currentHeading) {
+                        if (currentLines.length) intro = currentLines.join('\n').trim();
+                        return;
+                    }
+                    sections.push({
+                        heading: currentHeading,
+                        content: currentLines.join('\n').trim(),
+                    });
+                }
+
+                lines.forEach(function(line) {
+                    var match = line.match(/^##\s+(.+)$/);
+                    if (match) {
+                        flushSection();
+                        currentHeading = match[1].trim();
+                        currentLines = [];
+                    } else {
+                        currentLines.push(line);
+                    }
+                });
+                flushSection();
+
+                var headingAliases = {
+                    '고객 요청': '접수 증상',
+                    '수리 및 작업 내용': '작업 내용',
+                    '작업 항목': '작업 내용',
+                };
+
+                var mergedWork = [];
+                var output = [];
+                if (intro) {
+                    output.push(intro, '');
+                }
+
+                sections.forEach(function(section) {
+                    var heading = headingAliases[section.heading] || section.heading;
+                    if (heading === '작업 내용') {
+                        if (section.content) mergedWork.push(section.content);
+                        return;
+                    }
+                    if (section.content) {
+                        output.push('## ' + heading, '', section.content, '');
+                    }
+                });
+
+                if (mergedWork.length) {
+                    output.push('## 작업 내용', '', dedupeRepairDisplayLines(mergedWork.join('\n')), '');
+                }
+
+                return output.join('\n').trimEnd();
+            }
+
+            window.normalizeRepairBodyForDisplay = normalizeRepairBodyForDisplay;
+
             window.loadRepairCasesFromContent = function() {
                 var apiUrl = 'https://api.github.com/repos/dreamev5031/dreamev/contents/public/content/repair-cases';
                 return fetch(apiUrl)
@@ -327,7 +404,9 @@
                 }
                 var modalDateEl = document.getElementById('modalDate');
                 if (modalDateEl) modalDateEl.textContent = formatDate(caseData.date || '');
-                var bodyContent = caseData.description || caseData.body || '';
+                var bodyContent = (window.normalizeRepairBodyForDisplay || function(v) { return v || ''; })(
+                    caseData.description || caseData.body || '',
+                );
                 if (bodyContent && typeof marked !== 'undefined') {
                     modalContent.innerHTML = marked.parse(bodyContent);
                 } else {

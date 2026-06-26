@@ -34,7 +34,7 @@ const repairInput1 = {
   workDate: '2026-06-25',
   symptoms: ['전진 불량'],
   diagnosis: ['전자브레이크 쇼트'],
-  work: ['배선 보수'],
+  workContent: '배선 보수',
   result: ['주행 정상 확인'],
 };
 
@@ -45,7 +45,7 @@ const repairInput2 = {
   location: '',
   symptoms: ['전진 불량'],
   diagnosis: ['충전기 불량'],
-  work: ['시운전 및 전체 점검'],
+  workContent: '시운전 및 전체 점검',
   result: ['현장 수리 완료'],
 };
 
@@ -54,8 +54,7 @@ const repairInputSuv = {
   vehicle: '산업용 SUV',
   symptoms: ['주행 불가'],
   diagnosis: ['컨트롤러 이상'],
-  selectedWorkItems: ['컨트롤러 교체'],
-  work: ['충전기 점검'],
+  workContent: '컨트롤러 교체, 충전기 점검',
   result: ['주행 정상 확인'],
 };
 
@@ -181,7 +180,7 @@ test('normalizeRepairWorkItemLabel normalizes spacing and brush spelling', () =>
   assert.equal(normalizeRepairWorkItemLabel('카본브러쉬 교체'), '카본브러시 교체');
 });
 
-test('normalizeDraftInput maps selectedWorkItems', () => {
+test('normalizeDraftInput maps legacy work fields to workContent', () => {
   const input = normalizeDraftInput({
     contentType: 'repair',
     vehicle: '산업용 전동차',
@@ -191,24 +190,21 @@ test('normalizeDraftInput maps selectedWorkItems', () => {
     work: ['교체 후 주행 테스트 진행'],
     result: ['주행 정상 확인'],
   });
-  assert.deepEqual(input.selectedWorkItems, ['컨트롤러 교체', '배선 교체']);
+  assert.match(input.workContent, /컨트롤러 교체/);
+  assert.match(input.workContent, /배선교체|배선 교체/);
+  assert.match(input.workContent, /주행 테스트/);
 });
 
-test('validateDraftQuality rejects unselected work mention', () => {
+test('validateDraftInput requires workContent when symptoms provided', () => {
   const input = normalizeDraftInput({
     contentType: 'repair',
-    vehicle: '산업용 전동차',
-    symptoms: ['주행 불량'],
-    selectedWorkItems: ['컨트롤러 교체'],
-    work: ['주행 테스트'],
+    vehicle: '전동차',
+    symptoms: ['전진 불량'],
     result: ['주행 정상 확인'],
   });
-  const result = validateDraftQuality({
-    ...repairSampleDraft,
-    workDetails: '컨트롤러를 교체하고 타이어 교체를 진행했습니다.',
-  }, input);
+  const result = validateDraftInput(input);
   assert.equal(result.ok, false);
-  assert.equal(result.reason, 'unselected_work_mention');
+  assert.match(result.message, /작업 내용/);
 });
 
 test('findUnselectedWorkMentions ignores selected items', () => {
@@ -219,7 +215,7 @@ test('findUnselectedWorkMentions ignores selected items', () => {
   assert.deepEqual(mentions, []);
 });
 
-test('callOpenAiDraft succeeds with selectedWorkItems in prompt', async () => {
+test('callOpenAiDraft succeeds with workContent in prompt', async () => {
   const fetchImpl = async () => openAiSuccessResponse({
     ...repairSampleDraftController,
     workDetails: '점검 결과에 따라 컨트롤러를 교체하고 관련 배선을 정비한 뒤 주행 상태를 확인했습니다.',
@@ -229,8 +225,7 @@ test('callOpenAiDraft succeeds with selectedWorkItems in prompt', async () => {
     vehicle: '산업용 전동차',
     symptoms: ['주행 불량'],
     diagnosis: ['컨트롤러 출력 이상'],
-    selectedWorkItems: ['컨트롤러 교체', '배선 교체'],
-    work: ['교체 후 주행 테스트 진행'],
+    workContent: '컨트롤러 교체, 배선 교체, 주행 테스트',
     result: ['주행 정상 확인'],
   }), fetchImpl);
   assert.equal(result.ok, true);
@@ -434,6 +429,7 @@ test('repair input ignores production specifications fields', () => {
     userTitle: '수리',
     vehicle: '전동차',
     symptoms: ['전진 불량'],
+    workContent: '배선 보수',
     specifications: { voltage: '48V' },
     result: ['주행 정상 확인'],
   });
