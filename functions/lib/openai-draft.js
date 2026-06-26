@@ -329,6 +329,13 @@ export function normalizeDraftInput(payload) {
   };
 }
 
+function isWeakRepairWorkContent(text) {
+  const trimmed = (text || '').trim();
+  if (!trimmed) return false;
+  if (/^\d{1,8}$/.test(trimmed)) return true;
+  return false;
+}
+
 export function validateDraftInput(input) {
   if (input.contentType === 'repair') {
     const workContent = (input.workContent || '').trim();
@@ -340,6 +347,9 @@ export function validateDraftInput(input) {
       return { ok: false, code: 'VALIDATION_ERROR', message: '작업 내용을 입력해 주세요.' };
     }
     if (workContent && workContent.length < 4) {
+      return { ok: false, code: 'VALIDATION_ERROR', message: '작업 내용을 조금 더 자세히 입력해 주세요.' };
+    }
+    if (workContent && isWeakRepairWorkContent(workContent)) {
       return { ok: false, code: 'VALIDATION_ERROR', message: '작업 내용을 조금 더 자세히 입력해 주세요.' };
     }
     if (workContent.length > LIMITS.workContent) {
@@ -423,10 +433,15 @@ export function buildRepairFallbackDraft(input, partialDraft = {}) {
 
   if (!symptoms.length && !workContent && !results.length) return null;
 
-  const title = cleanField(partialDraft.title)
+  const partialTitle = cleanField(partialDraft.title);
+  const title = (partialTitle && !isMeaninglessTitle(partialTitle) ? partialTitle : '')
     || (isMeaninglessTitle(input.userTitle) ? '' : input.userTitle)
-    || [vehicle, symptoms[0], '수리'].filter(Boolean).join(' ').slice(0, LIMITS.title)
-    || '수리 사례';
+    || [
+      !isMeaninglessTitle(vehicle) ? vehicle : '',
+      symptoms[0],
+      '수리',
+    ].filter(Boolean).join(' ').slice(0, LIMITS.title)
+    || (symptoms[0] ? `${symptoms[0]} 수리 사례` : '수리 사례');
 
   const customerRequest = cleanField(partialDraft.customerRequest)
     || (symptoms.length
@@ -438,13 +453,22 @@ export function buildRepairFallbackDraft(input, partialDraft = {}) {
 
   const workDetails = cleanField(partialDraft.workDetails) || formatWorkContentAsDetails(workContent);
 
-  const result = cleanField(partialDraft.result)
-    || (results.length ? `작업 후 ${results.join(', ')} 상태를 확인했습니다.` : '');
+  const resultText = cleanField(partialDraft.result)
+    || (results.length
+      ? `작업 후 ${results.join(', ')} 상태를 확인했습니다.`
+      : (workContent
+        ? '입력하신 작업 내용을 반영해 수리 작업을 진행했습니다.'
+        : '접수된 증상을 확인하고 수리 작업을 진행했습니다.'));
 
   const summary = cleanField(partialDraft.summary)
-    || [vehicle, symptoms[0], workContent.slice(0, 50)].filter(Boolean).join(' ').slice(0, LIMITS.singleField);
+    || [
+      !isMeaninglessTitle(vehicle) ? vehicle : '',
+      symptoms[0],
+      !isWeakRepairWorkContent(workContent) ? workContent.slice(0, 50) : '',
+    ].filter(Boolean).join(' ').slice(0, LIMITS.singleField)
+    || (symptoms[0] ? `${symptoms[0]} 증상 수리 작업을 진행했습니다.` : '수리 작업을 진행했습니다.');
 
-  if (!summary || !customerRequest || !workDetails || !result) return null;
+  if (!summary || !customerRequest || !workDetails || !resultText) return null;
 
   let keywords = [];
   if (Array.isArray(partialDraft.keywords)) {
@@ -467,10 +491,32 @@ export function buildRepairFallbackDraft(input, partialDraft = {}) {
     customerRequest,
     diagnosis,
     workDetails,
-    result,
+    result: resultText,
     seoTitle: cleanField(partialDraft.seoTitle) || title,
     seoDescription: cleanField(partialDraft.seoDescription) || summary.slice(0, 140),
     keywords,
+  };
+}
+
+export function tryInputFallbackDraft(input, partialDraft) {
+  return input.contentType === 'repair'
+    ? buildRepairFallbackDraft(input, partialDraft)
+    : buildProductionFallbackDraft(input, partialDraft);
+}
+
+function attemptInputFallbackResult(input, partialDraft, meta) {
+  const draft = tryInputFallbackDraft(input, partialDraft);
+  if (!draft) return null;
+  return {
+    ok: true,
+    draft,
+    model: meta.model || '',
+    openAiStatus: meta.openAiStatus,
+    openAiRequestId: meta.openAiRequestId,
+    attempt: meta.attempt ?? 0,
+    openAiElapsedMs: meta.openAiElapsedMs,
+    elapsedMs: meta.elapsedMs,
+    usedFallback: true,
   };
 }
 
@@ -509,12 +555,6 @@ export function buildProductionFallbackDraft(input, partialDraft = {}) {
     seoDescription: cleanField(partialDraft.seoDescription) || summary.slice(0, 140),
     keywords,
   };
-}
-
-function tryInputFallbackDraft(input, partialDraft) {
-  return input.contentType === 'repair'
-    ? buildRepairFallbackDraft(input, partialDraft)
-    : buildProductionFallbackDraft(input, partialDraft);
 }
 
 export function buildOpenAiUserInput(input) {
@@ -731,7 +771,6 @@ export function sanitizeRepairDraft(draft, input) {
   const diagnosis = cleanField(draft.diagnosis ?? draft.inspectionResult);
   const workDetails = cleanField(draft.workDetails);
   const result = cleanField(draft.result);
-  const keywords = normalizeKeywords(draft.keywords);
 
   if (!summary || !customerRequest || !workDetails || !result) {
     const fallback = buildRepairFallbackDraft(input, draft);
@@ -739,6 +778,13 @@ export function sanitizeRepairDraft(draft, input) {
     const err = new Error('Repair draft missing required fields');
     err.code = 'OPENAI_PARSE_ERROR';
     throw err;
+  }
+
+  let keywords;
+  try {
+    keywords = normalizeKeywords(draft.keywords);
+  } catch {
+    keywords = buildRepairFallbackDraft(input, draft)?.keywords || [];
   }
 
   return {
@@ -1117,6 +1163,24 @@ async function requestOpenAi(env, input, fetchImpl, options = {}) {
   };
 }
 
+const FALLBACK_FETCH_STAGES = new Set([
+  'openai_content_json_parse',
+  'openai_empty_output',
+  'openai_response_json_parse',
+]);
+
+const FALLBACK_QUALITY_REASONS = new Set([
+  'missing_draft',
+  'missing_summary',
+  'missing_work_details',
+  'missing_customer_request',
+  'numeric_title',
+  'meaningless_title',
+  'title_not_rewritten',
+  'forbidden_particle',
+  'keywords_not_array',
+]);
+
 export async function callOpenAiDraft(env, input, fetchImpl = fetch) {
   const functionStartedAt = Date.now();
   const getBudgetRemaining = () => FUNCTION_BUDGET_MS - (Date.now() - functionStartedAt);
@@ -1141,28 +1205,24 @@ export async function callOpenAiDraft(env, input, fetchImpl = fetch) {
       budgetRemainingMs,
     });
     if (!response.ok) {
-      const fallbackDraft = (
-        response.stage === 'openai_content_json_parse'
-        || response.stage === 'openai_empty_output'
-      ) ? tryInputFallbackDraft(input) : null;
-
-      if (fallbackDraft) {
-        console.warn('openai-draft using input fallback', {
-          stage: response.stage,
-          contentType: input.contentType,
-          parseReason: response.parseReason || '',
-        });
-        return {
-          ok: true,
-          draft: fallbackDraft,
+      const canFetchFallback = FALLBACK_FETCH_STAGES.has(response.stage);
+      const fallbackResult = canFetchFallback
+        ? attemptInputFallbackResult(input, undefined, {
           model: response.model || resolveOpenAiModel(env),
           openAiStatus: response.openAiStatus,
           openAiRequestId: response.openAiRequestId,
           attempt,
           openAiElapsedMs: response.openAiElapsedMs,
           elapsedMs: Date.now() - functionStartedAt,
-          usedFallback: true,
-        };
+        })
+        : null;
+      if (fallbackResult) {
+        console.warn('openai-draft using input fallback', {
+          stage: response.stage,
+          contentType: input.contentType,
+          parseReason: response.parseReason || '',
+        });
+        return fallbackResult;
       }
 
       logOpenAiDraftFailure({
@@ -1190,6 +1250,23 @@ export async function callOpenAiDraft(env, input, fetchImpl = fetch) {
         && getBudgetRemaining() > (MIN_OPENAI_TIMEOUT_MS + OPENAI_SERVER_RETRY_DELAY_MS);
       if (canQualityRetry) {
         continue;
+      }
+      const fallbackResult = FALLBACK_QUALITY_REASONS.has(lastQualityReason)
+        ? attemptInputFallbackResult(input, response.draftJson, {
+          model: response.model,
+          openAiStatus: response.openAiStatus,
+          openAiRequestId: response.openAiRequestId,
+          attempt,
+          openAiElapsedMs: response.openAiElapsedMs,
+          elapsedMs: Date.now() - functionStartedAt,
+        })
+        : null;
+      if (fallbackResult) {
+        console.warn('openai-draft quality fallback', {
+          contentType: input.contentType,
+          qualityReason: lastQualityReason,
+        });
+        return fallbackResult;
       }
       const failure = {
         ok: false,
@@ -1260,6 +1337,21 @@ export async function callOpenAiDraft(env, input, fetchImpl = fetch) {
       if (canSanitizeRetry) {
         continue;
       }
+      const fallbackResult = attemptInputFallbackResult(input, response.draftJson, {
+        model: response.model,
+        openAiStatus: response.openAiStatus,
+        openAiRequestId: response.openAiRequestId,
+        attempt,
+        openAiElapsedMs: response.openAiElapsedMs,
+        elapsedMs: Date.now() - functionStartedAt,
+      });
+      if (fallbackResult) {
+        console.warn('openai-draft sanitize failure fallback', {
+          contentType: input.contentType,
+          errorCode: err.code || '',
+        });
+        return fallbackResult;
+      }
       const failure = {
         ok: false,
         code: err.code || 'OPENAI_PARSE_ERROR',
@@ -1286,6 +1378,16 @@ export async function callOpenAiDraft(env, input, fetchImpl = fetch) {
       });
       return failure;
     }
+  }
+
+  const exhaustedFallback = attemptInputFallbackResult(input, undefined, {
+    model: resolveOpenAiModel(env),
+    attempt: MAX_RETRIES,
+    elapsedMs: Date.now() - functionStartedAt,
+  });
+  if (exhaustedFallback) {
+    console.warn('openai-draft exhausted fallback', { contentType: input.contentType });
+    return exhaustedFallback;
   }
 
   return {

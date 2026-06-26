@@ -3,6 +3,7 @@ import {
   normalizeDraftInput,
   openAiDraftInternals,
   resolveOpenAiModel,
+  tryInputFallbackDraft,
   validateDraftInput,
 } from '../lib/openai-draft.js';
 import { createRequestId, errorResponse, handleOptions, readJsonBody, successResponse } from '../lib/http.js';
@@ -83,11 +84,47 @@ export async function onRequestPost(context) {
 
     lastStage = 'openai_call';
     const openAiStartedAt = Date.now();
-    const result = await callOpenAiDraft(env, input);
+    let result;
+    try {
+      result = await callOpenAiDraft(env, input);
+    } catch (err) {
+      console.error('generate-case-draft callOpenAiDraft uncaught', {
+        requestId,
+        stage: lastStage,
+        errorName: err?.name || '',
+        errorMessage: String(err?.message || err).slice(0, 300),
+        errorStack: String(err?.stack || '').slice(0, 800),
+      });
+      const fallbackDraft = tryInputFallbackDraft(input);
+      if (fallbackDraft) {
+        return successResponse({
+          requestId,
+          model: resolveOpenAiModel(env),
+          draft: fallbackDraft,
+          usedFallback: true,
+        });
+      }
+      throw err;
+    }
     const openAiWallMs = Date.now() - openAiStartedAt;
     const elapsedMs = Date.now() - handlerStartedAt;
 
     if (!result.ok) {
+      const fallbackDraft = tryInputFallbackDraft(input);
+      if (fallbackDraft) {
+        console.warn('generate-case-draft handler fallback', {
+          requestId,
+          stage: result.stage || lastStage,
+          code: result.code || '',
+        });
+        return successResponse({
+          requestId,
+          model: result.model || resolveOpenAiModel(env),
+          draft: fallbackDraft,
+          usedFallback: true,
+        });
+      }
+
       lastStage = result.stage || 'openai_draft_failed';
       const errorCode = mapHandlerErrorCode(result.code || 'OPENAI_SERVER_ERROR');
       console.warn('generate-case-draft failed', {
@@ -150,7 +187,7 @@ export async function onRequestPost(context) {
     });
     return errorResponse(
       'INTERNAL_ERROR',
-      'AI 초안 생성 중 서버 오류가 발생했습니다.',
+      'AI 처리 중 서버 오류가 발생했습니다.',
       500,
       { requestId },
     );

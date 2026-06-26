@@ -2,9 +2,9 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { onRequestPost } from '../api/generate-case-draft.js';
 import {
+  buildRepairFallbackDraft,
   buildDraftPrompt,
   buildOpenAiUserInput,
-  buildRepairFallbackDraft,
   callOpenAiDraft,
   isMeaninglessTitle,
   normalizeDraftInput,
@@ -449,16 +449,17 @@ test('callOpenAiDraft handles timeout', async () => {
   assert.equal(result.code, 'OPENAI_TIMEOUT');
 });
 
-test('callOpenAiDraft does not retry on meaningless title', async () => {
+test('callOpenAiDraft falls back when OpenAI returns meaningless numeric title', async () => {
   let calls = 0;
   const fetchImpl = async () => {
     calls += 1;
     return openAiSuccessResponse({ ...repairSampleDraft, title: '456' });
   };
   const result = await callOpenAiDraft(env, normalizeDraftInput(repairInput1), fetchImpl);
-  assert.equal(result.ok, false);
+  assert.equal(result.ok, true);
   assert.equal(calls, 1);
-  assert.equal(result.qualityReason, 'numeric_title');
+  assert.equal(result.usedFallback, true);
+  assert.notEqual(result.draft.title, '456');
 });
 
 test('callOpenAiDraft does not invent replacement when only inspection work', async () => {
@@ -500,6 +501,106 @@ test('buildDraftPrompt includes repair developer rules', () => {
   assert.match(prompt.system, /수리사례/);
   assert.match(prompt.user, /전진 불량/);
   assert.doesNotMatch(prompt.user, /후진/);
+});
+
+test('validateDraftInput rejects numeric-only weak workContent', () => {
+  const input = normalizeDraftInput({
+    contentType: 'repair',
+    vehicle: '1',
+    symptoms: ['전진 불량'],
+    workContent: '7272',
+    result: [],
+  });
+  const result = validateDraftInput(input);
+  assert.equal(result.ok, false);
+  assert.equal(result.code, 'VALIDATION_ERROR');
+  assert.match(result.message, /작업 내용/);
+});
+
+test('buildRepairFallbackDraft works without result chips', () => {
+  const input = normalizeDraftInput({
+    contentType: 'repair',
+    vehicle: '산업용 전동차',
+    symptoms: ['전진 불량'],
+    workContent: '배선 보수 및 시운전',
+    result: [],
+  });
+  const draft = buildRepairFallbackDraft(input);
+  assert.ok(draft);
+  assert.match(draft.result, /작업/);
+  assert.match(draft.customerRequest, /전진 불량/);
+});
+
+test('callOpenAiDraft returns fallback when OpenAI leaves result empty', async () => {
+  const fetchImpl = async () => openAiRawContentResponse(JSON.stringify({
+    title: '전진 불량 수리',
+    summary: '전진 불량 증상을 점검했습니다.',
+    customerRequest: '전진 불량 증상으로 점검을 요청받았습니다.',
+    diagnosis: '',
+    workDetails: '관련 점검 및 수리 작업을 진행했습니다.',
+    result: '',
+    seoTitle: '전진 불량 수리',
+    seoDescription: '전진 불량 수리 사례입니다.',
+    keywords: ['전진 불량', '수리'],
+  }));
+  const result = await callOpenAiDraft(env, normalizeDraftInput({
+    contentType: 'repair',
+    vehicle: '산업용 전동차',
+    symptoms: ['전진 불량'],
+    workContent: '배선 보수 및 시운전',
+    result: [],
+  }), fetchImpl);
+  assert.equal(result.ok, true);
+  assert.match(result.draft.result, /작업|확인/);
+});
+
+test('generate-case-draft handler returns 400 for weak workContent payload', async () => {
+  const response = await onRequestPost({
+    request: new Request('https://dreamev.kr/api/generate-case-draft', {
+      method: 'POST',
+      headers: authHeaders(),
+      body: JSON.stringify({
+        contentType: 'repair',
+        userTitle: '1',
+        vehicle: '1',
+        symptoms: ['전진 불량'],
+        workContent: '7272',
+        result: [],
+      }),
+    }),
+    env,
+  });
+  assert.equal(response.status, 400);
+  const body = await response.json();
+  assert.equal(body.code, 'VALIDATION_ERROR');
+  assert.ok(body.requestId);
+});
+
+test('generate-case-draft handler never returns 500 for workContent-only payload', async () => {
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async () => openAiRawContentResponse('not-json');
+  try {
+    const response = await onRequestPost({
+      request: new Request('https://dreamev.kr/api/generate-case-draft', {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify({
+          contentType: 'repair',
+          vehicle: '산업용 전동차',
+          symptoms: ['전진 불량'],
+          workContent: '배선 보수 및 시운전',
+          result: [],
+        }),
+      }),
+      env,
+    });
+    assert.notEqual(response.status, 500);
+    const body = await response.json();
+    assert.notEqual(body.code, 'INTERNAL_ERROR');
+    if (body.success) assert.ok(body.draft);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
 });
 
 test('real OpenAI integration contactor repair input', { skip: !process.env.OPENAI_API_KEY }, async () => {
