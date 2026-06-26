@@ -118,6 +118,7 @@
     </div>
 
     <script src="js/case-image-lightbox.js"></script>
+    <script src="js/case-modal-slider.js"></script>
     <script src="js/script.js"></script>
     <script>
         // Mobile Menu Toggle - 기존 코드 주석 처리
@@ -294,10 +295,9 @@
 
             var modalImageContainer = document.getElementById('modalImageContainer');
 
-            // 하이브리드 출력: gallery 있으면 여러 장, 없으면 image 한 장
+            // 슬라이더 출력: gallery 있으면 좌우 슬라이드, image면 한 장
             function renderModalImages(container, caseData) {
                 if (!container) return;
-                container.innerHTML = '';
                 var title = caseData.title || '수리사례';
                 var paths = [];
 
@@ -308,17 +308,8 @@
                     paths = [(raw.indexOf('/') === 0 || raw.indexOf('http') === 0) ? raw : ('/' + raw.replace(/^\//, ''))];
                 }
 
-                paths.forEach(function(imgUrl) {
-                    var img = document.createElement('img');
-                    img.src = imgUrl;
-                    img.alt = title;
-                    img.className = 'case-modal-image detail-image';
-                    img.loading = 'lazy';
-                    container.appendChild(img);
-                });
-
-                if (window.CaseImageLightbox && paths.length) {
-                    window.CaseImageLightbox.bindDetailImages(container, paths, title);
+                if (window.CaseModalSlider) {
+                    window.CaseModalSlider.render(container, paths, title);
                 }
             }
 

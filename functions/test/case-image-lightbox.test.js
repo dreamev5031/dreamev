@@ -12,7 +12,7 @@ const styleCss = readFileSync(join(root, 'css', 'style.css'), 'utf8');
 
 function assertLightboxWiring(html) {
   assert.match(html, /js\/case-image-lightbox\.js/);
-  assert.match(html, /CaseImageLightbox\.bindDetailImages/);
+  assert.match(html, /js\/case-modal-slider\.js/);
   assert.match(html, /CaseImageLightbox\.isOpen\(\)/);
   assert.match(html, /function renderModalImages\(/);
 }
@@ -26,7 +26,6 @@ test('repair-cases.html wires modal images to shared lightbox', () => {
 });
 
 test('case-image-lightbox.js supports gallery navigation and touch', () => {
-  assert.match(lightboxJs, /bindDetailImages/);
   assert.match(lightboxJs, /touchstart/);
   assert.match(lightboxJs, /touchend/);
   assert.match(lightboxJs, /showAt/);

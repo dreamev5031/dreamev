@@ -45,11 +45,11 @@
         closeBtn.addEventListener('click', close);
         prevBtn.addEventListener('click', function(e) {
             e.stopPropagation();
-            showAt(currentIndex - 1);
+            if (currentIndex > 0) showAt(currentIndex - 1);
         });
         nextBtn.addEventListener('click', function(e) {
             e.stopPropagation();
-            showAt(currentIndex + 1);
+            if (currentIndex < imagePaths.length - 1) showAt(currentIndex + 1);
         });
         stage.addEventListener('click', function(e) {
             e.stopPropagation();
@@ -67,8 +67,8 @@
             var dx = e.changedTouches[0].screenX - touchStartX;
             var dy = e.changedTouches[0].screenY - touchStartY;
             if (Math.abs(dx) < 50 || Math.abs(dx) < Math.abs(dy)) return;
-            if (dx > 0) showAt(currentIndex - 1);
-            else showAt(currentIndex + 1);
+            if (dx > 0 && currentIndex > 0) showAt(currentIndex - 1);
+            else if (dx < 0 && currentIndex < imagePaths.length - 1) showAt(currentIndex + 1);
         }, { passive: true });
 
         if (!keydownBound) {
@@ -79,9 +79,9 @@
                     e.preventDefault();
                     e.stopPropagation();
                     close();
-                } else if (e.key === 'ArrowLeft') {
+                } else if (e.key === 'ArrowLeft' && currentIndex > 0) {
                     showAt(currentIndex - 1);
-                } else if (e.key === 'ArrowRight') {
+                } else if (e.key === 'ArrowRight' && currentIndex < imagePaths.length - 1) {
                     showAt(currentIndex + 1);
                 }
             }, true);
@@ -90,8 +90,14 @@
 
     function updateNav() {
         var multi = imagePaths.length > 1;
-        if (prevBtn) prevBtn.style.display = multi ? '' : 'none';
-        if (nextBtn) nextBtn.style.display = multi ? '' : 'none';
+        if (prevBtn) {
+            prevBtn.style.display = multi ? '' : 'none';
+            prevBtn.disabled = currentIndex <= 0;
+        }
+        if (nextBtn) {
+            nextBtn.style.display = multi ? '' : 'none';
+            nextBtn.disabled = currentIndex >= imagePaths.length - 1;
+        }
         if (counterEl) {
             counterEl.style.display = multi ? '' : 'none';
             counterEl.textContent = multi ? (currentIndex + 1) + ' / ' + imagePaths.length : '';
@@ -100,7 +106,7 @@
 
     function showAt(index) {
         if (!imagePaths.length) return;
-        currentIndex = (index + imagePaths.length) % imagePaths.length;
+        currentIndex = Math.max(0, Math.min(index, imagePaths.length - 1));
         if (imgEl) {
             imgEl.src = imagePaths[currentIndex];
             imgEl.alt = altText;
