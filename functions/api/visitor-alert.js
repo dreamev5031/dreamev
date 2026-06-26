@@ -17,10 +17,18 @@ export async function onRequestPost(context) {
 
   try {
     const result = await processVisitorAlertRequest(context, body);
+
+    if (result.error === 'CONFIG_ERROR') {
+      return errorResponse('CONFIG_ERROR', result.message, 503);
+    }
+    if (result.error === 'VALIDATION_ERROR') {
+      return errorResponse('VALIDATION_ERROR', result.message, 400);
+    }
+
     return successResponse(result);
   } catch (err) {
     console.error('visitor-alert handler failed', err.message);
-    return successResponse({ sent: false, reason: 'server_error' });
+    return errorResponse('SERVER_ERROR', '방문 처리 중 오류가 발생했습니다.', 500);
   }
 }
 

@@ -10,5 +10,9 @@ OPENAI_MODEL=gpt-4.1-mini
 # TELEGRAM_BOT_TOKEN=
 # TELEGRAM_CHAT_ID=
 # VISITOR_ALERT_ENABLED=true
-# VISITOR_ALERT_COOLDOWN_MINUTES=30
 # VISITOR_ALERT_ADMIN_SECRET=
+
+# D1 (Cloudflare 대시보드 Pages 바인딩 — wrangler.toml 사용 안 함)
+# Binding name: VISITOR_DB
+# 권장 DB 이름: dreamev-visitors
+# 초기 스키마: schema/visitor-d1.sql

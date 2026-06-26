@@ -1,5 +1,14 @@
+import {
+  countDailyVisitors,
+  ensureVisitorSchema,
+  insertDailyVisitor,
+} from './visitor-db.js';
+
 const BOT_UA_PATTERN =
   /googlebot|bingbot|yandex|baiduspider|duckduckbot|slurp|facebookexternalhit|twitterbot|linkedinbot|whatsapp|telegrambot|discordbot|yeti|naverbot|daumoa|kakaotalk-scrap|bytespider|applebot|petalbot|semrush|ahrefsbot|mj12bot|dotbot|curl\/|wget\/|python-requests|headlesschrome|phantomjs/i;
+
+const UUID_PATTERN =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 const ALLOWED_PATHS = new Set(['/', '/cases', '/repair-cases', '/contact']);
 
@@ -20,6 +29,12 @@ export function isVisitorAlertEnabled(env) {
 export function isBotUserAgent(userAgent) {
   if (!userAgent) return true;
   return BOT_UA_PATTERN.test(userAgent);
+}
+
+export function isValidVisitorId(visitorId) {
+  if (!visitorId || typeof visitorId !== 'string') return false;
+  if (visitorId.length > 36) return false;
+  return UUID_PATTERN.test(visitorId);
 }
 
 export function normalizeVisitorPath(pathname) {
@@ -48,12 +63,23 @@ export function sanitizeVisitorText(value, maxLen = 200) {
     .slice(0, maxLen);
 }
 
+export function getKstVisitDate(date = new Date()) {
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Seoul',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(date);
+}
+
 function extractQueryKeyword(referrer, paramNames) {
   try {
     const url = new URL(referrer);
     for (const name of paramNames) {
       const value = url.searchParams.get(name);
-      if (value && value.trim()) return sanitizeVisitorText(decodeURIComponent(value.replace(/\+/g, ' ')), 80);
+      if (value && value.trim()) {
+        return sanitizeVisitorText(decodeURIComponent(value.replace(/\+/g, ' ')), 80);
+      }
     }
   } catch {
     return '확인 불가';
@@ -133,6 +159,10 @@ export function describeDevice(userAgent, screenType) {
   return `${typeLabel} (${browser})`;
 }
 
+export function describeDeviceShort(userAgent, screenType) {
+  return describeDevice(userAgent, screenType).replace(/\s*\([^)]+\)$/, '');
+}
+
 export function formatKstDateTime(date = new Date()) {
   const parts = new Intl.DateTimeFormat('ko-KR', {
     timeZone: 'Asia/Seoul',
@@ -149,6 +179,7 @@ export function formatKstDateTime(date = new Date()) {
 }
 
 export function buildTelegramMessage({
+  todayVisitors,
   source,
   pathname,
   keyword,
@@ -157,34 +188,16 @@ export function buildTelegramMessage({
   visitedAt,
 }) {
   return [
-    '드림전동차 홈페이지 방문',
+    '드림전동차 홈페이지 신규 방문',
     '',
+    `오늘 방문자: ${todayVisitors}명`,
     `유입: ${sanitizeVisitorText(source, 80)}`,
-    `페이지: ${sanitizeVisitorText(pathname, 120)}`,
+    `첫 페이지: ${sanitizeVisitorText(pathname, 120)}`,
     `검색어: ${sanitizeVisitorText(keyword, 80)}`,
     `기기: ${sanitizeVisitorText(device, 120)}`,
     `국가: ${sanitizeVisitorText(country, 8)}`,
     `시간: ${sanitizeVisitorText(visitedAt, 32)}`,
   ].join('\n');
-}
-
-export async function hashForDedup(ip, userAgent, pepper) {
-  const material = `${pepper || 'dreamev'}|${ip || 'unknown'}|${(userAgent || '').slice(0, 120)}`;
-  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(material));
-  return Array.from(new Uint8Array(digest))
-    .map((b) => b.toString(16).padStart(2, '0'))
-    .join('')
-    .slice(0, 32);
-}
-
-export async function isServerCooldownActive(cache, dedupKey, cooldownMinutes) {
-  if (!cache || !dedupKey) return false;
-  const ttl = Math.max(1, Number.parseInt(String(cooldownMinutes || 30), 10) || 30) * 60;
-  const cacheRequest = new Request(`https://visitor-alert.dedup/${encodeURIComponent(dedupKey)}`);
-  const hit = await cache.match(cacheRequest);
-  if (hit) return true;
-  await cache.put(cacheRequest, new Response('1', { status: 200 }), { expirationTtl: ttl });
-  return false;
 }
 
 export function hasVisitorSilenceCookie(request) {
@@ -197,10 +210,22 @@ export function isAllowedOrigin(request) {
   if (!origin) return true;
   try {
     const host = new URL(origin).hostname.toLowerCase();
-    return host === 'dreamev.kr' || host === 'www.dreamev.kr' || host === 'localhost' || host === '127.0.0.1';
+    return (
+      host === 'dreamev.kr' ||
+      host === 'www.dreamev.kr' ||
+      host === 'localhost' ||
+      host === '127.0.0.1'
+    );
   } catch {
     return false;
   }
+}
+
+export function isValidStatsDate(dateStr) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return false;
+  const [y, m, d] = dateStr.split('-').map(Number);
+  const dt = new Date(Date.UTC(y, m - 1, d));
+  return dt.getUTCFullYear() === y && dt.getUTCMonth() === m - 1 && dt.getUTCDate() === d;
 }
 
 export async function sendTelegramVisitorAlert(env, message, fetchImpl = fetch) {
@@ -222,7 +247,12 @@ export async function sendTelegramVisitorAlert(env, message, fetchImpl = fetch) 
 
   if (!response.ok) {
     const body = await response.text().catch(() => '');
-    return { ok: false, reason: 'telegram_http_error', status: response.status, body: body.slice(0, 200) };
+    return {
+      ok: false,
+      reason: 'telegram_http_error',
+      status: response.status,
+      body: body.slice(0, 200),
+    };
   }
 
   return { ok: true };
@@ -231,27 +261,51 @@ export async function sendTelegramVisitorAlert(env, message, fetchImpl = fetch) 
 export async function processVisitorAlertRequest(context, body, deps = {}) {
   const { request, env, waitUntil } = context;
   const fetchImpl = deps.fetchImpl || fetch;
-  const cache = deps.cache || globalThis.caches?.default;
+  const db = deps.db || env.VISITOR_DB;
+  const visitDate = deps.visitDate || getKstVisitDate();
+  const now = deps.now || new Date();
 
-  if (!isVisitorAlertEnabled(env)) {
-    return { sent: false, reason: 'disabled' };
-  }
-
-  if (!env.TELEGRAM_BOT_TOKEN || !env.TELEGRAM_CHAT_ID) {
-    return { sent: false, reason: 'not_configured' };
+  if (!db) {
+    return { error: 'CONFIG_ERROR', message: 'VISITOR_DB 바인딩이 설정되지 않았습니다.' };
   }
 
   if (!isAllowedOrigin(request)) {
-    return { sent: false, reason: 'origin_blocked' };
+    return {
+      isNewVisitorToday: false,
+      visitDate,
+      todayVisitors: null,
+      telegramTriggered: false,
+      skipped: true,
+      reason: 'origin_blocked',
+    };
   }
 
   const userAgent = request.headers.get('User-Agent') || '';
   if (isBotUserAgent(userAgent)) {
-    return { sent: false, reason: 'bot' };
+    return {
+      isNewVisitorToday: false,
+      visitDate,
+      todayVisitors: null,
+      telegramTriggered: false,
+      skipped: true,
+      reason: 'bot',
+    };
   }
 
   if (hasVisitorSilenceCookie(request)) {
-    return { sent: false, reason: 'silenced' };
+    return {
+      isNewVisitorToday: false,
+      visitDate,
+      todayVisitors: null,
+      telegramTriggered: false,
+      skipped: true,
+      reason: 'silenced',
+    };
+  }
+
+  const visitorId = sanitizeVisitorText(body?.visitorId || '', 36);
+  if (!isValidVisitorId(visitorId)) {
+    return { error: 'VALIDATION_ERROR', message: '유효한 visitorId(UUID)가 필요합니다.' };
   }
 
   const headerReferrer = sanitizeVisitorText(request.headers.get('Referer') || '', 500);
@@ -260,56 +314,94 @@ export async function processVisitorAlertRequest(context, body, deps = {}) {
 
   const pathname = normalizeVisitorPath(body?.path || new URL(request.url).pathname);
   if (!isAllowedVisitorPath(pathname)) {
-    return { sent: false, reason: 'path_not_tracked' };
-  }
-
-  if (body?.clientCooldownActive === true) {
-    return { sent: false, reason: 'client_cooldown' };
+    return {
+      isNewVisitorToday: false,
+      visitDate,
+      todayVisitors: null,
+      telegramTriggered: false,
+      skipped: true,
+      reason: 'path_not_tracked',
+    };
   }
 
   const screenType = sanitizeVisitorText(body?.screenType || '', 20).toLowerCase();
-  const ip = request.headers.get('CF-Connecting-IP') || '';
-  const pepper = env.TELEGRAM_BOT_TOKEN.slice(-12);
-  const dedupKey = await hashForDedup(ip, userAgent, pepper);
-  const cooldownMinutes = env.VISITOR_ALERT_COOLDOWN_MINUTES || '30';
-
-  if (await isServerCooldownActive(cache, dedupKey, cooldownMinutes)) {
-    return { sent: false, reason: 'server_cooldown' };
-  }
-
   const refInfo = classifyReferrer(referrer);
-  if (refInfo.source === '사이트 내부') {
-    return { sent: false, reason: 'internal_navigation' };
-  }
-
   const { source, keyword } = refInfo;
-  const device = describeDevice(userAgent, screenType);
+  const deviceType = describeDevice(userAgent, screenType);
+  const deviceShort = describeDeviceShort(userAgent, screenType);
   const country = sanitizeVisitorText(request.headers.get('CF-IPCountry') || '??', 8);
-  const visitedAt = formatKstDateTime();
-  const message = buildTelegramMessage({
+  const firstSeenAt = formatKstDateTime(now);
+
+  await ensureVisitorSchema(db);
+
+  const isNew = await insertDailyVisitor(db, {
+    visitDate,
+    visitorId,
+    firstPath: pathname,
+    firstReferrer: referrer || null,
     source,
-    pathname,
-    keyword,
-    device,
+    deviceType,
     country,
-    visitedAt,
+    firstSeenAt,
   });
 
-  const sendPromise = sendTelegramVisitorAlert(env, message, fetchImpl).then((result) => {
-    if (!result.ok) {
-      console.error('visitor-alert telegram failed', {
-        reason: result.reason,
-        status: result.status,
-      });
-    }
-    return result;
-  });
+  const todayVisitors = await countDailyVisitors(db, visitDate);
 
-  if (typeof waitUntil === 'function') {
-    waitUntil(sendPromise);
-  } else {
-    await sendPromise;
+  if (!isNew) {
+    return {
+      isNewVisitorToday: false,
+      visitDate,
+      todayVisitors,
+      telegramTriggered: false,
+    };
   }
 
-  return { sent: true };
+  const warnings = [];
+  let telegramTriggered = false;
+
+  if (isVisitorAlertEnabled(env) && env.TELEGRAM_BOT_TOKEN && env.TELEGRAM_CHAT_ID) {
+    const message = buildTelegramMessage({
+      todayVisitors,
+      source,
+      pathname,
+      keyword,
+      device: deviceShort,
+      country,
+      visitedAt: firstSeenAt,
+    });
+
+    const sendPromise = sendTelegramVisitorAlert(env, message, fetchImpl).then((result) => {
+      if (!result.ok) {
+        console.error('visitor-alert telegram failed', {
+          reason: result.reason,
+          status: result.status,
+        });
+      }
+      return result;
+    });
+
+    if (typeof waitUntil === 'function') {
+      waitUntil(sendPromise);
+      telegramTriggered = true;
+    } else {
+      const result = await sendPromise;
+      telegramTriggered = result.ok;
+      if (!result.ok) warnings.push('TELEGRAM_SEND_FAILED');
+    }
+  } else if (!env.TELEGRAM_BOT_TOKEN || !env.TELEGRAM_CHAT_ID) {
+    warnings.push('TELEGRAM_NOT_CONFIGURED');
+  }
+
+  const response = {
+    isNewVisitorToday: true,
+    visitDate,
+    todayVisitors,
+    telegramTriggered,
+  };
+
+  if (warnings.length > 0) {
+    response.warnings = warnings;
+  }
+
+  return response;
 }
