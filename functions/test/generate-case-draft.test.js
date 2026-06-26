@@ -4,12 +4,15 @@ import { onRequestPost } from '../api/generate-case-draft.js';
 import {
   buildDraftPrompt,
   buildOpenAiUserInput,
+  buildRepairFallbackDraft,
   callOpenAiDraft,
   isMeaninglessTitle,
   normalizeDraftInput,
   openAiDraftInternals,
+  parseOpenAiDraftJson,
   sanitizeProductionDraft,
   sanitizeRepairDraft,
+  stripJsonCodeFence,
   validateDraftInput,
   validateDraftQuality,
   normalizeRepairWorkItemLabel,
@@ -48,6 +51,26 @@ const repairInput2 = {
   workContent: '시운전 및 전체 점검',
   result: ['현장 수리 완료'],
 };
+
+const repairInputContactor = {
+  contentType: 'repair',
+  userTitle: '석고 운반용 전동차',
+  vehicle: '석고 운반용 전동차',
+  symptoms: ['컨택터 작동 불량', '주행 불가'],
+  diagnosis: [],
+  workContent: '컨택터 이상으로 주행 불가 컨택터 신품으로 교체후 정상작동',
+  result: ['정상 작동'],
+};
+
+function openAiRawContentResponse(rawContent) {
+  return {
+    ok: true,
+    status: 200,
+    text: async () => JSON.stringify({
+      choices: [{ message: { content: rawContent } }],
+    }),
+  };
+}
 
 const repairInputSuv = {
   contentType: 'repair',
@@ -193,6 +216,113 @@ test('normalizeDraftInput maps legacy work fields to workContent', () => {
   assert.match(input.workContent, /컨트롤러 교체/);
   assert.match(input.workContent, /배선교체|배선 교체/);
   assert.match(input.workContent, /주행 테스트/);
+});
+
+test('normalizeDraftInput accepts string symptoms and results', () => {
+  const input = normalizeDraftInput({
+    contentType: 'repair',
+    vehicle: '전동차',
+    symptoms: '컨택터 작동 불량, 주행 불가',
+    workContent: '컨택터 교체',
+    result: '정상 작동',
+  });
+  assert.deepEqual(input.symptoms, ['컨택터 작동 불량', '주행 불가']);
+  assert.deepEqual(input.result, ['정상 작동']);
+});
+
+test('normalizeDraftInput accepts repairContent and repairDetails aliases', () => {
+  const input = normalizeDraftInput({
+    contentType: 'repair',
+    vehicle: '전동차',
+    symptoms: ['주행 불가'],
+    repairDetails: '컨택터 이상으로 교체 작업',
+    result: ['정상 작동'],
+  });
+  assert.match(input.workContent, /컨택터/);
+});
+
+test('stripJsonCodeFence and parseOpenAiDraftJson handle fenced JSON', () => {
+  const fenced = '```json\n{"title":"테스트"}\n```';
+  assert.equal(stripJsonCodeFence(fenced), '{"title":"테스트"}');
+  const parsed = parseOpenAiDraftJson(fenced);
+  assert.equal(parsed.ok, true);
+  assert.equal(parsed.value.title, '테스트');
+});
+
+test('callOpenAiDraft uses input fallback when OpenAI returns invalid JSON', async () => {
+  const fetchImpl = async () => openAiRawContentResponse('not-json-at-all');
+  const result = await callOpenAiDraft(env, normalizeDraftInput(repairInputContactor), fetchImpl);
+  assert.equal(result.ok, true);
+  assert.equal(result.usedFallback, true);
+  assert.match(result.draft.workDetails, /컨택터/);
+});
+
+test('callOpenAiDraft uses input fallback when OpenAI returns empty content', async () => {
+  const fetchImpl = async () => openAiRawContentResponse('');
+  const result = await callOpenAiDraft(env, normalizeDraftInput(repairInputContactor), fetchImpl);
+  assert.equal(result.ok, true);
+  assert.equal(result.usedFallback, true);
+});
+
+test('buildRepairFallbackDraft uses only user facts', () => {
+  const draft = buildRepairFallbackDraft(normalizeDraftInput(repairInputContactor));
+  assert.match(draft.customerRequest, /컨택터 작동 불량/);
+  assert.match(draft.workDetails, /컨택터/);
+  assert.match(draft.result, /정상 작동/);
+});
+
+test('generate-case-draft handler succeeds with workContent-only contactor payload', async () => {
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async () => openAiSuccessResponse({
+    ...repairSampleDraft,
+    title: '석고 운반용 전동차 컨택터 교체 작업',
+    customerRequest: '석고 운반용 전동차에서 컨택터 작동 불량과 주행 불가 증상으로 점검을 요청받았습니다.',
+    workDetails: '점검 결과 컨택터 이상이 확인되어 신품 컨택터로 교체 작업을 진행했습니다.',
+    result: '작업 후 정상 작동 상태를 확인했습니다.',
+  });
+  try {
+    const response = await onRequestPost({
+      request: new Request('https://dreamev.kr/api/generate-case-draft', {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify(repairInputContactor),
+      }),
+      env,
+    });
+    assert.equal(response.status, 200);
+    const body = await response.json();
+    assert.equal(body.success, true);
+    assert.match(body.draft.workDetails, /컨택터/);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test('generate-case-draft handler does not throw when legacy work arrays are absent', async () => {
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async () => openAiSuccessResponse(repairSampleDraft);
+  const payload = {
+    contentType: 'repair',
+    vehicle: '전동차',
+    symptoms: ['주행 불가'],
+    workContent: '컨택터 교체 작업 진행',
+    result: ['정상 작동'],
+  };
+  try {
+    const response = await onRequestPost({
+      request: new Request('https://dreamev.kr/api/generate-case-draft', {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify(payload),
+      }),
+      env,
+    });
+    assert.notEqual(response.status, 500);
+    const body = await response.json();
+    assert.notEqual(body.code, 'INTERNAL_ERROR');
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
 });
 
 test('validateDraftInput requires workContent when symptoms provided', () => {
@@ -370,6 +500,15 @@ test('buildDraftPrompt includes repair developer rules', () => {
   assert.match(prompt.system, /수리사례/);
   assert.match(prompt.user, /전진 불량/);
   assert.doesNotMatch(prompt.user, /후진/);
+});
+
+test('real OpenAI integration contactor repair input', { skip: !process.env.OPENAI_API_KEY }, async () => {
+  const result = await callOpenAiDraft(
+    { OPENAI_API_KEY: process.env.OPENAI_API_KEY, OPENAI_MODEL: 'gpt-4.1-mini' },
+    normalizeDraftInput(repairInputContactor),
+  );
+  assert.equal(result.ok, true, JSON.stringify(result));
+  assert.match(result.draft.workDetails, /컨택터/);
 });
 
 test('real OpenAI integration repair input 1', { skip: !process.env.OPENAI_API_KEY }, async () => {

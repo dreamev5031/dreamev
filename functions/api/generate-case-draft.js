@@ -104,6 +104,8 @@ export async function onRequestPost(context) {
         openAiRequestId: result.openAiRequestId || '',
         contentType: input.contentType,
         qualityReason: result.qualityReason || '',
+        parseReason: result.parseReason || '',
+        contentPreview: result.contentPreview ? String(result.contentPreview).slice(0, 120) : '',
         openAiElapsedMs: result.openAiElapsedMs ?? openAiWallMs,
         elapsedMs,
         aborted: result.aborted ?? false,
@@ -133,6 +135,7 @@ export async function onRequestPost(context) {
       requestId,
       model: result.model,
       draft: result.draft,
+      ...(result.usedFallback ? { usedFallback: true } : {}),
     });
   } catch (err) {
     const elapsedMs = Date.now() - handlerStartedAt;

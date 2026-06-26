@@ -245,8 +245,47 @@ export function dedupeRepairTextLines(...chunks) {
   return lines.join('\n');
 }
 
+/** 배열·문자열·null/undefined를 안전하게 단일 텍스트로 정규화 */
+export function normalizeText(value) {
+  if (Array.isArray(value)) {
+    return value
+      .map((item) => (typeof item === 'string' ? item.trim() : String(item || '').trim()))
+      .filter(Boolean)
+      .join(', ');
+  }
+  if (typeof value === 'string') return value.trim();
+  if (value == null) return '';
+  return String(value).trim();
+}
+
+function collectRepairWorkItems(...sources) {
+  const items = [];
+  for (const source of sources) {
+    if (Array.isArray(source)) {
+      for (const item of source) {
+        const text = normalizeText(item);
+        if (text) items.push(text);
+      }
+      continue;
+    }
+    const text = normalizeText(source);
+    if (!text) continue;
+    if (text.includes('\n')) {
+      for (const line of text.split('\n')) {
+        const trimmed = line.trim();
+        if (trimmed) items.push(trimmed);
+      }
+    } else {
+      items.push(text);
+    }
+  }
+  return items;
+}
+
 export function mergeLegacyRepairWorkContent({
   workContent,
+  repairContent,
+  repairDetails,
   workDetails,
   workItems,
   selectedWorkItems,
@@ -254,20 +293,22 @@ export function mergeLegacyRepairWorkContent({
   actions,
   additionalNote,
 } = {}) {
-  const direct = (workContent || '').trim();
+  const direct = normalizeText(workContent)
+    || normalizeText(repairContent)
+    || normalizeText(repairDetails);
   if (direct) return direct;
 
-  const itemList = []
-    .concat(Array.isArray(workItems) ? workItems : [])
-    .concat(Array.isArray(selectedWorkItems) ? selectedWorkItems : [])
-    .concat(Array.isArray(work) ? work : [])
-    .concat(Array.isArray(actions) ? actions : [])
-    .map((item) => String(item || '').trim())
-    .filter(Boolean);
+  const itemList = collectRepairWorkItems(
+    workItems,
+    selectedWorkItems,
+    work,
+    actions,
+  );
 
   return dedupeRepairTextLines(
     itemList.join('\n'),
     workDetails,
+    repairDetails,
     additionalNote,
   );
 }

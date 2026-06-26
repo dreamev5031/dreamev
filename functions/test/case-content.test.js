@@ -11,6 +11,7 @@ import {
   isValidMdFileName,
   mergeLegacyRepairWorkContent,
   normalizeContentType,
+  normalizeText,
   parseRepairFrontmatter,
   resolveMdFileName,
   validateCategory,
@@ -182,6 +183,34 @@ test('mergeLegacyRepairWorkContent merges legacy fields', () => {
   assert.match(merged, /컨트롤러 교체/);
   assert.match(merged, /배선/);
   assert.match(merged, /시운전/);
+});
+
+test('normalizeText handles array and string values', () => {
+  assert.equal(normalizeText(['컨택터 교체', '시운전']), '컨택터 교체, 시운전');
+  assert.equal(normalizeText('  작업 내용 '), '작업 내용');
+  assert.equal(normalizeText(null), '');
+});
+
+test('mergeLegacyRepairWorkContent prefers workContent and repair aliases', () => {
+  assert.equal(
+    mergeLegacyRepairWorkContent({ workContent: '신규 작업 내용' }),
+    '신규 작업 내용',
+  );
+  assert.equal(
+    mergeLegacyRepairWorkContent({ repairContent: '레거시 repairContent' }),
+    '레거시 repairContent',
+  );
+  assert.equal(
+    mergeLegacyRepairWorkContent({ workItems: '컨택터 교체, 배선 정비' }),
+    '컨택터 교체, 배선 정비',
+  );
+  assert.match(
+    mergeLegacyRepairWorkContent({
+      repairDetails: '컨택터 이상 확인',
+      selectedWorkItems: ['컨택터 교체'],
+    }),
+    /컨택터/,
+  );
 });
 
 test('dedupeRepairTextLines removes repeated lines', () => {

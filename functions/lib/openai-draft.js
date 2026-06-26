@@ -1,4 +1,4 @@
-import { mergeLegacyRepairWorkContent } from './case-content.js';
+import { mergeLegacyRepairWorkContent, normalizeText } from './case-content.js';
 
 const DEFAULT_MODEL = 'gpt-4.1-mini';
 const OPENAI_ENDPOINT = 'https://api.openai.com/v1/chat/completions';
@@ -192,7 +192,11 @@ function normalizeStringList(value, maxItems = LIMITS.listCount, maxItemLen = LI
   if (!Array.isArray(value)) {
     if (typeof value === 'string') {
       const text = emptyAsBlank(value);
-      return text ? [trimText(text, maxItemLen)] : [];
+      if (!text) return [];
+      return text.split(/[,，\n]/)
+        .map((item) => trimText(emptyAsBlank(item), maxItemLen))
+        .filter(Boolean)
+        .slice(0, maxItems);
     }
     return [];
   }
@@ -200,6 +204,33 @@ function normalizeStringList(value, maxItems = LIMITS.listCount, maxItemLen = LI
     .map((item) => trimText(emptyAsBlank(item), maxItemLen))
     .filter(Boolean)
     .slice(0, maxItems);
+}
+
+function normalizeListField(payload, field, aliases = []) {
+  for (const key of [field, ...aliases]) {
+    const raw = payload?.[key];
+    if (raw !== undefined && raw !== null && raw !== '') {
+      return normalizeStringList(raw);
+    }
+  }
+  return [];
+}
+
+function resolveRepairWorkContent(payload) {
+  return trimText(
+    mergeLegacyRepairWorkContent({
+      workContent: payload?.workContent,
+      repairContent: payload?.repairContent,
+      repairDetails: payload?.repairDetails,
+      workDetails: payload?.workDetails,
+      workItems: payload?.workItems,
+      selectedWorkItems: payload?.selectedWorkItems,
+      work: payload?.work ?? payload?.actions,
+      actions: payload?.actions,
+      additionalNote: payload?.additionalNote,
+    }),
+    LIMITS.workContent,
+  );
 }
 
 export const REPAIR_WORK_ITEM_CANONICAL = [
@@ -264,7 +295,7 @@ export function normalizeDraftInput(payload) {
   const userTitle = trimText(payload?.userTitle ?? payload?.title, LIMITS.title);
 
   if (contentType === 'repair') {
-    const normalized = {
+    return {
       contentType,
       userTitle,
       title: userTitle,
@@ -272,31 +303,13 @@ export function normalizeDraftInput(payload) {
       vehicle: trimText(payload?.vehicle, LIMITS.vehicle),
       location: trimText(payload?.location, LIMITS.location),
       workDate: trimText(payload?.workDate, 20),
-      workTypes: normalizeStringList(payload?.workTypes),
-      symptoms: normalizeStringList(payload?.symptoms),
-      diagnosis: normalizeStringList(payload?.diagnosis ?? payload?.confirmedCauses),
-      workContent: trimText(
-        mergeLegacyRepairWorkContent({
-          workContent: payload?.workContent,
-          workDetails: payload?.workDetails,
-          selectedWorkItems: payload?.selectedWorkItems,
-          work: payload?.work ?? payload?.actions,
-          actions: payload?.actions,
-          additionalNote: payload?.additionalNote,
-        }),
-        LIMITS.workContent,
-      ),
-      result: normalizeStringList(payload?.result ?? payload?.results),
+      workTypes: normalizeListField(payload, 'workTypes'),
+      symptoms: normalizeListField(payload, 'symptoms'),
+      diagnosis: normalizeListField(payload, 'diagnosis', ['confirmedCauses']),
+      workContent: resolveRepairWorkContent(payload),
+      result: normalizeListField(payload, 'result', ['results']),
       additionalNote: trimText(payload?.additionalNote, LIMITS.additionalNote),
     };
-
-    ['symptoms', 'diagnosis', 'result'].forEach((field) => {
-      if (typeof payload?.[field] === 'string') {
-        normalized[field] = normalizeStringList([payload[field]]);
-      }
-    });
-
-    return normalized;
   }
 
   return {
@@ -347,6 +360,161 @@ export function validateDraftInput(input) {
 
 function joinInputList(items) {
   return items.length ? items.join(', ') : '';
+}
+
+function formatWorkContentAsDetails(workContent) {
+  const text = normalizeText(workContent);
+  if (!text) return '';
+  if (/습니다[.!?]?$/.test(text)) return text;
+  return `${text.replace(/[.!?]$/, '')} 작업을 진행했습니다.`;
+}
+
+/** OpenAI content의 ```json 코드펜스 제거 */
+export function stripJsonCodeFence(text) {
+  let trimmed = String(text || '').trim();
+  if (!trimmed) return '';
+  if (trimmed.startsWith('```')) {
+    trimmed = trimmed.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
+  }
+  return trimmed;
+}
+
+/** 코드펜스 제거 후 JSON 파싱, 실패 시 객체 블록 1회 보정 시도 */
+export function parseOpenAiDraftJson(content) {
+  const stripped = stripJsonCodeFence(content);
+  if (!stripped) {
+    return { ok: false, reason: 'empty_content' };
+  }
+
+  try {
+    return { ok: true, value: JSON.parse(stripped) };
+  } catch (firstError) {
+    const objectMatch = stripped.match(/\{[\s\S]*\}/);
+    if (objectMatch) {
+      try {
+        return { ok: true, value: JSON.parse(objectMatch[0]), repaired: true };
+      } catch (secondError) {
+        return {
+          ok: false,
+          reason: 'json_parse_failed',
+          preview: stripped.slice(0, 200),
+          errorMessage: String(secondError.message || firstError.message).slice(0, 120),
+        };
+      }
+    }
+    return {
+      ok: false,
+      reason: 'json_parse_failed',
+      preview: stripped.slice(0, 200),
+      errorMessage: String(firstError.message || '').slice(0, 120),
+    };
+  }
+}
+
+/** OpenAI 응답 실패 시 사용자 입력만으로 최소 수리 초안 생성 */
+export function buildRepairFallbackDraft(input, partialDraft = {}) {
+  if (input.contentType !== 'repair') return null;
+
+  const symptoms = input.symptoms || [];
+  const workContent = normalizeText(input.workContent);
+  const results = input.result || [];
+  const diagnosisList = input.diagnosis || [];
+  const vehicle = normalizeText(input.vehicle);
+
+  if (!symptoms.length && !workContent && !results.length) return null;
+
+  const title = cleanField(partialDraft.title)
+    || (isMeaninglessTitle(input.userTitle) ? '' : input.userTitle)
+    || [vehicle, symptoms[0], '수리'].filter(Boolean).join(' ').slice(0, LIMITS.title)
+    || '수리 사례';
+
+  const customerRequest = cleanField(partialDraft.customerRequest)
+    || (symptoms.length
+      ? `${vehicle ? `${vehicle}에서 ` : ''}${symptoms.join(', ')} 증상으로 점검과 수리를 요청받았습니다.`
+      : '');
+
+  const diagnosis = cleanField(partialDraft.diagnosis ?? partialDraft.inspectionResult)
+    || (diagnosisList.length ? `${diagnosisList.join(', ')}으로 확인되었습니다.` : '');
+
+  const workDetails = cleanField(partialDraft.workDetails) || formatWorkContentAsDetails(workContent);
+
+  const result = cleanField(partialDraft.result)
+    || (results.length ? `작업 후 ${results.join(', ')} 상태를 확인했습니다.` : '');
+
+  const summary = cleanField(partialDraft.summary)
+    || [vehicle, symptoms[0], workContent.slice(0, 50)].filter(Boolean).join(' ').slice(0, LIMITS.singleField);
+
+  if (!summary || !customerRequest || !workDetails || !result) return null;
+
+  let keywords = [];
+  if (Array.isArray(partialDraft.keywords)) {
+    try {
+      keywords = normalizeKeywords(partialDraft.keywords);
+    } catch {
+      keywords = [];
+    }
+  }
+  if (!keywords.length) {
+    keywords = [vehicle, ...symptoms.slice(0, 2), ...results.slice(0, 1)]
+      .map((k) => cleanField(k))
+      .filter(Boolean)
+      .slice(0, 6);
+  }
+
+  return {
+    title,
+    summary,
+    customerRequest,
+    diagnosis,
+    workDetails,
+    result,
+    seoTitle: cleanField(partialDraft.seoTitle) || title,
+    seoDescription: cleanField(partialDraft.seoDescription) || summary.slice(0, 140),
+    keywords,
+  };
+}
+
+export function buildProductionFallbackDraft(input, partialDraft = {}) {
+  if (input.contentType !== 'production') return null;
+
+  const title = cleanField(partialDraft.title)
+    || (isMeaninglessTitle(input.userTitle) ? '' : input.userTitle)
+    || '제작 사례';
+  const customerRequest = cleanField(partialDraft.customerRequest) || normalizeText(input.customerRequest);
+  const productionDetails = cleanField(partialDraft.productionDetails ?? partialDraft.workDetails)
+    || normalizeText(input.customWork);
+  const summary = cleanField(partialDraft.summary)
+    || [title, customerRequest.slice(0, 40)].filter(Boolean).join(' ').slice(0, LIMITS.singleField);
+
+  if (!summary || !customerRequest) return null;
+
+  let keywords = [];
+  if (Array.isArray(partialDraft.keywords)) {
+    try {
+      keywords = normalizeKeywords(partialDraft.keywords);
+    } catch {
+      keywords = [];
+    }
+  }
+
+  return {
+    title,
+    summary,
+    customerRequest,
+    productionDetails,
+    specifications: cleanField(partialDraft.specifications),
+    features: cleanField(partialDraft.features),
+    result: cleanField(partialDraft.result) || normalizeText(input.result),
+    seoTitle: cleanField(partialDraft.seoTitle) || title,
+    seoDescription: cleanField(partialDraft.seoDescription) || summary.slice(0, 140),
+    keywords,
+  };
+}
+
+function tryInputFallbackDraft(input, partialDraft) {
+  return input.contentType === 'repair'
+    ? buildRepairFallbackDraft(input, partialDraft)
+    : buildProductionFallbackDraft(input, partialDraft);
 }
 
 export function buildOpenAiUserInput(input) {
@@ -566,6 +734,8 @@ export function sanitizeRepairDraft(draft, input) {
   const keywords = normalizeKeywords(draft.keywords);
 
   if (!summary || !customerRequest || !workDetails || !result) {
+    const fallback = buildRepairFallbackDraft(input, draft);
+    if (fallback) return fallback;
     const err = new Error('Repair draft missing required fields');
     err.code = 'OPENAI_PARSE_ERROR';
     throw err;
@@ -595,6 +765,8 @@ export function sanitizeProductionDraft(draft, input) {
   const keywords = normalizeKeywords(draft.keywords);
 
   if (!summary || !customerRequest) {
+    const fallback = buildProductionFallbackDraft(input, draft);
+    if (fallback) return fallback;
     const err = new Error('Production draft missing required fields');
     err.code = 'OPENAI_PARSE_ERROR';
     throw err;
@@ -843,9 +1015,8 @@ async function executeOpenAiFetch(env, input, fetchImpl, options, timeoutMs) {
   }
 
   let draftJson;
-  try {
-    draftJson = JSON.parse(content);
-  } catch {
+  const parsedContent = parseOpenAiDraftJson(content);
+  if (!parsedContent.ok) {
     return {
       ok: false,
       code: 'OPENAI_PARSE_ERROR',
@@ -856,8 +1027,12 @@ async function executeOpenAiFetch(env, input, fetchImpl, options, timeoutMs) {
       model,
       stage: 'openai_content_json_parse',
       fetchElapsedMs,
+      parseReason: parsedContent.reason,
+      contentPreview: parsedContent.preview || '',
+      parseErrorMessage: parsedContent.errorMessage || '',
     };
   }
+  draftJson = parsedContent.value;
 
   return {
     ok: true,
@@ -966,6 +1141,30 @@ export async function callOpenAiDraft(env, input, fetchImpl = fetch) {
       budgetRemainingMs,
     });
     if (!response.ok) {
+      const fallbackDraft = (
+        response.stage === 'openai_content_json_parse'
+        || response.stage === 'openai_empty_output'
+      ) ? tryInputFallbackDraft(input) : null;
+
+      if (fallbackDraft) {
+        console.warn('openai-draft using input fallback', {
+          stage: response.stage,
+          contentType: input.contentType,
+          parseReason: response.parseReason || '',
+        });
+        return {
+          ok: true,
+          draft: fallbackDraft,
+          model: response.model || resolveOpenAiModel(env),
+          openAiStatus: response.openAiStatus,
+          openAiRequestId: response.openAiRequestId,
+          attempt,
+          openAiElapsedMs: response.openAiElapsedMs,
+          elapsedMs: Date.now() - functionStartedAt,
+          usedFallback: true,
+        };
+      }
+
       logOpenAiDraftFailure({
         stage: response.stage,
         model: response.model,
@@ -1035,6 +1234,25 @@ export async function callOpenAiDraft(env, input, fetchImpl = fetch) {
         elapsedMs: Date.now() - functionStartedAt,
       };
     } catch (err) {
+      const fallbackDraft = tryInputFallbackDraft(input, response.draftJson);
+      if (fallbackDraft) {
+        console.warn('openai-draft sanitize fallback', {
+          contentType: input.contentType,
+          errorCode: err.code || '',
+        });
+        return {
+          ok: true,
+          draft: fallbackDraft,
+          model: response.model,
+          openAiStatus: response.openAiStatus,
+          openAiRequestId: response.openAiRequestId,
+          attempt,
+          openAiElapsedMs: response.openAiElapsedMs,
+          elapsedMs: Date.now() - functionStartedAt,
+          usedFallback: true,
+        };
+      }
+
       lastQualityReason = err.code || err.message;
       const canSanitizeRetry = attempt < MAX_RETRIES
         && (err.code === 'OPENAI_SCHEMA_ERROR' || err.code === 'OPENAI_PARSE_ERROR')
