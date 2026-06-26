@@ -3103,6 +3103,21 @@ header nav a.active {
     color: #fecaca;
 }
 
+.hp-field {
+    position: absolute;
+    left: -10000px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.global-inquiry-form .contact-submit:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+}
+
 .contact-file-field {
     position: relative;
     display: flex;
