@@ -1,4 +1,12 @@
-import { mergeLegacyRepairWorkContent, normalizeText } from './case-content.js';
+import { normalizeText } from './case-content.js';
+import {
+  buildRepairOpenAiUserInput,
+  formatRepairResultFallback,
+  isWeakRepairWorkContent,
+  normalizeRepairDraftInput,
+  normalizeStringList,
+  validateRepairDraftInput,
+} from './repair-draft-canonical.js';
 
 const DEFAULT_MODEL = 'gpt-4.1-mini';
 const OPENAI_ENDPOINT = 'https://api.openai.com/v1/chat/completions';
@@ -188,24 +196,6 @@ function emptyAsBlank(value) {
   return EMPTY_MARKERS.has(text) ? '' : text;
 }
 
-function normalizeStringList(value, maxItems = LIMITS.listCount, maxItemLen = LIMITS.listItem) {
-  if (!Array.isArray(value)) {
-    if (typeof value === 'string') {
-      const text = emptyAsBlank(value);
-      if (!text) return [];
-      return text.split(/[,，\n]/)
-        .map((item) => trimText(emptyAsBlank(item), maxItemLen))
-        .filter(Boolean)
-        .slice(0, maxItems);
-    }
-    return [];
-  }
-  return value
-    .map((item) => trimText(emptyAsBlank(item), maxItemLen))
-    .filter(Boolean)
-    .slice(0, maxItems);
-}
-
 function normalizeListField(payload, field, aliases = []) {
   for (const key of [field, ...aliases]) {
     const raw = payload?.[key];
@@ -214,23 +204,6 @@ function normalizeListField(payload, field, aliases = []) {
     }
   }
   return [];
-}
-
-function resolveRepairWorkContent(payload) {
-  return trimText(
-    mergeLegacyRepairWorkContent({
-      workContent: payload?.workContent,
-      repairContent: payload?.repairContent,
-      repairDetails: payload?.repairDetails,
-      workDetails: payload?.workDetails,
-      workItems: payload?.workItems,
-      selectedWorkItems: payload?.selectedWorkItems,
-      work: payload?.work ?? payload?.actions,
-      actions: payload?.actions,
-      additionalNote: payload?.additionalNote,
-    }),
-    LIMITS.workContent,
-  );
 }
 
 export const REPAIR_WORK_ITEM_CANONICAL = [
@@ -295,21 +268,7 @@ export function normalizeDraftInput(payload) {
   const userTitle = trimText(payload?.userTitle ?? payload?.title, LIMITS.title);
 
   if (contentType === 'repair') {
-    return {
-      contentType,
-      userTitle,
-      title: userTitle,
-      category: trimText(payload?.category, LIMITS.category),
-      vehicle: trimText(payload?.vehicle, LIMITS.vehicle),
-      location: trimText(payload?.location, LIMITS.location),
-      workDate: trimText(payload?.workDate, 20),
-      workTypes: normalizeListField(payload, 'workTypes'),
-      symptoms: normalizeListField(payload, 'symptoms'),
-      diagnosis: normalizeListField(payload, 'diagnosis', ['confirmedCauses']),
-      workContent: resolveRepairWorkContent(payload),
-      result: normalizeListField(payload, 'result', ['results']),
-      additionalNote: trimText(payload?.additionalNote, LIMITS.additionalNote),
-    };
+    return normalizeRepairDraftInput(payload);
   }
 
   return {
@@ -329,32 +288,10 @@ export function normalizeDraftInput(payload) {
   };
 }
 
-function isWeakRepairWorkContent(text) {
-  const trimmed = (text || '').trim();
-  if (!trimmed) return false;
-  if (/^\d{1,8}$/.test(trimmed)) return true;
-  return false;
-}
-
 export function validateDraftInput(input) {
   if (input.contentType === 'repair') {
-    const workContent = (input.workContent || '').trim();
-    if (!input.userTitle && !input.symptoms.length && !workContent
-      && !input.diagnosis.length && !input.result.length) {
-      return { ok: false, code: 'VALIDATION_ERROR', message: '초안 생성에 필요한 입력 정보가 없습니다.' };
-    }
-    if (input.symptoms.length && !workContent) {
-      return { ok: false, code: 'VALIDATION_ERROR', message: '작업 내용을 입력해 주세요.' };
-    }
-    if (workContent && workContent.length < 4) {
-      return { ok: false, code: 'VALIDATION_ERROR', message: '작업 내용을 조금 더 자세히 입력해 주세요.' };
-    }
-    if (workContent && isWeakRepairWorkContent(workContent)) {
-      return { ok: false, code: 'VALIDATION_ERROR', message: '작업 내용을 조금 더 자세히 입력해 주세요.' };
-    }
-    if (workContent.length > LIMITS.workContent) {
-      return { ok: false, code: 'VALIDATION_ERROR', message: `작업 내용은 ${LIMITS.workContent}자 이하로 입력해 주세요.` };
-    }
+    const validation = validateRepairDraftInput(input);
+    if (!validation.ok) return validation;
   } else if (!input.userTitle && !input.customerRequest && !input.customWork
     && !input.purpose && !input.result && !input.additionalNote
     && Object.keys(input.specifications || {}).length === 0) {
@@ -454,11 +391,7 @@ export function buildRepairFallbackDraft(input, partialDraft = {}) {
   const workDetails = cleanField(partialDraft.workDetails) || formatWorkContentAsDetails(workContent);
 
   const resultText = cleanField(partialDraft.result)
-    || (results.length
-      ? `작업 후 ${results.join(', ')} 상태를 확인했습니다.`
-      : (workContent
-        ? '입력하신 작업 내용을 반영해 수리 작업을 진행했습니다.'
-        : '접수된 증상을 확인하고 수리 작업을 진행했습니다.'));
+    || formatRepairResultFallback(results);
 
   const summary = cleanField(partialDraft.summary)
     || [
@@ -559,20 +492,7 @@ export function buildProductionFallbackDraft(input, partialDraft = {}) {
 
 export function buildOpenAiUserInput(input) {
   if (input.contentType === 'repair') {
-    return {
-      contentType: input.contentType,
-      category: emptyAsBlank(input.category),
-      userTitle: emptyAsBlank(input.userTitle),
-      vehicle: emptyAsBlank(input.vehicle),
-      location: emptyAsBlank(input.location),
-      workDate: emptyAsBlank(input.workDate),
-      workTypes: joinInputList(input.workTypes),
-      symptoms: joinInputList(input.symptoms),
-      diagnosis: joinInputList(input.diagnosis),
-      workContent: emptyAsBlank(input.workContent),
-      result: joinInputList(input.result),
-      additionalNote: emptyAsBlank(input.additionalNote),
-    };
+    return buildRepairOpenAiUserInput(input);
   }
 
   const specs = input.specifications || {};
@@ -1409,3 +1329,12 @@ export const openAiDraftInternals = {
   REPAIR_JSON_SCHEMA,
   PRODUCTION_JSON_SCHEMA,
 };
+
+export {
+  buildRepairOpenAiUserInput,
+  formatRepairResultFallback,
+  isWeakRepairWorkContent,
+  normalizeRepairDraftInput,
+  normalizeStringList,
+  validateRepairDraftInput,
+} from './repair-draft-canonical.js';

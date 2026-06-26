@@ -6,6 +6,7 @@ import {
   tryInputFallbackDraft,
   validateDraftInput,
 } from '../lib/openai-draft.js';
+import { buildRepairLogMeta } from '../lib/repair-draft-canonical.js';
 import { createRequestId, errorResponse, handleOptions, readJsonBody, successResponse } from '../lib/http.js';
 import { requireUploadAuth } from '../lib/session.js';
 
@@ -74,11 +75,15 @@ export async function onRequestPost(context) {
 
     logStage(requestId, 'openai_call_start', {
       model: resolveOpenAiModel(env),
-      contentType: input.contentType,
-      symptomCount: input.symptoms.length,
-      diagnosisCount: input.diagnosis.length,
-      workContentLength: (input.workContent || '').length,
-      resultCount: input.result.length,
+      ...(input.contentType === 'repair'
+        ? buildRepairLogMeta(input)
+        : {
+          contentType: input.contentType,
+          symptomCount: 0,
+          diagnosisCount: 0,
+          workContentLength: 0,
+          resultCount: 0,
+        }),
       payloadFieldCount: Object.keys(payload).length,
     });
 

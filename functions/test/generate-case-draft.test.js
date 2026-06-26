@@ -392,12 +392,14 @@ test('isMeaninglessTitle detects numeric title', () => {
   assert.equal(isMeaninglessTitle('산업용 전동차 전진 불량'), false);
 });
 
-test('buildOpenAiUserInput uses empty location and workTypes', () => {
+test('buildOpenAiUserInput uses canonical repair fields', () => {
   const input = normalizeDraftInput(repairInput1);
   const json = buildOpenAiUserInput(input);
+  assert.equal(json.contentType, 'repair');
   assert.equal(json.location, '');
-  assert.equal(json.workTypes, '');
   assert.equal(json.userTitle, '456');
+  assert.equal(json.workContent, '배선 보수');
+  assert.equal(json.symptoms, '전진 불량');
 });
 
 test('validateDraftQuality rejects numeric title', () => {
